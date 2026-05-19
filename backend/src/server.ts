@@ -2,16 +2,14 @@ import Fastify from 'fastify';
 
 const app = Fastify({ logger: true });
 
-app.get('/health', async () => 
-{
-	return { ok: true };
-});
+app.get('/health', async () => {return { ok: true };});
 
 const start = async () => {
 	try 
 	{
 		await app.listen({ port: 3000, host: '0.0.0.0' });
-	} catch (err) 
+	}
+	catch (err) 
 	{
 		app.log.error(err);
 		process.exit(1);
