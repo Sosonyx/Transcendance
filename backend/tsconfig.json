@@ -27,6 +27,9 @@
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force", // evite ambiguites CommonJS/ES
     "skipLibCheck": true, // ne verifie pas le typage dans les librairies externes (accelere compilation)
+    "moduleResolution": "nodenext",
     "esModuleInterop": true, // tu peux ecrire "import x from" au lieu de "import * as x from"
   }
+  ,
+  "include": ["src/**/*"]
 }

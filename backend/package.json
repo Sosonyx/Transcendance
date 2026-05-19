@@ -1,23 +1,29 @@
 {
-	"name": "backend",
-	"version": "1.0.0",
-	"description": "",
-	"main": "index.js",
-	"scripts": {
-		"dev": "tsx watch src/server.ts",
-		"build": "tsc",
-		"start": "node dist/server.js"
-	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC",
-	"devDependencies": {
-		"@types/node": "^25.7.0",
-		"prisma": "^7.8.0",
-		"tsx": "^4.21.0",
-		"typescript": "^6.0.3"
-	},
-	"dependencies": {
-		"fastify": "^5.8.5"
-	}
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node build/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^25.7.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "@fastify/cookie": "^11.0.2",
+    "@fastify/cors": "^11.2.0",
+    "@fastify/helmet": "^13.0.2",
+    "@fastify/jwt": "^10.1.0",
+    "@prisma/client": "^6.19.3",
+    "fastify": "^5.8.5",
+    "prisma": "^6.19.3"
+  }
 }
