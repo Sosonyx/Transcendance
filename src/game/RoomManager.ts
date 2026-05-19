@@ -32,7 +32,6 @@ export	class RoomManager implements RoomManagerInterface
 		return room
 	}
 
-	// TODO : return NULL
 	public connectPlayer(playerId : string , isTTY : boolean = false) : [string, EventEmitter] {
 		let player : Player | undefined;
 		let room : Room | undefined;

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Test</title>
+    <link rel="stylesheet" href="/style.css">
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+    <ul id="messages"></ul>
+    <form id="form" style="display:none">
+    <input id="input" type="text" placeholder="Message..." autocomplete="off" /><button>Envoyer</button>
+    </form>
+    <button id="ready-btn">Prêt</button>
+    <script>
+        const socket = io('http://localhost:3000')
+        const form = document.getElementById("form");
+        const input = document.getElementById("input");
+        const readyBtn = document.getElementById("ready-btn");
+
+        readyBtn.addEventListener('click', () => {
+            socket.emit('ready');
+            readyBtn.disabled = true;
+            readyBtn.textContent = 'En attente des autres...';
+        });
+
+        socket.on('startAction', () => {
+            readyBtn.style.display = 'none';
+            form.style.display = '';  // on affiche le chat
+        });
+
+        // Envoyer un message
+        form.addEventListener('submit', (e) =>{
+            e.preventDefault();
+            if (input.value){
+                socket.emit('message', input.value);
+                input.value = '';
+            }
+        });
+
+        // Recevoir un message
+        socket.on('message', (message) => {
+            const li = document.createElement('li');
+            li.textContent = `${message.senderId} : ${message.content}`;
+            document.getElementById('messages').appendChild(li);
+        });
+
+        // Le vote se lance
+        socket.on('startVote', (players) => {
+            form.innerHTML = '';
+            form.classList.add('voting');
+            // Pour chaque joueur on crée un bouton
+            players.forEach((player) => {
+                const button = document.createElement('button');
+                button.textContent = player;
+                button.classList.add('vote-btn');
+
+                button.addEventListener('click', () => {
+                    socket.emit('vote', player);
+                    
+                    // On désactive tous les boutons après le vote
+                    document.querySelectorAll('.vote-btn').forEach(btn => {
+                        btn.disabled = true;
+                    });
+                });
+                
+                form.appendChild(button);
+            });
+
+            // 4. On insère dans le DOM
+            document.getElementById('messages').appendChild(voteContainer)
+        });
+
+    </script>
+</body>
+</html>

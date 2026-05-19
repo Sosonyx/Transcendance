@@ -1,4 +1,4 @@
-import {v4 as uuid} from 'uuid';
+// import {v4 as uuid} from 'uuid';
 
 export class Player
 {
@@ -31,10 +31,10 @@ export class Player
 		this._shouldVote = status;
 	}
 
-	public constructor(name : string) {
+	public constructor(id : string) {
 		console.log("Constructor called for class Player");
-		this._id = uuid();
-		this._name = name;
+		this._id = id;
+		this._name = 'no-name';
 		this._isReady = false;
 		this._shouldVote = false;
 	}

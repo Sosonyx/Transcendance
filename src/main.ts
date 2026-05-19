@@ -1,6 +1,6 @@
 // import { Player } from './Player.js';
-import { RoomManager } from './RoomManager.js';
-import { CLI } from './CommandLine.js';
+import { RoomManager } from './game/RoomManager.js';
+import { CLI } from './game/CommandLine.js';
 
 const roomManager = new RoomManager();
 if (true)
