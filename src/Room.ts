@@ -1,0 +1,181 @@
+import { Player } from "./Player.js";
+import {v4 as uuid} from 'uuid';
+import { EventEmitter } from "node:events";
+
+const voteTime : number = 30000;
+const actionTime : number = 30000;
+const maxPlayerCount : number = 3;
+
+export enum roomStates {
+	INIT = "INIT",
+	LOBBY = "LOBBY",
+	ACTION = "ACTION",
+	VOTE = "VOTE",
+	RESULT = "RESULT",
+	ERROR = "ERROR"
+}
+
+export class Room extends EventEmitter
+{
+	private	_id : string;
+	private _number : number;
+	private _state : roomStates;
+	private	_players : Player[];
+	private _playerCount : number;
+	private _maxPlayerCount : number;
+	private _isAccessible : boolean;
+	private _timerId : NodeJS.Timeout | undefined;
+
+	// SETGET
+
+	public getId() : string {
+		return this._id;
+	}
+
+	public getNumber() : number {
+		return this._number;
+	}
+
+	public getPlayers() : Player[] {
+		return this._players;
+	}
+
+	public getPlayerCount() : number {
+		return this._playerCount;
+	}
+
+	public getMaxPlayerCount() : number {
+		return this._maxPlayerCount;
+	}
+
+	public getState() : string {
+		return this._state;
+	}
+
+	public getIsAccessible() : boolean {
+		return this._isAccessible;
+	}
+
+	private _setPlayersAsVoters() {
+		this._players.forEach((player : Player) => player.setShouldVote(true));
+	}
+
+	// STATE LOGIC
+
+	public stateSwitch(newState : roomStates) : void {
+		if (!(newState in roomStates))
+			newState = roomStates.ERROR;
+		clearTimeout(this._timerId);
+
+		if (newState === roomStates.ACTION)
+			this._timerId = setTimeout(() => { this.stateSwitch(roomStates.VOTE) }, actionTime);
+		else if (newState === roomStates.VOTE)
+		{
+			this._setPlayersAsVoters();
+			this._timerId = setTimeout(() => { this.stateSwitch(roomStates.RESULT) }, voteTime);
+		}
+		
+		console.log(`\x1b[33m-> Room ${this._number} : switching from ${this._state} to ${newState}\x1b[0m`)
+		this._state = newState;
+		this.emit('stateChanged', this._id, this._state)
+	}
+
+	public start() {
+		this.stateSwitch(roomStates.LOBBY);
+	}
+
+	// EVENTS
+
+	public onJoin(player : Player) {
+		if (this._state != roomStates.LOBBY)
+		{
+			this.stateSwitch(roomStates.ERROR);
+			return ;
+		}
+		this._players.push(player);
+		this._playerCount++;
+		if (this._playerCount === this._maxPlayerCount)
+			this._isAccessible = false;
+	}
+
+	public onReady(player : Player) {
+		if (this._state != roomStates.LOBBY)
+		{
+			this.stateSwitch(roomStates.ERROR);
+			return ;
+		}
+		player.switchReady();
+		if (this._isLobbyReady())
+		{
+			this.stateSwitch(roomStates.ACTION);
+			this._isAccessible = false;
+		}
+	}
+
+	public onChat(player : Player, message : string) {
+		if (this._state != roomStates.ACTION)
+		{
+			this.stateSwitch(roomStates.ERROR);
+			return ;
+		}
+		// TODO : define logic
+		console.log(`Player ${player.getName()} (room ${this._number}) : ${message}`);
+	}
+
+	public onVote(playerFrom : Player, playerTo : Player) {
+		if (this._state != roomStates.VOTE)
+		{
+			this.stateSwitch(roomStates.ERROR);
+			return ;
+		}
+		if (!playerFrom.shouldVote())
+		{
+			// console.log(`Player ${playerFrom.getName} has already voted.`);
+			return ;
+		}
+		playerFrom.setShouldVote(false);
+		console.log(`Room ${this._number} : Player ${playerFrom.getName()} is voting against player ${playerTo.getName()}`);
+		if (this._haveAllPlayersVoted())
+			this.stateSwitch(roomStates.RESULT)
+	}
+
+	// ACCESS AND UTILS
+
+	public accessPlayerByName(name : string) : Player | undefined {
+		return this._players.find(player => player.getName() == name);
+	}
+
+	public accessPlayerById(id : string) : Player | undefined {
+		return this._players.find(player => player.getId() == id);
+	}
+
+	private _isLobbyReady() : boolean {
+		return (this._playerCount > 1 && this._areAllPlayersReady())
+	}
+
+	private _areAllPlayersReady() {
+		if (this._players.find(player => player.isReady() === false))
+			return (false);
+		return (true);
+	}
+
+	private _haveAllPlayersVoted() : boolean {
+		if (this._players.find(player  => player.shouldVote() === true))
+			return (false);
+		return (true);
+	}
+
+	// CONSTRUCTOR
+
+	public constructor(nb : number) {
+		super();
+		console.log("Constructor called for class Room");
+		this._id = uuid();
+		this._number = nb;
+		this._state = roomStates.INIT;
+		this._players = [];
+		this._playerCount = 0;
+		this._maxPlayerCount = maxPlayerCount;
+		this._isAccessible = true;
+	}
+}
