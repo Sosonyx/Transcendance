@@ -3,6 +3,8 @@ import {authRoutes} from "./routes/authRoutes.js"
 import fastifyCookie from '@fastify/cookie';
 import fastifyJwt from '@fastify/jwt';
 
+import {healthRoutes} from './routes/healthRoutes.js';
+
 export const app = Fastify({ logger: true });
 
 await app.register(authRoutes);
@@ -11,6 +13,7 @@ await app.register(fastifyCookie, {secret: 'COOKIESECRET'});
 
 await app.register(fastifyJwt, {secret: 'JWTSECRET'});
 
+await app.register(healthRoutes);
 
 const start = async () => {
 	try 

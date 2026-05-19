@@ -27,6 +27,7 @@ export async function loginController(req : FastifyRequest, reply : FastifyReply
 	console.log("LOGIN OK :", user);
   var token: string = req.server.jwt.sign({username: user.username}, { expiresIn: '1h' });
   reply.setCookie('token', token);
+  console.log(reply)
   return reply.send(user);
 }
 

@@ -22,8 +22,6 @@ export async function registerUser(newUser: userInterface) : Promise<Partial<use
 {
   const hash = await bcrypt.hash(newUser.password, 10);
   const user = await prisma.user.create({ data :{ email: newUser.email, username: newUser.username, hashedPassword: hash, avatar : newUser.avatar ? newUser.avatar : null}})
-  var token: string = app.jwt.sign({username: newUser.username}, { expiresIn: '1h' });
-  console.log(token);
 
   return (user);
 }
