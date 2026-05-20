@@ -1,0 +1,5 @@
+node_modules/
+npc_lab/
+.env
+test
+llm_test
