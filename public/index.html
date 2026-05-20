@@ -111,9 +111,11 @@
         replayBtn.addEventListener('click',   () => {
             socket.emit('replay');
             replayBtn.disabled = true;
+            newGameBtn.disabled = true;
         });
         newGameBtn.addEventListener('click',  () => {
             socket.emit('newGame');
+            replayBtn.disabled = true;
             newGameBtn.disabled = true;
         });
 
