@@ -77,7 +77,7 @@ export class Room extends EventEmitter
 		
 		console.log(`\x1b[33m-> Room ${this._number} : switching from ${this._state} to ${newState}\x1b[0m`)
 		this._state = newState;
-		this.emit('stateChanged', this._id, this._state)
+		this.emit('stateChanged', this._state)
 	}
 
 	public start() {
@@ -93,9 +93,7 @@ export class Room extends EventEmitter
 			return ;
 		}
 		this._players.push(player);
-		this._playerCount++;
-		if (this._playerCount === this._maxPlayerCount)
-			this._isAccessible = false;
+		this._checkLobbyStatus();
 	}
 
 	public onReady(player : Player) {
@@ -105,11 +103,7 @@ export class Room extends EventEmitter
 			return ;
 		}
 		player.switchReady();
-		if (this._isLobbyReady())
-		{
-			this.stateSwitch(roomStates.ACTION);
-			this._isAccessible = false;
-		}
+		this._checkLobbyStatus();
 	}
 
 	public onChat(player : Player, message : string) {
@@ -139,7 +133,49 @@ export class Room extends EventEmitter
 			this.stateSwitch(roomStates.RESULT)
 	}
 
+	public onReplay(player : Player)
+	{
+		if (this._state != roomStates.RESULT)
+		{
+			this.stateSwitch(roomStates.ERROR);
+			return ;
+		}
+		player.setWantReplay(true);
+		if (this._doAllPlayersWannaReplay())
+		{
+			// TODO 
+			// this.resetRoom();
+			this.stateSwitch(roomStates.LOBBY);
+		}
+	}
+
+	public onDisconnect(player : Player) {
+		if (this._state != roomStates.LOBBY && this._state != roomStates.RESULT)
+		{
+			this.stateSwitch(roomStates.ERROR);
+			return ;
+		}
+		let index : number = this._players.findIndex((elem) => elem.getId() === player.getId());
+		this._players.splice(index, 1);
+		this._checkLobbyStatus();
+	}
+
 	// ACCESS AND UTILS
+
+	private _checkLobbyStatus() {
+		if (this._state != roomStates.LOBBY)
+		{
+			this.stateSwitch(roomStates.ERROR);
+				return ;
+		}
+		this._playerCount = this._players.length;
+		this._isAccessible = (this._playerCount !== this._maxPlayerCount);
+		if (this._isLobbyReady())
+		{
+			this._isAccessible = false;
+			this.stateSwitch(roomStates.ACTION);
+		}
+	}
 
 	public accessPlayerByName(name : string) : Player | undefined {
 		return this._players.find(player => player.getName() == name);
@@ -161,6 +197,12 @@ export class Room extends EventEmitter
 
 	private _haveAllPlayersVoted() : boolean {
 		if (this._players.find(player  => player.shouldVote() === true))
+			return (false);
+		return (true);
+	}
+
+	private _doAllPlayersWannaReplay() : boolean {
+		if (this._players.find(player  => player.getWantReplay() === false))
 			return (false);
 		return (true);
 	}

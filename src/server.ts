@@ -4,12 +4,14 @@ import fastifyStatic from '@fastify/static';
 import { join } from 'path';
 import { registerSocketHandlers } from './socket/index.js';
 
-
 const fastify = Fastify();
 
 fastify.register(fastifyStatic, {
     root: join(process.cwd(), 'public')
 });
+// await fastify.ready();
+console.log('Fastify is now ready ;)');
+
 
 const io = new Server(fastify.server, {
     connectionStateRecovery: {}

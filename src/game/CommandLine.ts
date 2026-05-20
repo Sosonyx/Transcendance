@@ -24,11 +24,17 @@ export class CLI
 				else
 					console.log("join ['room'/'player'] [id]");
 				break;
-			case 'join':
+			case 'connect':
 				if (arg1 && !arg2 && !arg3)
 					this.roomManager.connectPlayer(arg1, true);
 				else
-					console.log('join [player name]');
+					console.log('connect [player name]');
+				break;
+			case 'disconnect':
+				if (arg1 && arg2 && !arg3)
+					this.roomManager.onDisconnectEvent(arg1, arg2, true);
+				else
+					console.log('disconnect [player name] [room id]');
 				break;
 			case 'ready':
 				if (arg1 && arg2 && !arg3)
@@ -48,6 +54,9 @@ export class CLI
 				else
 					console.log('vote [player name] [player name] [room id]');
 				break;
+			case 'replay':
+				if (arg1 && arg2 && !arg3)
+					this.roomManager.onReplayEvent(arg1, arg2, true)
 			default:
 				console.log('Invalid command.');
 		}

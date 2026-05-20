@@ -1,11 +1,12 @@
-// import {v4 as uuid} from 'uuid';
+import EventEmitter from "node:events";
 
-export class Player
+export class Player extends EventEmitter
 {
 	private	_id : string;
 	private _name : string;
 	private _isReady : boolean;
 	private _shouldVote : boolean;
+	private _wantReplay : boolean;
 
 	public getId() : string {
 		return this._id;
@@ -23,6 +24,10 @@ export class Player
 		return this._shouldVote;
 	}
 
+	public getWantReplay() : boolean {
+		return this._wantReplay;
+	}
+
 	public switchReady() {
 		this._isReady = !this._isReady;
 	}
@@ -31,11 +36,17 @@ export class Player
 		this._shouldVote = status;
 	}
 
+	public setWantReplay(status : boolean) {
+		this._wantReplay = status;
+	}
+
 	public constructor(id : string) {
+		super();
 		console.log("Constructor called for class Player");
 		this._id = id;
 		this._name = 'no-name';
 		this._isReady = false;
 		this._shouldVote = false;
+		this._wantReplay = false;
 	}
 }

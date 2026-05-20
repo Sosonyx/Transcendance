@@ -1,22 +1,7 @@
 import { Room } from "./Room.js";
 import { Player } from "./Player.js";
 import { EventEmitter } from "node:events";
-
-// emit('stateChanged', roomId : string, newState : roomState)
-
-// When a new room is created, I need to give to Jesus side the room as an eventEmitter.
-//
-// 2 possibilities :
-//	-> connectClient function, directly called by Jesus, returns [roomId, EventEmitter | null]
-//	-> 
-
-interface RoomManagerInterface {
-	connectPlayer(playerId : string, isTTY? : boolean) : [string, EventEmitter]; // return RoomId + room as Emitter if new room
-	onReadyEvent(playerId : string, roomId : string, isTTY? : boolean) : void;
-	onChatEvent(playerId : string, roomId : string, message : string, isTTY? : boolean) : void;
-	onVoteEvent(playerIdFrom : string, playerIdTo : string, roomId : string, isTTY? : boolean) : void;
-	getPlayersIdFromRoomId(roomId : string) : readonly string[]; // return playersId
-}
+import { type RoomManagerInterface, type RoomId } from "../types/index.js";
 
 export	class RoomManager implements RoomManagerInterface
 {
@@ -32,7 +17,7 @@ export	class RoomManager implements RoomManagerInterface
 		return room
 	}
 
-	public connectPlayer(playerId : string , isTTY : boolean = false) : [string, EventEmitter] {
+	public connectPlayer(playerId : string , isTTY : boolean = false) : [roomId : RoomId, room : EventEmitter, player : EventEmitter] {
 		let player : Player | undefined;
 		let room : Room | undefined;
 
@@ -40,7 +25,8 @@ export	class RoomManager implements RoomManagerInterface
 		if (isTTY)
 		{
 			room = this._rooms.find(room => room.accessPlayerByName(playerId));
-			player = room?.accessPlayerByName(playerId);
+			// player = room?.accessPlayerByName(playerId);
+			player = room?.accessPlayerById(playerId);
 			if (room)
 				console.log(`Found existing room ${room.getNumber()}`);
 		}
@@ -55,18 +41,22 @@ export	class RoomManager implements RoomManagerInterface
 			player = new Player(playerId);
 		}
 		room.onJoin(player as Player);
-		// if (isTTY)
-		// 	console.log(room);
-		return ([room.getId(), room as EventEmitter]);
+		return ([room.getId(), room as EventEmitter, player as EventEmitter]);
 	}
 
-	public onReadyEvent(playerId : string, roomId : string, isTTY : boolean = false) {
+	public onReadyEvent(playerId : string, roomId : RoomId, isTTY : boolean = false)
+	{
+		if (roomId === null)
+			return ;
+
 		let room : Room | undefined;
 		let player : Player | undefined;
+		
 		if (isTTY)
 		{
 			room = this._accessRoomByNumber(parseInt(roomId));
-			player = room?.accessPlayerByName(playerId);
+			// player = room?.accessPlayerByName(playerId);
+			player = room?.accessPlayerById(playerId);
 		}
 		else
 		{
@@ -84,17 +74,21 @@ export	class RoomManager implements RoomManagerInterface
 			return ;
 		}
 		room.onReady(player);
-		// if (isTTY)
-		// console.log(room);
 	}
 
-	public onChatEvent(playerId : string, roomId : string, message : string, isTTY : boolean = false) {
+	public onChatEvent(playerId : string, roomId : RoomId, message : string, isTTY : boolean = false)
+	{
+		if (roomId === null)
+			return ;
+
 		let room : Room | undefined;
 		let player : Player | undefined;
+
 		if (isTTY)
 		{
 			room = this._accessRoomByNumber(parseInt(roomId));
-			player = room?.accessPlayerByName(playerId);
+			// player = room?.accessPlayerByName(playerId);
+			player = room?.accessPlayerById(playerId);
 		}
 		else
 		{
@@ -115,10 +109,15 @@ export	class RoomManager implements RoomManagerInterface
 		room.onChat(player, message);
 	}
 
-	public onVoteEvent(playerIdFrom : string, playerIdTo : string, roomId : string, isTTY : boolean = false) {
+	public onVoteEvent(playerIdFrom : string, playerIdTo : string, roomId : RoomId, isTTY : boolean = false)
+	{
+		if (roomId === null)
+			return ;
+
 		let room : Room | undefined;
 		let playerFrom : Player | undefined;
 		let playerTo : Player | undefined;
+
 		if (isTTY)
 		{
 			room = this._accessRoomByNumber(parseInt(roomId));
@@ -148,6 +147,71 @@ export	class RoomManager implements RoomManagerInterface
 		}
 		room.onVote(playerFrom, playerTo);
 	}
+
+	public onDisconnectEvent( playerId : string, roomId : RoomId, isTTY : boolean = false) : void
+	{
+		if (roomId === null)
+			return ;
+
+		let room : Room | undefined;
+		let player : Player | undefined;
+
+		if (isTTY)
+		{
+			room = this._accessRoomByNumber(parseInt(roomId));
+			// player = room?.accessPlayerByName(playerId);
+			player = room?.accessPlayerById(playerId);
+		}
+		else
+		{
+			room = this._accessRoomById(roomId);
+			player = room?.accessPlayerById(playerId);
+		}
+		if (room === undefined)
+		{
+			console.error(`\n\x1b[41mNo room found with ID ${roomId}\x1b[0m\n`);
+			return ;
+		}
+		if (player === undefined)
+		{
+			console.error(`\n\x1b[41mNo player with ID ${playerId} in room ${roomId}\x1b[0m\n`);
+			return ;
+		}
+		room.onDisconnect(player);
+	}
+
+	public onReplayEvent(playerId : string, roomId : RoomId, isTTY : boolean = false) : void
+	{
+		if (roomId === null)
+			return ;
+
+		let room : Room | undefined;
+		let player : Player | undefined;
+
+		if (isTTY)
+		{
+			room = this._accessRoomByNumber(parseInt(roomId));
+			// player = room?.accessPlayerByName(playerId);
+			player = room?.accessPlayerById(playerId);
+		}
+		else
+		{
+			room = this._accessRoomById(roomId);
+			player = room?.accessPlayerById(playerId);
+		}
+		if (room === undefined)
+		{
+			console.error(`\n\x1b[41mNo room found with ID ${roomId}\x1b[0m\n`);
+			return ;
+		}
+		if (player === undefined)
+		{
+			console.error(`\n\x1b[41mNo player with ID ${playerId} in room ${roomId}\x1b[0m\n`);
+			return ;
+		}
+		if (isTTY)
+			console.log(playerId, roomId);
+	};
 
 	public getPlayersIdFromRoomId(roomId: string): readonly string[] {
 		let res : string[] = [];
