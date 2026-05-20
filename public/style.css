@@ -12,7 +12,7 @@ body {
 	left: 0;
 	right: 0;
 	display: flex;
-	height: 3rem;
+	height: 4rem;
 	box-sizing: border-box;
 	backdrop-filter: blur(10px);
 }
@@ -29,7 +29,7 @@ body {
 	outline: none;
 }
 
-#form>button {
+#form > button {
 	background: #333;
 	border: none;
 	padding: 0 1rem;
@@ -45,38 +45,85 @@ body {
 	padding: 0;
 }
 
-#messages>li {
+#messages > li {
 	padding: 0.5rem 1rem;
 }
 
-#messages>li:nth-child(odd) {
+#messages > li:nth-child(odd) {
 	background: #efefef;
 }
 
-#form.voting {
-    justify-content: space-around;
-    padding: 0.5rem;
-	height: 4rem;
+/* Vote */
+#vote-container {
+	display: flex;
+	flex: 1;
+	gap: 0.25rem;
+	padding: 0.25rem;
 }
 
 .vote-btn {
-    background: #333;
-    border: none;
-    border-radius: 3px;
-    color: #fff;
-    cursor: pointer;
-    flex: 1;              /* prend l'espace disponible */
-    margin: 0.25rem;
-    height: 2.5rem;
-    transition: background 0.2s;
+	background: #333;
+	border: none;
+	border-radius: 3px;
+	color: #fff;
+	cursor: pointer;
+	flex: 1;
+	transition: background 0.2s;
 }
 
 .vote-btn:hover:not(:disabled) {
-    background: #555;
+	background: #555;
 }
 
 .vote-btn:disabled {
-    background: #999;
-    cursor: not-allowed;
-    opacity: 0.6;
+	background: #999;
+	cursor: not-allowed;
+	opacity: 0.6;
+}
+
+/* Lobby */
+#ready-btn {
+	background: #333;
+	border: none;
+	border-radius: 3px;
+	color: #fff;
+	cursor: pointer;
+	flex: 1;
+	margin: 0.25rem;
+	transition: background 0.2s;
+}
+
+#ready-btn:hover:not(:disabled) {
+	background: #555;
+}
+
+#ready-btn:disabled {
+	background: #999;
+	cursor: not-allowed;
+	opacity: 0.6;
+}
+
+/* Result */
+#replay-btn,
+#new-game-btn {
+	background: #333;
+	border: none;
+	border-radius: 3px;
+	color: #fff;
+	cursor: pointer;
+	flex: 1;
+	margin: 0.25rem;
+	transition: background 0.2s;
+}
+
+#replay-btn:hover:not(:disabled),
+#new-game-btn:hover:not(:disabled) {
+	background: #555;
+}
+
+#replay-btn:disabled,
+#new-game-btn:disabled {
+	background: #999;
+	cursor: not-allowed;
+	opacity: 0.6;
 }

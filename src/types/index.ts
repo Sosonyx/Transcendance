@@ -6,7 +6,7 @@ export interface Message {
     timestamp: number
 };
 
-export type RoomId = string | null
+export type RoomId = string | null;
 
 export interface RoomManagerInterface {
     connectPlayer(playerId : string, isTTY? : boolean) : [roomId : string | null, room : EventEmitter, player : EventEmitter]; // return RoomId + room as Emitter if new room
@@ -16,13 +16,4 @@ export interface RoomManagerInterface {
 	onDisconnectEvent(playerId : string, roomId : RoomId | null, isTTY? : boolean) : void;
 	onReplayEvent(playerId : string, roomId : RoomId, isTTY? : boolean) : void;
     getPlayersIdFromRoomId(roomId : RoomId) : readonly  string[]; // return playersId
-};
-
-export enum roomStates {
-    INIT = "INIT",
-    LOBBY = "LOBBY",
-    ACTION = "ACTION",
-    VOTE = "VOTE",
-    RESULT = "RESULT",
-    ERROR = "ERROR"
 };
