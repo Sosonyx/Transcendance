@@ -33,3 +33,7 @@ model Friendship {
 
   @@unique([userId, friendId])   // pas deux fois la même paire
 }
+
+model gameState {
+  
+}
