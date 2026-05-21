@@ -1,4 +1,4 @@
-const FORBIDEN_WORDS = [
+const FORBIDDEN_WORDS = [
    /ignore (les|tes) instructions/i,
    /tu es une ia/i,
    /oublie ton role/i,
@@ -11,7 +11,7 @@ const FORBIDEN_WORDS = [
 
 export function blockBadPatterns(message : string) : {blockedResult :boolean, reason? : string}
 {
-    for ( const pattern of FORBIDEN_WORDS)
+    for ( const pattern of FORBIDDEN_WORDS)
     {
         if (pattern.test(message))
         {
