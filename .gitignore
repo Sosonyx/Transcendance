@@ -4,3 +4,7 @@ dist/
 *.log
 .DS_Store
 /generated/prisma
+npc_lab/
+.env
+test
+
