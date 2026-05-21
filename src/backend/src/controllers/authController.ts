@@ -22,7 +22,8 @@ export async function registerController(req: FastifyRequest, reply: FastifyRepl
   return reply.status(201).send(user);
 }
 
-export async function loginController(req : FastifyRequest, reply : FastifyReply){
+export async function loginController(req : FastifyRequest, reply : FastifyReply)
+{
   const body = req.body as Partial <userInterface>;
   const user = await loginUser(body);
 	console.log("LOGIN OK :", user);
@@ -33,7 +34,8 @@ export async function loginController(req : FastifyRequest, reply : FastifyReply
   return reply.send(user);
 }
 
-export async function logoutController(req : FastifyRequest, reply: FastifyReply){
+export async function logoutController(req : FastifyRequest, reply: FastifyReply)
+{
   reply.clearCookie('token', {path : '/'});
   
   return ({message: 'Deconnecte'});
