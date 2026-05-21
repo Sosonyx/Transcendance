@@ -1,7 +1,6 @@
 import bcrypt from "bcrypt";
 import { prisma } from "../lib/prisma.js";
 import type { userInterface } from "../types.js"
-import {app} from "../server.js"
 import type { FastifyRequest } from "fastify/types/request.js";
 import type { FastifyReply } from "fastify/types/reply.js";
 
@@ -14,7 +13,7 @@ export async function loginUser(currUser : Partial <userInterface>)
 
   const validPassword = await bcrypt.compare(currUser.password as string, user.hashedPassword)
 	if (!validPassword)
-    	throw new Error("Invalid credentials");
+    throw new Error("Invalid credentials");
   return user;
 }
 

@@ -6,6 +6,3 @@ export function authRoutes(){
 	app.post('/login', loginController);
 	app.post('/logout', logoutController);
 }
-
-
-

@@ -18,6 +18,7 @@ export async function registerController(req: FastifyRequest, reply: FastifyRepl
   const user = await registerUser({email: newUser.email, username: newUser.username, password: newUser.password, avatar: newUser.avatar});
   var token: string = req.server.jwt.sign({username: user.username}, { expiresIn: '1h' });
   reply.setCookie('token', token);
+
   return reply.status(201).send(user);
 }
 
@@ -28,10 +29,12 @@ export async function loginController(req : FastifyRequest, reply : FastifyReply
   var token: string = req.server.jwt.sign({username: user.username}, { expiresIn: '1h' });
   reply.setCookie('token', token);
   console.log(reply)
+
   return reply.send(user);
 }
 
 export async function logoutController(req : FastifyRequest, reply: FastifyReply){
   reply.clearCookie('token', {path : '/'});
+  
   return ({message: 'Deconnecte'});
 }

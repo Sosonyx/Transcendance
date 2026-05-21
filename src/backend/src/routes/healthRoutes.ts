@@ -1,7 +1,8 @@
 import type { FastifyInstance } from 'fastify';
 import { prisma } from '../lib/prisma.js';
 
-export async function healthRoutes(app: FastifyInstance) {
+export async function healthRoutes(app: FastifyInstance) 
+{
     // Simple healthcheck
     app.get("/health", async () => 
 	{

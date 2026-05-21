@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transcendance - Auth Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e24;
+            color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #2a2a35;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+        }
+        h2 {
+            text-align: center;
+            color: #00adb5;
+            margin-bottom: 20px;
+        }
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #3f3f4e;
+        }
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: #eeeeee;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border-radius: 6px;
+            border: 1px solid #3f3f4e;
+            background-color: #1e1e24;
+            color: #fff;
+            font-size: 1rem;
+        }
+        input:focus {
+            outline: none;
+            border-color: #00adb5;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #00adb5;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #007a80;
+        }
+        .message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.9rem;
+            display: none;
+        }
+        .success { background-color: #2e7d32; color: #fff; }
+        .error { background-color: #c62828; color: #fff; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- SECTION INSCRIPTION -->
+    <div class="form-section">
+        <h2>Créer un compte</h2>
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="reg-email">Email</label>
+                <input type="email" id="reg-email" required>
+            </div>
+            <div class="form-group">
+                <label for="reg-username">Nom d'utilisateur</label>
+                <input type="text" id="reg-username" required>
+            </div>
+            <div class="form-group">
+                <label for="reg-password">Mot de passe</label>
+                <input type="password" id="reg-password" required>
+            </div>
+            <button type="submit">S'inscrire</button>
+        </form>
+        <div id="registerMessage" class="message"></div>
+    </div>
+
+    <!-- SECTION CONNEXION -->
+    <div class="form-section">
+        <h2>Se connecter</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="login-username">Nom d'utilisateur</label>
+                <input type="text" id="login-username" required>
+            </div>
+            <div class="form-group">
+                <label for="login-password">Mot de passe</label>
+                <input type="password" id="login-password" required>
+            </div>
+            <button type="submit">Connexion</button>
+        </form>
+        <div id="loginMessage" class="message"></div>
+    </div>
+
+</div>
+
+    <!-- SECTION AJOUT D'AMI -->
+    <div class="container" style="max-width:400px; margin-top:20px;">
+        <div class="form-section">
+            <h2>Ajouter un ami</h2>
+            <form id="addFriendForm">
+                <div class="form-group">
+                    <label for="friend-username">Nom d'utilisateur à ajouter</label>
+                    <input type="text" id="friend-username" placeholder="Ex: Teo" required>
+                </div>
+                <button type="submit">Ajouter</button>
+            </form>
+            <div id="addFriendMessage" class="message"></div>
+        </div>
+    </div>
+
+<script>
+    // Configuration des routes de ton authRoutes.js
+    // Si tu passes par Nginx, utilise '/api/register' et '/api/login'
+    // Si tu testes directement Fastify sur le port 3000, utilise '/register' et '/login'
+    const REGISTER_URL = '/register'; 
+    const LOGIN_URL = '/login';
+
+    function displayMessage(elementId, text, isSuccess) {
+        const el = document.getElementById(elementId);
+        el.innerText = text;
+        el.style.display = 'block';
+        el.className = 'message ' + (isSuccess ? 'success' : 'error');
+    }
+
+    // Gestion de l'Inscription
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('reg-email').value;
+        const username = document.getElementById('reg-username').value;
+        const password = document.getElementById('reg-password').value;
+
+        try {
+            const response = await fetch(REGISTER_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, username, password })
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                displayMessage('registerMessage', 'Compte créé avec succès !', true);
+                document.getElementById('registerForm').reset();
+            } else {
+                displayMessage('registerMessage', data.error || 'Erreur lors de l\'inscription', false);
+            }
+        } catch (err) {
+            displayMessage('registerMessage', 'Erreur réseau impossible de joindre le serveur', false);
+        }
+    });
+
+    // Gestion de la Connexion
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('login-username').value;
+        const password = document.getElementById('login-password').value;
+
+        try {
+            const response = await fetch(LOGIN_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                displayMessage('loginMessage', 'Connexion réussie ! Cookie stocké.', true);
+                document.getElementById('loginForm').reset();
+                // Ici tu pourras rediriger l'utilisateur s'il le faut :
+                // window.location.href = '/dashboard.html';
+            } else {
+                displayMessage('loginMessage', data.error || 'Identifiants invalides', false);
+            }
+        } catch (err) {
+            displayMessage('loginMessage', 'Erreur réseau impossible de joindre le serveur', false);
+        }
+    });
+
+    // Gestion Ajout d'ami
+    document.getElementById('addFriendForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('friend-username').value.trim();
+        const messageId = 'addFriendMessage';
+
+        if (!username) {
+            displayMessage(messageId, 'Veuillez renseigner un nom d\'utilisateur.', false);
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/friend/${encodeURIComponent(username)}`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+            const data = await response.json().catch(() => ({}));
+
+            if (response.ok) {
+                displayMessage(messageId, data.message || 'Ami ajouté.', true);
+                document.getElementById('addFriendForm').reset();
+            } else {
+                displayMessage(messageId, data.error || data.message || 'Erreur lors de l\'ajout', false);
+            }
+        } catch (err) {
+            displayMessage(messageId, 'Erreur réseau impossible de joindre le serveur', false);
+        }
+    });
+</script>
+</body>
+</html>
