@@ -10,7 +10,6 @@ export	class RoomManager implements RoomManagerInterface
 
 	private _createRoom() : Room {
 		let room = new Room(this._roomCount);
-		(room as EventEmitter).on('stateChanged', (roomId, state) => { console.log(`room ${roomId} is now in state ${state}`) });
 		this._roomCount++;
 		this._rooms.push(room);
 		room.start();
@@ -209,9 +208,27 @@ export	class RoomManager implements RoomManagerInterface
 			console.error(`\n\x1b[41mNo player with ID ${playerId} in room ${roomId}\x1b[0m\n`);
 			return ;
 		}
-		if (isTTY)
-			console.log(playerId, roomId);
+		room.onReplay(player);
 	};
+
+	public onSkipEvent(roomId: RoomId, isTTY : boolean = false) {
+		if (roomId === null)
+			return ;
+
+		let room : Room | undefined;
+
+		if (isTTY)
+			room = this._accessRoomByNumber(parseInt(roomId));
+		else
+			room = this._accessRoomById(roomId);
+		if (room === undefined)
+		{
+			console.error(`\n\x1b[41mNo room found with ID ${roomId}\x1b[0m\n`);
+			return ;
+		}
+		room.onSkip();
+
+	}
 
 	public getPlayersIdFromRoomId(roomId: string): readonly string[] {
 		let res : string[] = [];

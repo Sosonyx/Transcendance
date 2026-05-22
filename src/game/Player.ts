@@ -32,6 +32,12 @@ export class Player extends EventEmitter
 		this._isReady = !this._isReady;
 	}
 
+	public reset() {
+		this._isReady = false;
+		this._shouldVote = false;
+		this._wantReplay = false;
+	}
+
 	public setShouldVote(status : boolean) {
 		this._shouldVote = status;
 	}

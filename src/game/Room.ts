@@ -141,11 +141,25 @@ export class Room extends EventEmitter
 			return ;
 		}
 		player.setWantReplay(true);
-		if (this._doAllPlayersWannaReplay())
+		this._checkRestart();
+	}
+
+	public onSkip()
+	{
+		if (this._state != roomStates.ACTION && this._state != roomStates.VOTE)
 		{
-			// TODO 
-			// this.resetRoom();
-			this.stateSwitch(roomStates.LOBBY);
+			this.stateSwitch(roomStates.ERROR);
+			return ;
+		}
+		if (this._state === roomStates.ACTION)
+		{
+			this.stateSwitch(roomStates.VOTE);
+			return ;
+		}
+		if (this._state === roomStates.VOTE)
+		{
+			this.stateSwitch(roomStates.RESULT);
+			return ;
 		}
 	}
 
@@ -157,10 +171,42 @@ export class Room extends EventEmitter
 		}
 		let index : number = this._players.findIndex((elem) => elem.getId() === player.getId());
 		this._players.splice(index, 1);
-		this._checkLobbyStatus();
+		if (this._state === roomStates.LOBBY)
+			this._checkLobbyStatus();
+		if (this._state === roomStates.RESULT)
+			this._checkResultStatus();
 	}
 
 	// ACCESS AND UTILS
+
+	private	_checkRestart() {
+		if (this._doAllPlayersWannaReplay())
+		{
+			// TODO 
+			this._restartRoom();
+		}
+	}
+
+	private _restartRoom() {
+		this._players.forEach(player => {player.reset()});
+		this.stateSwitch(roomStates.LOBBY)
+		this._checkLobbyStatus();
+	}
+
+	private _checkResultStatus() {
+		if (this._state != roomStates.RESULT)
+		{
+			this.stateSwitch(roomStates.ERROR);
+				return ;
+		}
+		if (this._playerCount === 0)
+		{
+			//TODO : delete
+			console.log(`Room ${this._number} is empty, should be deleted`);
+		}
+		else
+			this._checkRestart();
+	}
 
 	private _checkLobbyStatus() {
 		if (this._state != roomStates.LOBBY)

@@ -57,6 +57,15 @@ export class CLI
 			case 'replay':
 				if (arg1 && arg2 && !arg3)
 					this.roomManager.onReplayEvent(arg1, arg2, true)
+				else
+					console.log('replay [playername] [room id]');
+				break;
+			case 'skip':
+				if (arg1 && !arg2 && !arg3)
+					this.roomManager.onSkipEvent(arg1, true);
+				else
+					console.log('skip (skip current timer for action | vote phase');
+				break;
 			default:
 				console.log('Invalid command.');
 		}
