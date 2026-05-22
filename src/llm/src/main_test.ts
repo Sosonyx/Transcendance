@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import { buildSystemPrompt } from "./prompt.js";
 import type { GameState } from "./prompt.js";
 import { getSession } from "./context.js";
-import {router } from "./router.js"
+import {pipeline } from "./pipeline.js"
 
 
 const rl = readline.createInterface({
@@ -31,7 +31,7 @@ async function main() {
               break;
             }
           else 
-            router(userInput);
+            pipeline(userInput);
   }
 }
 

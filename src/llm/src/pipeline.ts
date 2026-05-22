@@ -1,18 +1,14 @@
 import type { Router, Request, Response } from "express";
 import { buildSystemPrompt } from "./prompt.js";
 import type { GameState } from "./prompt.js";
-import { blockBadPatterns } from "./guardrails_input.js";
+import { blockBadPatterns } from "./guardrails/input.js";
 import * as readline from "readline";
 import { callLLM } from "./llm.js";
 import Anthropic from "@anthropic-ai/sdk";
 import dotenv from "dotenv";
 import { getSession } from "./context.js";
 
-
-
-
-
-export async function router(userInput: string): Promise<T> {
+export async function pipeline(userInput: string): Promise<T> {
 
     const llmPerso: GameState =
     {
