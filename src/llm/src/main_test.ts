@@ -1,11 +1,11 @@
 import * as readline from "readline";
-import { callLLM } from "./llm.ts";
+import { callLLM } from "./llm.js";
 import Anthropic from "@anthropic-ai/sdk";
 import dotenv from "dotenv";
-import { buildSystemPrompt } from "./prompt.ts";
-import type { GameState } from "./prompt.ts";
-import { getSession } from "./context.ts";
-import {router } from "./router.ts"
+import { buildSystemPrompt } from "./prompt.js";
+import type { GameState } from "./prompt.js";
+import { getSession } from "./context.js";
+import {router } from "./router.js"
 
 
 const rl = readline.createInterface({

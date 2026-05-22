@@ -1,13 +1,9 @@
 const FORBIDDEN_WORDS = [
-   /ignore (les|tes) instructions/i,
-   /tu es une ia/i,
-   /oublie ton role/i,
-   /oublie ton /i,
-   /oublie ta/i,
-   /oublie tes/i,
+   /je suis une ia/i,
+   /en tant que modele/i,
+   /en tant qu'ia/i,
    /prompt/
 ];
-
 
 export function blockBadPatterns(message : string) : {blockedResult :boolean, reason? : string}
 {

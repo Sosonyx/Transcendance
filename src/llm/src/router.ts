@@ -1,12 +1,12 @@
 import type { Router, Request, Response } from "express";
-import { buildSystemPrompt } from "./prompt.ts";
-import type { GameState } from "./prompt.ts";
-import { blockBadPatterns } from "./guardrails_input.ts";
+import { buildSystemPrompt } from "./prompt.js";
+import type { GameState } from "./prompt.js";
+import { blockBadPatterns } from "./guardrails_input.js";
 import * as readline from "readline";
-import { callLLM } from "./llm.ts";
+import { callLLM } from "./llm.js";
 import Anthropic from "@anthropic-ai/sdk";
 import dotenv from "dotenv";
-import { getSession } from "./context.ts";
+import { getSession } from "./context.js";
 
 
 
