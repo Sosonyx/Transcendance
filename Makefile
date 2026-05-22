@@ -3,7 +3,7 @@ SHELL := /bin/sh
 BACKEND_DIR := src/backend
 GAME_DIR := src/game
 
-.PHONY: help deps deps-backend deps-game build build-backend build-game run run-backend clean
+.PHONY: help deps deps-backend deps-game build build-backend build-game run run-backend run-game clean
 
 help:
 	@printf '%s\n' \
@@ -11,6 +11,7 @@ help:
 		"  make deps           Install dependencies for backend and game" \
 		"  make build          Compile backend and game" \
 		"  make run            Launch the backend server with tsx" \
+		"  make run-game       Launch the game server" \
 		"  make clean          Remove generated build output"
 
 deps: deps-backend deps-game
@@ -25,14 +26,21 @@ build: build-backend build-game
 
 build-backend: deps-backend
 	npm --prefix $(BACKEND_DIR) run build
+	mkdir -p build/backend
+	ln -sfn ../../src/backend/node_modules build/backend/node_modules
 
 build-game: deps-game
 	npm --prefix $(GAME_DIR) run build
+	mkdir -p build/game
+	ln -sfn ../../src/game/node_modules build/game/node_modules
 
 run: run-backend
 
 run-backend: deps-backend
-	cd $(BACKEND_DIR) && npm exec tsx server.ts
+	cd build/backend && node server.js
+
+run-game: deps-game
+	cd build/game && node server.js
 
 clean:
 	rm -rf build
