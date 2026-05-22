@@ -1,9 +1,10 @@
 node_modules/
-dist/
 .env
 *.log
 .DS_Store
 /generated/prisma
 npc_lab/
-.env
 test
+todo.txt
+build
+build/*

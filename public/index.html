@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Test</title>
+    <link rel="stylesheet" href="/style.css">
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+    <ul id="messages"></ul>
+    <form id="form">
+<!-- State: Action -->
+        <input id="input" type="text" placeholder="Message..." autocomplete="off" />
+        <button id="send-btn">Send</button>
+
+        <!-- State: Lobby -->
+        <button id="ready-btn" type="button">Ready</button>
+
+        <!-- State: Vote -->
+        <div id="vote-container"></div>
+
+        <!-- State: Result -->
+        <button id="replay-btn" type="button">Replay</button>
+        <button id="new-game-btn" type="button">New game</button>
+    </form>
+    <script>
+        const socket = io('http://localhost:3000')
+        const form = document.getElementById("form");
+        const input = document.getElementById("input");
+        const sendBtn = document.getElementById('send-btn');
+        const readyBtn = document.getElementById('ready-btn');
+        const voteContainer = document.getElementById('vote-container');
+        const replayBtn = document.getElementById('replay-btn');
+        const newGameBtn = document.getElementById('new-game-btn');
+
+        // -- Helpers --
+        const ALL = [input, sendBtn, readyBtn, voteContainer, replayBtn, newGameBtn];
+        const hide = (...els) => els.forEach(el => el.style.display = 'none');
+        const show = (...els) => els.forEach(el => el.style.display = '');
+
+        function setState(state, players = []) {
+            hide(...ALL);
+            switch (state) {
+                case 'lobby':
+                    readyBtn.disabled = false;
+                    readyBtn.textContent = 'Ready';
+                    show(readyBtn);
+                    break;
+                case 'action':
+                    show(input, sendBtn);
+                    break;
+                case 'vote':
+                    voteContainer.innerHTML = '';
+                    players.forEach(player => {
+                        const btn = document.createElement('button');
+                        btn.textContent = player;
+                        btn.classList.add('vote-btn');
+                        btn.type = 'button';
+                        btn.addEventListener('click', () => {
+                            socket.emit('vote', player);
+                            
+                            // On désactive tous les boutons après le vote
+                            document.querySelectorAll('.vote-btn').forEach(b => {
+                                b.disabled = true;
+                            });
+                        });
+                        voteContainer.appendChild(btn);
+                    });
+                    show(voteContainer);
+                    break;
+                case 'result':
+                    replayBtn.disabled = false;
+                    newGameBtn.disabled = false;
+                    show(replayBtn, newGameBtn);
+                    break;
+            }
+        }
+
+        // Init
+        setState('lobby');
+
+        // Events socket
+        socket.on('startLobby',  ()        => setState('lobby'));
+        socket.on('startAction', ()        => setState('action'));
+        socket.on('startVote',   (players) => setState('vote', players));
+        socket.on('startResult', ()        => setState('result'));
+
+        // Clicker sur ready
+        readyBtn.addEventListener('click', () => {
+            socket.emit('ready');
+            readyBtn.disabled = true;
+            readyBtn.textContent = 'Waiting for other players...';
+        });
+
+        // Envoyer un message
+        form.addEventListener('submit', (e) =>{
+            e.preventDefault();
+            if (input.value){
+                socket.emit('message', input.value);
+                input.value = '';
+            }
+        });
+
+        // Recevoir un message
+        socket.on('message', (message) => {
+            const li = document.createElement('li');
+            li.textContent = `${message.senderId} : ${message.content}`;
+            document.getElementById('messages').appendChild(li);
+        });
+
+        // Result
+        replayBtn.addEventListener('click',   () => {
+            socket.emit('replay');
+            replayBtn.disabled = true;
+            newGameBtn.disabled = true;
+        });
+        newGameBtn.addEventListener('click',  () => {
+            socket.emit('newGame');
+            replayBtn.disabled = true;
+            newGameBtn.disabled = true;
+        });
+
+        // Time out du replay
+        socket.on('timedOut', () => {
+            replayBtn.disabled = true;
+        });
+
+    </script>
+</body>
+</html>
