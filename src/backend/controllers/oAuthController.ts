@@ -20,11 +20,20 @@ export async function intraHandler(req: FastifyRequest, reply: FastifyReply){
     email: profile.email,
     username: profile.name,
   });
-
-  reply.setCookie("token", result.token, {
+  
+ reply.setCookie("token", result.token, {
     path: "/",
     maxAge: 86400,
+    sameSite: "strict"
   });
+
+  reply.setCookie("username", result.user.username, {
+    path: "/",
+    maxAge: 86400,
+    sameSite: "strict",
+    httpOnly: false
+  });
+
   return (reply.redirect("http://localhost:3000"));
 }
 
@@ -51,9 +60,17 @@ export async function googleHandler(req: FastifyRequest, reply: FastifyReply){
     username: profile.name,
   });
 
-  reply.setCookie("token", result.token, {
+ reply.setCookie("token", result.token, {
     path: "/",
     maxAge: 86400,
+    sameSite: "strict"
+  });
+
+  reply.setCookie("username", result.user.username, {
+    path: "/",
+    maxAge: 86400,
+    sameSite: "strict",
+    httpOnly: false
   });
 
   return (reply.redirect("http://localhost:3000"));

@@ -17,7 +17,7 @@ export async function registerController(req: FastifyRequest, reply: FastifyRepl
 
   const user = await registerUser({email: newUser.email, username: newUser.username, password: newUser.password, avatar: newUser.avatar, id : null});
   var token: string = req.server.jwt.sign({ userId: user.id, username: user.username }, { expiresIn: '1h' });
-  reply.setCookie('token', token, { httpOnly: false, secure: false /* true en prod (HTTPS seulement)*/, sameSite: 'strict', maxAge: 86400, path: '/'});
+  reply.setCookie('token', token, { httpOnly: false, secure: false /* true en prod (HTTPS seulement)*/, sameSite: 'strict', path: '/'});
   return reply.status(201).send({token, user});
 }
 

@@ -55,7 +55,6 @@
         }
         .btn-logout:hover { background-color: #c62828; color: #fff; }
         
-        /* Style ajouté pour harmoniser tes boutons OAuth avec ta charte */
         .oauth-container {
             width: 100%;
             max-width: 420px;
@@ -205,7 +204,6 @@
         <button class="btn-logout" id="logoutBtn" style="display:none" onclick="handleLogout()">Déconnexion</button>
     </div>
 
-    <!-- DIV CONTENANT LES BOUTONS OAUTH (Masquée via JS si connecté) -->
     <div class="oauth-container" id="oauthLinks">
         <a href="/api/auth/42">
             <button class="btn-oauth">Connexion 42</button>
@@ -215,7 +213,6 @@
         </a>
     </div>
 
-    <!-- FORMULAIRES D'INSCRIPTION ET DE CONNEXION CLASSIQUES -->
     <div class="container" id="authFormsContainer">
         <div class="form-section">
             <h2>Créer un compte</h2>
@@ -254,7 +251,6 @@
         </div>
     </div>
 
-    <!-- ESPACE JOUEUR PRIVE -->
     <div class="container" id="statsContainer" style="display: none;">
         <h2>Espace Joueur</h2>
         <div class="action-group">
@@ -288,26 +284,38 @@
         el.className = 'message ' + (ok ? 'success' : 'error');
     }
 
+    // Fonction utilitaire pour lire un cookie
+    function getCookie(name) {
+        return document.cookie.split('; ')
+            .find(row => row.startsWith(name + '='))
+            ?.split('=')[1];
+    }
+
+    // Fonction utilitaire pour effacer un cookie
+    function deleteCookie(name) {
+        document.cookie = name + '=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=strict';
+    }
+
     function updateStatusBar() {
-        const token    = localStorage.getItem('token');
-        const username = localStorage.getItem('username');
+        // Si le serveur utilise un cookie HttpOnly pour le 'token', le JS ne peut pas le lire.
+        // On se base donc sur la présence du cookie 'username' qu'on écrit nous-mêmes.
+        const username = getCookie('username');
         const dot  = document.getElementById('statusDot');
         const text = document.getElementById('statusText');
         const btn  = document.getElementById('logoutBtn');
         const statsSection = document.getElementById('statsContainer');
         const statsDisplay = document.getElementById('statsDisplay');
         
-        // Ciblage des nouveaux éléments à masquer/afficher
         const oauthLinks   = document.getElementById('oauthLinks');
         const authFormsContainer = document.getElementById('authFormsContainer');
 
-        if (token && username) {
+        if (username) {
+            const decodedUsername = decodeURIComponent(username);
             dot.classList.add('connected');
-            text.innerHTML = 'Connecté en tant que <span>' + username + '</span>';
+            text.innerHTML = 'Connecté en tant que <span>' + decodedUsername + '</span>';
             btn.style.display = 'block';
             statsSection.style.display = 'block'; 
             
-            // ON CACHE les éléments de connexion si le joueur est connecté
             oauthLinks.style.display = 'none';
             authFormsContainer.style.display = 'none';
         } else {
@@ -318,7 +326,6 @@
             statsDisplay.style.display = 'none';
             statsDisplay.innerHTML = '';
             
-            // ON RE-AFFICHE les options de connexion si déconnecté
             oauthLinks.style.display = 'flex';
             authFormsContainer.style.display = 'block';
         }
@@ -328,12 +335,12 @@
         try {
             const res = await fetch(LOGOUT_URL, {
                 method: 'POST',
-                credentials: 'include' 
+                credentials: 'include' // Obligatoire pour envoyer le cookie de session à Fastify
             });
 
             if (res.ok) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('username');
+                // On nettoie notre témoin côté client
+                deleteCookie('username');
                 updateStatusBar();
             } else {
                 console.error("Échec de la déconnexion côté serveur.");
@@ -479,8 +486,12 @@
             });
             const data = await res.json();
             if (res.ok) {
+                // Le serveur génère le cookie token. On génère notre témoin username.
+                const userLogin = data.user?.username || username;
+                document.cookie = `username=${encodeURIComponent(userLogin)}; path=/; max-age=3600; samesite=strict`;
                 displayMessage('registerMessage', 'Compte créé avec succès !', true);
                 document.getElementById('registerForm').reset();
+                updateStatusBar();
             } else {
                 displayMessage('registerMessage', data.error || "Erreur lors de l'inscription", false);
             }
@@ -501,8 +512,9 @@
             });
             const data = await res.json();
             if (res.ok) {
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('username', data.user?.username || username);
+                // Le serveur met le cookie token. On stocke le username dans un cookie standard.
+                const userLogin = data.user?.username || username;
+                document.cookie = `username=${encodeURIComponent(userLogin)}; path=/; max-age=86400; samesite=strict`;
                 displayMessage('loginMessage', 'Connexion réussie !', true);
                 document.getElementById('loginForm').reset();
                 updateStatusBar();
@@ -519,15 +531,22 @@
         const token = urlParams.get('token');
         const username = urlParams.get('username');
 
-        if (token && username) {
-            localStorage.setItem('token', token);
-            localStorage.setItem('username', username);
+        if (username) {
+            // Si l'URL contient un paramètre username (redirection OAuth réussie), on l'enregistre en cookie
+            document.cookie = `username=${encodeURIComponent(username)}; path=/; max-age=86400; samesite=strict`;
+            
+            // Si le token est envoyé dans l'URL plutôt que via un Set-Cookie direct du callback serveur, on le passe aussi en cookie
+            if (token) {
+                document.cookie = `token=${token}; path=/; max-age=86400; samesite=strict`;
+            }
+
             window.history.replaceState({}, document.title, window.location.pathname);
             displayMessage('loginMessage', 'Connexion OAuth réussie !', true);
-            updateStatusBar(); // Mis à jour pour rafraîchir l'interface immédiatement après l'OAuth
+            updateStatusBar();
         }
     }
 
+    // Au chargement de la page, on vérifie d'abord si on revient d'un flux OAuth, puis on met à jour la vue.
     checkOAuthCallback();
     updateStatusBar();
 </script>
