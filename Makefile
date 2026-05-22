@@ -1,5 +1,5 @@
 SHELL := /bin/sh
-
+LLM_DIR := src/backend/llm
 BACKEND_DIR := src/backend
 GAME_DIR := src/game
 
@@ -35,6 +35,9 @@ build-game: deps-game
 	ln -sfn ../../src/game/node_modules build/game/node_modules
 
 run: run-backend
+
+run-llm:
+	npm run chat --prefix $(LLM_DIR)
 
 run-backend: deps-backend
 	cd build/backend && node server.js

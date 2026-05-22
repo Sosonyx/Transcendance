@@ -5,7 +5,7 @@ import * as readline from "readline";
 // import { buildSystemPrompt } from "./prompt.js";
 // import type { GameState } from "./prompt.js";
 // import { getSession } from "./context.js";
-import {pipeline } from "./pipeline.js"
+import { pipeline } from "./pipeline.js"
 
 
 const rl = readline.createInterface({
