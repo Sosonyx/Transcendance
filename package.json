@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "@fastify/static": "^9.1.3"
+  }
+}
