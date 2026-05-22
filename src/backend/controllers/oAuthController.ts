@@ -20,7 +20,7 @@ export async function intraHandler(req: FastifyRequest, reply: FastifyReply){
     email: profile.email,
     username: profile.name,
   });
-  
+
  reply.setCookie("token", result.token, {
     path: "/",
     maxAge: 86400,
@@ -52,7 +52,6 @@ export async function googleHandler(req: FastifyRequest, reply: FastifyReply){
 
   if (!profile)
     return (1);
-  // TODO: handle error if profile is not valid
 
   const result = await handleOAuthLogin(fastify, "google", {
     providerId: profile.id,
