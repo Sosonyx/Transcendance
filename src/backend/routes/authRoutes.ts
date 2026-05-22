@@ -1,4 +1,4 @@
-import { app } from "../server.js" 
+import { app } from "../../server.js" 
 import { registerController, loginController, logoutController } from "../controllers/authController.js";
 
 export function authRoutes(){
