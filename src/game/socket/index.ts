@@ -1,10 +1,10 @@
 import { Server } from 'socket.io';
 import { EventEmitter } from "node:events";
-import { RoomManager } from '../game/RoomManager.js';
-import { roomStates } from '../game/Room.js';
+import { RoomManager } from '../game_logic/RoomManager.js';
+import { roomStates } from '../game_logic/Room.js';
 import { type Message , type RoomId } from '../types/index.js';
 
-import { CLI } from '../game/CommandLine.js';
+import { CLI } from '../game_logic/CommandLine.js';
 
 export function registerSocketHandlers(io: Server) {
 	const roomManager = new RoomManager();

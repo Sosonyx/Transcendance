@@ -1,14 +1,14 @@
-import type { Router, Request, Response } from "express";
+// import type { Router, Request, Response } from "express";
 import { buildSystemPrompt } from "./prompt.js";
 import type { GameState } from "./prompt.js";
 import { blockBadPatterns } from "./guardrails/input.js";
-import * as readline from "readline";
+// import * as readline from "readline";
 import { callLLM } from "./llm.js";
-import Anthropic from "@anthropic-ai/sdk";
-import dotenv from "dotenv";
+// import Anthropic from "@anthropic-ai/sdk";
+// import dotenv from "dotenv";
 import { getSession } from "./context.js";
 
-export async function pipeline(userInput: string): Promise<T> {
+export async function pipeline(userInput: string): Promise<number> {
 
     const llmPerso: GameState =
     {
@@ -16,11 +16,10 @@ export async function pipeline(userInput: string): Promise<T> {
         llmMood: "hostile",
     };
 
-    const messages_array: Anthropic.MessageParam[] = [];
+    // const messages_array: Anthropic.MessageParam[] = [];
 
     const myPromptStr: string = buildSystemPrompt(llmPerso);
     const mySession = getSession("player1");
-    let result: string;
     if (blockBadPatterns(userInput).blockedResult === true)
         return (console.log("secu\n"), 1);
     else

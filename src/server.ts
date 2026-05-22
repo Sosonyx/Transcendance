@@ -2,9 +2,9 @@ import Fastify from 'fastify';
 import { Server } from 'socket.io';
 import fastifyStatic from '@fastify/static';
 import { join } from 'path';
-import { registerSocketHandlers } from './socket/index.js';
+import { registerSocketHandlers } from './game/socket/index.js';
 
-const fastify = Fastify();
+export const fastify = Fastify();
 
 fastify.register(fastifyStatic, {
     root: join(process.cwd(), 'public')

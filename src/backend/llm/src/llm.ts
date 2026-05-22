@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { MessageParam } from "@anthropic-ai/sdk/resources";
-import { error } from "node:console";
+// import { error } from "node:console";
 import dotenv from "dotenv";
 
 dotenv.config();
