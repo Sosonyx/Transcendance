@@ -1,38 +1,54 @@
 import * as readline from "readline";
-// import { callLLM } from "./llm.js";
-// import Anthropic from "@anthropic-ai/sdk";
-// import dotenv from "dotenv";
-// import { buildSystemPrompt } from "./prompt.js";
-// import type { GameState } from "./prompt.js";
-// import { getSession } from "./context.js";
-import { pipeline } from "./pipeline.js"
+import dotenv from "dotenv";
 
+import type { RoomChatMessage } from "./types/messages.js";
+
+dotenv.config({ path: "../.env" });
+
+const { pipeline } = await import("./pipeline.js");
 
 const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
+    input: process.stdin,
+    output: process.stdout,
 });
 
-function ask(question: string): Promise<string>
-{
-    return new Promise((resolve) => { rl.question(question, (answer) => resolve(answer));});
+function ask(question: string): Promise<string> {
+    return new Promise((resolve) => {
+    rl.question(question, (answer: string) => resolve(answer));
+    });
 }
 
-async function main() {
-  console.log("llm-test -> tape 'exit' pour quitter\n");
-  while (true)
-    {
-    const userInput = await ask("Player : ");
+async function main() 
+{
+    console.log("\x1b[47mllm-test -> tape 'exit' pour quitter\x1b[0m\n");
 
-          if (userInput === "exit")
-            {
-              console.log("Bye !");
-              rl.close();
-              break;
-            }
-          else 
-            pipeline(userInput);
-  }
+    while (true) {
+    const userInput = await ask("\x1b[32mPlayer : \x1b[0m");
+
+    if (userInput === "exit") {
+        console.log("\x1b[31mBye !\x1b[0m");
+        rl.close();
+        break;
+    }
+
+    const chatHistory: RoomChatMessage[] = [
+    {
+        senderId: "player1",
+        content: userInput,
+        timestamp: Date.now(),
+    },
+    ];
+
+    await pipeline({
+        llmPlayer: {
+        playerId: "player1",
+        playerName: "player1",
+        llmMood: "hostile",
+        gameRole: "llm",
+        },
+        chatHistory,
+    });
+    }
 }
 
 main();

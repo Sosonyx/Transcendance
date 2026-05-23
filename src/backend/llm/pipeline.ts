@@ -1,25 +1,50 @@
 import { buildSystemPrompt } from "./prompt.js";
-import type { GameState } from "./prompt.js";
-import { blockBadPatterns } from "../guardrails/input.js";
-import { callLLM } from "../guardrails/llm.js";
-import { getSession } from "../guardrails/context.js";
+import type { LlmPersona } from "./prompt.js";
+import { blockBadPatterns } from "./guardrails/input.js";
+import { callLLM } from "./llm.js";
+import { getOrCreateSession } from "./sessionStore.js";
+import type { RoomChatMessage } from "./types/messages.js";
 
-export async function pipeline(userInput: string): Promise<number> {
-    const llmPerso: GameState =
+// Extends means that LlmRoomContext has all properties of LlmPersona, 
+// plus the additional ones defined in LlmRoomContext
+export interface LlmRoomContext extends LlmPersona
+{
+    playerId: string;
+    gameRole: "human" | "llm"; // A  voir selon comment on stocke les datas dans ROOMplayer?
+}
+
+export interface PipelineInput
+{
+    llmPlayer: LlmRoomContext;
+    chatHistory: RoomChatMessage[];
+}
+
+export async function pipeline(input: PipelineInput): Promise<void> 
+{
+    const myPromptStr: string = buildSystemPrompt(input.llmPlayer);
+
+    const mySession = getOrCreateSession(input.llmPlayer.playerId);
+
+    // We add the new messages to the session history, but we need to distinguish between user and assistant messages
+    for (const message of input.chatHistory)
     {
-        playerName: "player1",
-        llmMood: "hostile",
-    };
-    const myPromptStr: string = buildSystemPrompt(llmPerso);
-    const mySession = getSession("player1");
-    if (blockBadPatterns(userInput).blockedResult === true)
-        return (console.log("secu\n"), 1);
-    else
-        mySession.addUserMessage(userInput, 'user');
-    mySession.addUserMessage("answer test", 'assitant');
+        if (message.senderId === input.llmPlayer.playerId)
+        {
+            mySession.addMessageAsAssistant(message.content);
+            continue;
+        }
 
-    const llmReply: string = await callLLM(myPromptStr, mySession.getMessage());
-    mySession.addUserMessage(llmReply, 'assistant');
-    console.log(`\n${llmPerso.playerName} : ${llmReply}\n`);
-    return (0);
+        if (blockBadPatterns(message.content).blockedResult === true)
+        {
+            console.log("Wrong input detected\n");
+            continue;
+        }
+
+        mySession.addMessageAsUser(message.content);
+    }
+
+    const llmReply: string = await callLLM(myPromptStr, mySession.getMessageHistory());
+    mySession.addMessageAsAssistant(llmReply);
+
+    console.log(`\x1b[36m\n${input.llmPlayer.playerName} : ${llmReply}\n\x1b[0m`);
 }

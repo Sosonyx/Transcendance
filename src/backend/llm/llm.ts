@@ -1,14 +1,11 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { MessageParam } from "@anthropic-ai/sdk/resources";
 // import { error } from "node:console";
-import dotenv from "dotenv";
-import { debugLLMResponse } from "../debug_llm.js";
-
-dotenv.config();
+import { debugLLMResponse } from "./debug_llm.js";
 
 const myClientAPI = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-export async function callLLM(myPromptStr: string, messages: MessageParam[]): Promise<string> {
+export async function callLLM(myPromptStr: string, conversationHistory: MessageParam[]): Promise<string> {
     const llmResponse = await myClientAPI.messages.create({
         model: "claude-haiku-4-5-20251001",
         max_tokens: 150,
@@ -21,8 +18,9 @@ export async function callLLM(myPromptStr: string, messages: MessageParam[]): Pr
         //         cache_control: { type: "ephemeral" }
         //     }
         // ],
-        messages
+        messages: conversationHistory
     });
+
     // console.log("content complet:", JSON.stringify(llmResponse.content, null, 2));
     // const block = llmResponse.content[0];
     const block = llmResponse.content.find( b => b.type === "text")
