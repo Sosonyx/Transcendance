@@ -2,6 +2,7 @@ import * as readline from "readline";
 import dotenv from "dotenv";
 import { askGroq } from "./groq.js";
 import type { RoomChatMessage } from "./types/messages.js";
+import { askGemini } from "./gemini.js";
 
 dotenv.config({ path: ".env" });
 
@@ -30,13 +31,20 @@ async function main()
         rl.close();
         break;
     }
-
     if (userInput === "groq")
     {
         const userInput = await ask("\x1b[32mmessage to Groq : \x1b[0m");
         const new_msg = await askGroq(userInput);
         console.log("\x1b new groq =\x1b[0m");
         console.log(new_msg);
+        console.log("\n");
+    }
+     if (userInput === "gemini")
+    {
+        const userInput = await ask("\x1b[32mmessage to gemini : \x1b[0m");
+        const new_msg_gemini = await askGemini(userInput);
+        console.log("\x1b new gemini msg =\x1b[0m");
+        console.log(new_msg_gemini);
         console.log("\n");
     }
 

@@ -6,6 +6,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@google/genai": "^2.6.0",
     "groq": "^5.26.0",
     "groq-sdk": "^1.2.0"
   }
