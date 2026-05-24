@@ -1,23 +1,31 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { MessageParam } from "@anthropic-ai/sdk/resources";
-// import { error } from "node:console";
 import { debugLLMResponse } from "./debug_llm.js";
+// import { promiseHooks } from "v8";
+// import dotenv from "dotenv";
+
+
+
 
 const myClientAPI = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-export async function callLLM(myPromptStr: string, conversationHistory: MessageParam[]): Promise<string> {
+function getSystemePrompt(myPromptStr : string) : Anthropic.Messages.TextBlockParam
+{
+    let SystemePromptBlock: Anthropic.Messages.TextBlockParam = {
+                type: "text",
+                text: myPromptStr,
+                cache_control: { type: "ephemeral" }
+            };
+    return (SystemePromptBlock);
+}
+
+
+export async function askClaude(myPromptStr: string, conversationHistory: MessageParam[]): Promise<string> {
     const llmResponse = await myClientAPI.messages.create({
         model: "claude-haiku-4-5-20251001",
         max_tokens: 150,
         temperature: 1.0,
-        system: myPromptStr, 
-        // [
-        //     {
-        //         type: "text",
-        //         text: myPromptStr,             // ← myPromptStr pas systemPrompt
-        //         cache_control: { type: "ephemeral" }
-        //     }
-        // ],
+        system: [getSystemePrompt(myPromptStr)], 
         messages: conversationHistory
     });
 

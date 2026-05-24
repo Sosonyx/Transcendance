@@ -6,7 +6,7 @@
 /*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/19 15:51:02 by tlecuyer          #+#    #+#             */
-/*   Updated: 2026/05/20 14:40:59 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/05/24 16:46:49 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ export class ConversationContext
 
     addMessageAsAssistant(content: string)
     {
-        this.conversationHistory.push({ role: 'assistant', content });
+        this.conversationHistory.push({ role: 'assistant', content : content.trim() });
         this.trim();
     }
 

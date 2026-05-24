@@ -1,7 +1,7 @@
 import { buildSystemPrompt } from "./prompt.js";
 import type { LlmPersona } from "./prompt.js";
 import { blockBadPatterns } from "./guardrails/input.js";
-import { callLLM } from "./llm.js";
+import { askClaude } from "./llm.js";
 import { getOrCreateSession } from "./sessionStore.js";
 import type { RoomChatMessage } from "./types/messages.js";
 
@@ -43,7 +43,7 @@ export async function pipeline(input: PipelineInput): Promise<void>
         mySession.addMessageAsUser(message.content);
     }
 
-    const llmReply: string = await callLLM(myPromptStr, mySession.getMessageHistory());
+    const llmReply: string = await askClaude(myPromptStr, mySession.getMessageHistory());
     mySession.addMessageAsAssistant(llmReply);
 
     console.log(`\x1b[36m\n${input.llmPlayer.playerName} : ${llmReply}\n\x1b[0m`);

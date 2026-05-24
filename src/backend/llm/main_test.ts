@@ -1,9 +1,9 @@
 import * as readline from "readline";
 import dotenv from "dotenv";
-
+import { askGroq } from "./groq.js";
 import type { RoomChatMessage } from "./types/messages.js";
 
-dotenv.config({ path: "../.env" });
+dotenv.config({ path: ".env" });
 
 const { pipeline } = await import("./pipeline.js");
 
@@ -29,6 +29,15 @@ async function main()
         console.log("\x1b[31mBye !\x1b[0m");
         rl.close();
         break;
+    }
+
+    if (userInput === "groq")
+    {
+        const userInput = await ask("\x1b[32mmessage to Groq : \x1b[0m");
+        const new_msg = await askGroq(userInput);
+        console.log("\x1b new groq =\x1b[0m");
+        console.log(new_msg);
+        console.log("\n");
     }
 
     const chatHistory: RoomChatMessage[] = [
