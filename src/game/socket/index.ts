@@ -21,8 +21,7 @@ export function registerSocketHandlers(io: Server) {
 		if (roomId !== null)
 			socket.join(roomId);
 
-		// Changement d'etat de la room
-		roomEmitter.on('stateChanged', (state: string) => {
+		const onStateChanged = (state: string) => {
 			if (roomId === null) return;
 			gamestate = state;
 		    switch (state) {
@@ -51,12 +50,16 @@ export function registerSocketHandlers(io: Server) {
 		            break;
 		        }
 		    }
-		});
+		};
+
+		// Changement d'etat de la room
+		roomEmitter.on('stateChanged', onStateChanged);
 
 		/* ==========LOBBY==========*/
 		// Joueur pret
 		socket.on('ready', () => {
-			if (gamestate !== roomStates.LOBBY) return;
+			// if (gamestate !== roomStates.LOBBY) return;
+			console.log(`Ready registered dor roomId ${roomId}`);
 			roomManager.onReadyEvent(socket.id, roomId);
 		});
 
@@ -101,10 +104,16 @@ export function registerSocketHandlers(io: Server) {
 			roomManager.onDisconnectEvent(socket.id, roomId);
 			process.stdout.write(`${socket.id} quitte la room ${roomId} pour `);
 			if (roomId !== null)
+			{
 				socket.leave(roomId);
+				roomEmitter.off('stateChanged', onStateChanged);
+			}
 			[roomId, roomEmitter, playerEmitter] = roomManager.connectPlayer(socket.id);
 			if (roomId !== null)
+			{
 				socket.join(roomId);
+				roomEmitter.on('stateChanged', onStateChanged);
+			}
 			process.stdout.write(`rejouer dans une nouvelle room ${roomId}\n`);
 			socket.emit('startLobby');
 		});
@@ -122,9 +131,10 @@ export function registerSocketHandlers(io: Server) {
 		// Joueur se deconnecte
 		socket.on('disconnect', () => {
 			roomManager.onDisconnectEvent(socket.id, roomId);
+			roomEmitter.off('stateChanged', onStateChanged);
 			console.log(`Joueur déconnecté : ${socket.id}`);
 		});
 	});
 	const CommandLineInterpreter = new CLI(roomManager);
     CommandLineInterpreter.run();
-};
+}
