@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String @id @default(cuid())
+  email          String @unique
+  username       String @unique
+  hashedPassword String?
+
+  avatar String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  friends  Friendship[] @relation("UserFriends")
+  friendOf Friendship[] @relation("FriendOf")
+  Stats    GameStats?
+  OAuthAccount OAuthAccount[]
+}
+
+model OAuthAccount {
+  id         Int    @id @default(autoincrement())
+  provider   String
+  providerId String
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@unique([provider, providerId])
+}
+
+model BlacklistedToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([token])
+}
+
+model GameStats {
+  id            String @id @default(cuid())
+  numberOfGames Int    @default(0)
+  gamesWin      Int    @default(0)
+  gamesLose     Int    @default(0)
+  winrate       Float  @default(0.0)
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Friendship {
+  id        String   @id @default(cuid())
+  userId    String
+  friendId  String
+  createdAt DateTime @default(now())
+
+  user   User @relation("UserFriends", fields: [userId], references: [id])
+  friend User @relation("FriendOf", fields: [friendId], references: [id])
+
+  @@unique([userId, friendId]) // pas deux fois la même paire
+}
