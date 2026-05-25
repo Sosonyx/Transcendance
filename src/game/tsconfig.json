@@ -1,9 +1,0 @@
-{
-  "extends": "../../tsconfig.json",
-  "compilerOptions": {
-    "rootDir": ".",
-    "outDir": "../../build/game"
-  },
-  "include": ["**/*.ts"],
-  "exclude": ["node_modules", "build", "dist"]
-}
