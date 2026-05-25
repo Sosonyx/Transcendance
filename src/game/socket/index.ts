@@ -100,7 +100,11 @@ export function registerSocketHandlers(io: Server) {
 			if (gamestate !== roomStates.RESULT) return;
 			roomManager.onDisconnectEvent(socket.id, roomId);
 			process.stdout.write(`${socket.id} quitte la room ${roomId} pour `);
+			if (roomId !== null)
+				socket.leave(roomId);
 			[roomId, roomEmitter, playerEmitter] = roomManager.connectPlayer(socket.id);
+			if (roomId !== null)
+				socket.join(roomId);
 			process.stdout.write(`rejouer dans une nouvelle room ${roomId}\n`);
 			socket.emit('startLobby');
 		});
