@@ -31,27 +31,29 @@ export class ConversationContext
         }
     }
 
-    addMessageAsUser(content: string) 
+    public addMessageAsUser(content: string) 
     {
         this.conversationHistory.push({ role: 'user', content });
         this.trim();
     }
 
-    addMessageAsAssistant(content: string)
+    public addMessageAsAssistant(content: string)
     {
         this.conversationHistory.push({ role: 'assistant', content : content.trim() });
         this.trim();
     }
 
-    getMessageHistory(): Anthropic.MessageParam[]
+    public getMessageHistory(): Anthropic.MessageParam[]
     {
         return (this.conversationHistory);
     }
 
-    reset() : void
+    public reset() : void
     {
         this.conversationHistory = [];
     }
+
+    public constructor() {}
     // ---------------------------- Only for debug, to remove later ------------------
     toString(): string 
     {
