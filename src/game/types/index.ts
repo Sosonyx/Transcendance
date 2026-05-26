@@ -1,4 +1,5 @@
 import EventEmitter from "events";
+// import type { roomStates } from "../game_logic/Room.js";
 
 export interface Message {
     senderId: string,
@@ -16,4 +17,5 @@ export interface RoomManagerInterface {
 	onDisconnectEvent(playerId : string, roomId : RoomId | null, isTTY? : boolean) : void;
 	onReplayEvent(playerId : string, roomId : RoomId, isTTY? : boolean) : void;
     getPlayersIdFromRoomId(roomId : RoomId) : readonly  string[]; // return playersId
+	getRoomState(roomId : RoomId) : string | null;
 };
