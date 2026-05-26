@@ -3,7 +3,7 @@ import type { LlmPersona } from "./prompt.js";
 import { blockBadPatterns } from "./guardrails/input.js";
 import { askClaude } from "./llm.js";
 import { getOrCreateSession } from "./sessionStore.js";
-import type { RoomChatMessage } from "./types/messages.js";
+import type { RoomChatMessages } from "./types/messages.js";
 
 // Extends means that LlmRoomContext has all properties of LlmPersona, 
 // plus the additional ones defined in LlmRoomContext
@@ -16,10 +16,10 @@ export interface LlmRoomContext extends LlmPersona
 export interface PipelineInput
 {
     llmPlayer: LlmRoomContext;
-    chatHistory: RoomChatMessage[];
+    chatHistory: RoomChatMessages[];
 }
 
-export async function pipeline(input: PipelineInput): Promise<void> 
+export async function pipeline(input: PipelineInput): Promise<string> 
 {
     const myPromptStr: string = buildSystemPrompt(input.llmPlayer);
 
@@ -47,4 +47,5 @@ export async function pipeline(input: PipelineInput): Promise<void>
     mySession.addMessageAsAssistant(llmReply);
 
     console.log(`\x1b[36m\n${input.llmPlayer.playerName} : ${llmReply}\n\x1b[0m`);
+    return llmReply;
 }

@@ -1,4 +1,4 @@
-export interface RoomChatMessage 
+export interface RoomChatMessages 
 {
     senderId: string;
     content: string;

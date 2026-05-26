@@ -1,7 +1,7 @@
 import * as readline from "readline";
 import dotenv from "dotenv";
 import { askGroq } from "./groq.js";
-import type { RoomChatMessage } from "./types/messages.js";
+import type { RoomChatMessages } from "./types/messages.js";
 import { askGemini } from "./gemini.js";
 
 dotenv.config({ path: ".env" });
@@ -39,7 +39,7 @@ async function main()
         console.log(new_msg);
         console.log("\n");
     }
-     if (userInput === "gemini")
+    if (userInput === "gemini")
     {
         const userInput = await ask("\x1b[32mmessage to gemini : \x1b[0m");
         const new_msg_gemini = await askGemini(userInput);
@@ -48,7 +48,7 @@ async function main()
         console.log("\n");
     }
 
-    const chatHistory: RoomChatMessage[] = [
+    const chatHistory: RoomChatMessages[] = [
     {
         senderId: "player1",
         content: userInput,
