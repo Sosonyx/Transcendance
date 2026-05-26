@@ -70,8 +70,6 @@ model Friendship {
   @@unique([userId, friendId]) // pas deux fois la même paire
 }
 
-
-
 model Player {
   id        String @id @default(cuid())
   roomId    String 

@@ -1,7 +1,7 @@
 import { buildSystemPrompt } from "./prompt.js";
 import type { LlmPersona } from "./prompt.js";
 import { blockBadPatterns } from "./guardrails/input.js";
-import { askClaude } from "./llm.js";
+import { askClaude } from "./claude.js";
 import { getOrCreateSession } from "./sessionStore.js";
 import type { RoomChatMessages } from "./types/messages.js";
 
