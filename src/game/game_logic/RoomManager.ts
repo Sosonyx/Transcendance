@@ -230,6 +230,17 @@ export	class RoomManager implements RoomManagerInterface
 
 	}
 
+	public 	getRoomState(roomId : RoomId) : string | null
+	{
+		if (roomId === null)
+			return (null);
+		let room : Room | undefined =this._accessRoomById(roomId);
+		if (room === undefined)
+			return (null);
+		return (room.getState());
+	}
+
+
 	public getPlayersIdFromRoomId(roomId: string): readonly string[] {
 		let res : string[] = [];
 		let players : Player[] | undefined = this._accessRoomById(roomId)?.getPlayers();
