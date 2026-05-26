@@ -1,8 +1,8 @@
 import * as readline from "readline";
 import dotenv from "dotenv";
-import { askGroq } from "./groq.js";
+import { askGroq } from "./others_llm/groq.js";
 import type { RoomChatMessages } from "./types/messages.js";
-import { askGemini } from "./gemini.js";
+import { askGemini } from "./others_llm/gemini.js";
 
 dotenv.config({ path: ".env" });
 

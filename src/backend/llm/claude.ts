@@ -1,8 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { MessageParam } from "@anthropic-ai/sdk/resources";
-import { debugLLMResponse } from "./debug_llm.js";
-// import { promiseHooks } from "v8";
-// import dotenv from "dotenv";
+import { debugLLMResponse } from "./src/debug_llm.js";
+
 
 const myClientAPI = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
