@@ -11,7 +11,7 @@ export function registerSocketHandlers(io: Server) {
 
 	/* ===============Connexion client================= */
 	io.on('connection', (socket) => {
-		console.log(`Joueur connecté : ${socket.id}`);
+		// console.log(`Joueur connecté : ${socket.id}`);
 
 		// Recupere la room
 		let [roomId, roomEmitter, playerEmitter] : [RoomId, EventEmitter, EventEmitter] = roomManager.connectPlayer(socket.id);
@@ -26,26 +26,26 @@ export function registerSocketHandlers(io: Server) {
 		    switch (state) {
 				case roomStates.LOBBY: {
 					io.to(roomId).emit('startLobby');
-					console.log(`${roomId}: lobby phase, waiting for the players to be ready`);
+					// console.log(`${roomId}: lobby phase, waiting for the players to be ready`);
 					break;
 				}
 				case roomStates.ACTION: {
 					io.to(roomId).emit('startAction');
-					console.log(`${roomId}: starting action phase`);
+					// console.log(`${roomId}: starting action phase`);
 					break;
 				}
 		        case roomStates.VOTE: {
 		            io.to(roomId).emit('startVote', roomManager.getPlayersIdFromRoomId(roomId));
-		            console.log(`${roomId}: starting vote phase`);
+		            // console.log(`${roomId}: starting vote phase`);
 		            break;
 		        }
 				case roomStates.RESULT: {
 					io.to(roomId).emit('startResult');
-					console.log(`${roomId}: result phase`)
+					// console.log(`${roomId}: result phase`)
 					break;
 				}
 		        default: {
-					console.log(`Phase ${state} de room ${roomId} non reconnue`);
+					// console.log(`Phase ${state} de room ${roomId} non reconnue`);
 		            break;
 		        }
 		    }
@@ -59,7 +59,7 @@ export function registerSocketHandlers(io: Server) {
 		socket.on('ready', () => {
 			// TODO : still need to check the state ?
 			// if (gamestate !== roomStates.LOBBY) return;
-			console.log(`Ready registered for roomId ${roomId}`);
+			// console.log(`Ready registered for roomId ${roomId}`);
 			roomManager.onReadyEvent(socket.id, roomId);
 		});
 
@@ -87,7 +87,7 @@ export function registerSocketHandlers(io: Server) {
 		socket.on('vote', (playerId: string) => {
 			if (roomManager.getRoomState(roomId) !== roomStates.VOTE) return;
 			roomManager.onVoteEvent(socket.id, playerId, roomId);
-			console.log(`${socket.id} a vote pour ${playerId}`);
+			// console.log(`${socket.id} a vote pour ${playerId}`);
 		});
 
 		/* ==========RESULT==========*/
@@ -95,7 +95,7 @@ export function registerSocketHandlers(io: Server) {
 		socket.on('replay', () => {
 			if (roomManager.getRoomState(roomId) !== roomStates.RESULT) return;
 			roomManager.onReplayEvent(socket.id, roomId);
-			console.log(`${socket.id} rejoue dans sa room ${roomId}`);
+			// console.log(`${socket.id} rejoue dans sa room ${roomId}`);
 		});
 
 		// Joueur appuie sur "New game"
@@ -132,7 +132,7 @@ export function registerSocketHandlers(io: Server) {
 		socket.on('disconnect', () => {
 			roomManager.onDisconnectEvent(socket.id, roomId);
 			roomEmitter.off('stateChanged', onStateChanged);
-			console.log(`Joueur déconnecté : ${socket.id}`);
+			// console.log(`Joueur déconnecté : ${socket.id}`);
 		});
 	});
 	const CommandLineInterpreter = new CLI(roomManager);

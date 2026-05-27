@@ -104,7 +104,6 @@ export	class RoomManager implements RoomManagerInterface
 			console.error(`\n\x1b[41mNo player with ID ${playerId} in room ${roomId}\x1b[0m\n`);
 			return ;
 		}
-		// TODO: implement logic 
 		room.onChat(player, message);
 	}
 

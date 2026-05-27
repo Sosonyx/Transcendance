@@ -2,9 +2,12 @@ import { Player } from "./Player.js";
 import {v4 as uuid} from 'uuid';
 import { EventEmitter } from "node:events";
 
-const voteTime : number = 30000;
-const actionTime : number = 30000;
+const voteTime : number = 30 * 1000; // 30 seconds
+const actionTime : number = 30 * 1000; // 30 seconds
+const replayTime : number = 10 * 1000; // 10 seconds
 const maxPlayerCount : number = 3;
+const scoreCorrectVote : number = 3;
+const scoreGetVoted : number = 1;
 
 export enum roomStates {
 	INIT = "INIT",
@@ -68,11 +71,19 @@ export class Room extends EventEmitter
 		clearTimeout(this._timerId);
 
 		if (newState === roomStates.ACTION)
+		{
+			this._addLLMPLayer();
 			this._timerId = setTimeout(() => { this.stateSwitch(roomStates.VOTE) }, actionTime);
+		}
 		else if (newState === roomStates.VOTE)
 		{
 			this._setPlayersAsVoters();
 			this._timerId = setTimeout(() => { this.stateSwitch(roomStates.RESULT) }, voteTime);
+		}
+		else if (newState === roomStates.RESULT)
+		{
+			this._computeResult();
+			this._timerId = setTimeout(() => { this._onReplayTimerEnded() }, replayTime)
 		}
 		
 		console.log(`\x1b[33m-> Room ${this._number} : switching from ${this._state} to ${newState}\x1b[0m`)
@@ -127,6 +138,7 @@ export class Room extends EventEmitter
 			// console.log(`Player ${playerFrom.getName} has already voted.`);
 			return ;
 		}
+		playerFrom.setVoteAgainst(playerTo);
 		playerFrom.setShouldVote(false);
 		console.log(`Room ${this._number} : Player ${playerFrom.getName()} is voting against player ${playerTo.getName()}`);
 		if (this._haveAllPlayersVoted())
@@ -187,10 +199,46 @@ export class Room extends EventEmitter
 		}
 	}
 
+	private	_addLLMPLayer() {
+		this._players.push(new Player(uuid(), true));
+	}
+
+	private	_removeLLMPlayers() {
+		this._players = this._players.filter(player => !player.getIsLLM());
+	}
+
 	private _restartRoom() {
+		this._removeLLMPlayers();
 		this._players.forEach(player => {player.reset()});
 		this.stateSwitch(roomStates.LOBBY)
 		this._checkLobbyStatus();
+	}
+
+	private _computeResult() : void
+	{
+		this._players.forEach(player => {
+			if (!player.getIsLLM() && player.getVoteAgainst() !== null)
+			{
+				let target : Player = player.getVoteAgainst() as Player;
+				if (target.getIsLLM())
+				{
+					player.incrementScore(scoreCorrectVote);
+				}
+				else 
+				{
+					target.incrementScore(scoreGetVoted)
+				}
+			}
+		});
+	}
+
+	private _onReplayTimerEnded()
+	{
+		clearTimeout(this._timerId);
+		let timedOut = this._players.filter(player => !player.getIsLLM() && !player.getWantReplay());
+		timedOut.forEach(player => {
+			player.emit('timedOut')
+		});
 	}
 
 	private _checkResultStatus() {
@@ -242,13 +290,13 @@ export class Room extends EventEmitter
 	}
 
 	private _haveAllPlayersVoted() : boolean {
-		if (this._players.find(player  => player.shouldVote() === true))
+		if (this._players.find(player  => player.shouldVote() && !player.getIsLLM()))
 			return (false);
 		return (true);
 	}
 
 	private _doAllPlayersWannaReplay() : boolean {
-		if (this._players.find(player  => player.getWantReplay() === false))
+		if (this._players.find(player  => !player.getWantReplay() && !player.getIsLLM()))
 			return (false);
 		return (true);
 	}
