@@ -1,7 +1,7 @@
 import * as readline from "readline";
 import dotenv from "dotenv";
 import { askGroq } from "./others_llm/groq.js";
-import type { RoomChatMessages } from "./types/messages.js";
+import type { RoomChatMessage } from "./types/messages.js";
 import { askGemini } from "./others_llm/gemini.js";
 import { Llm } from "./personnality.js";
 import EventEmitter from "node:events";
@@ -36,7 +36,7 @@ async function main() {
             break;
         }
 
-        const chatHistory: RoomChatMessages[] = [
+        const chatHistory: RoomChatMessage[] = [
             {
                 senderId: "player1",
                 content: userInput,

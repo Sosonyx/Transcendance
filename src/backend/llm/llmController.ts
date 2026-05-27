@@ -1,148 +1,165 @@
 import type { EventEmitter } from "node:events";
 import { pipeline } from "./pipeline.js";
-import type { RoomChatMessages } from "./types/messages.js";
-import { PrismaClient } from "./generated/client";
+import { llmHistory as llmHistory } from "./llmHistory.js";
+import { llmPersonnality } from "./personnality.js";
+import type { Message } from "./types/messages.js";
 
-// function retrieveUserMessagesFromDb(): Promise<RoomChatMessages[]> 
-// {
-// 	prisma.
-// }
-// ``
-export type LlmControllerOptions = {
+export type timerOptions = {
 	intervalMs?: number;
 	jitterMs?: number;
-	llmPlayerId?: string;
-	llmPlayerName?: string;
-	llmMood?: "hostile" | "neutral" | "friendly" | "observer" | "joker";
 };
 
 export class LlmController {
-	private readonly roomId: string;
-	private readonly roomEmitter: EventEmitter;
+	private readonly	_roomId: string;
+	private readonly	_roomEmitter: EventEmitter;
 
-	private readonly intervalMs: number;
-	private readonly jitterMs: number;
-	private readonly llmPlayerId: string;
-	private readonly llmPlayerName: string;
-	private readonly llmMood: "hostile" | "neutral" | "friendly" | "observer" | "joker";
+	private readonly	_intervalMs: number;
+	private readonly	_jitterMs: number;
 
-	private isListening = false;
-	private roomIsInActionState = false;
-	private isAnswering = false;
-	private timer: NodeJS.Timeout | null = null;
+	private readonly	_lastMessages: Message[] = [];
+	private 			_llmHistory: llmHistory;
 
-	public constructor(roomId: string, roomEmitter: EventEmitter,
-		options: LlmControllerOptions = {}) 
+	private				_isListening = false;
+	private				_roomIsInActionState = false;
+	private				_isAnswering = false;
+	private				_timer: NodeJS.Timeout | null = null;
+
+	private				_llmPersonnality: llmPersonnality;
+
+	public constructor(roomId: string, roomEmitter: EventEmitter, options: timerOptions = {},
+	playerNames: string[] = [], llmName: string) 
 	{
-		this.roomId = roomId;
-		this.roomEmitter = roomEmitter;
-		this.intervalMs = options.intervalMs ?? 5000;
-		this.jitterMs = options.jitterMs ?? 2000;
-		this.llmPlayerId = options.llmPlayerId ?? "llm-player";
-		this.llmPlayerName = options.llmPlayerName ?? "llm";
-		this.llmMood = options.llmMood ?? "neutral";
+		this._roomId = roomId;
+		this._roomEmitter = roomEmitter;
+		this._intervalMs = options.intervalMs ?? 5000;
+		this._jitterMs = options.jitterMs ?? 2000;
+		this._llmHistory = new llmHistory();
+		this._llmPersonnality = new llmPersonnality(playerNames, llmName);
 	}
 
-	public startListening(): void 
-    {
-		if (this.isListening) 
-			return;
+	private onStateChanged = (state: string): void => {
+		this._roomIsInActionState = (state === "ACTION");
 
-		this.isListening = true;
-		this.roomEmitter.on("stateChanged", this.onStateChanged);
-	}
-
-	public stopListening(): void 
-    {
-		if (!this.isListening) 
-			return;
-
-		this.isListening = false;
-		this.roomEmitter.off("stateChanged", this.onStateChanged);
-		this.clearTimer();
-	}
-
-	private onStateChanged = (state: string): void => 
-    {
-		this.roomIsInActionState = (state === "ACTION");
-
-		if (this.roomIsInActionState) 
-        {
+		if (this._roomIsInActionState) {
 			this.scheduleNextTick();
 			return;
 		}
-
 		this.clearTimer();
 	};
 
-	private computeDelay(): number 
-    {
-		if (this.jitterMs <= 0)
-			return this.intervalMs;
+	public startListening(): void {
+		if (this._isListening)
+			return;
 
-		const jitter = Math.random() * this.jitterMs;
+		this._isListening = true;
+		this._roomEmitter.on("message", (message: Message) => {
+			this._lastMessages.push(message);
+		});
+		this._roomEmitter.on("stateChanged", this.onStateChanged);
+	}
+
+	public stopListening(): void {
+		if (!this._isListening)
+			return;
+
+		this._isListening = false;
+		this._roomEmitter.off("stateChanged", this.onStateChanged);
+		this.clearTimer();
+	}
+
+	private computeDelay(): number {
+		if (this._jitterMs <= 0)
+			return this._intervalMs;
+
+		const jitter = Math.random() * this._jitterMs;
 		const sign = Math.random() < 0.5 ? -1 : 1;
 
-		return Math.round(this.intervalMs + sign * jitter);
+		return Math.round(this._intervalMs + sign * jitter);
 	}
 
-	private scheduleNextTick(): void 
-    {
-		if (this.timer !== null || !this.isListening || !this.roomIsInActionState) 
+	private scheduleNextTick(): void {
+		if (this._timer !== null || !this._isListening || !this._roomIsInActionState)
 			return;
 
-		this.timer = setTimeout(() => {void this.nextTick();}
-        , this.computeDelay());
+		this._timer = setTimeout(() => { void this.nextTick(); }
+			, this.computeDelay());
 	}
 
-	private clearTimer(): void 
-    {
-		if (!this.timer)
+	private clearTimer(): void {
+		if (!this._timer)
 			return;
 
-		clearTimeout(this.timer);
-		this.timer = null;
+		clearTimeout(this._timer);
+		this._timer = null;
 	}
 
-	private async nextTick(): Promise<void> 
-    {
-		this.timer = null;
+	// private async retrieveUserMessagesFromDb(): Promise<RoomChatMessage[]> {
+	// 	let llmName = await prisma.room.findUnique({
+	// 		where: {
+	// 			id: this._roomId
+	// 		},
+	// 		select: {
+	// 			llmName: true
+	// 		}
+	// 	});
 
-		if (!this.isListening || !this.roomIsInActionState || this.isAnswering) 
-        {
+	// 	let logs = await prisma.roomChatMessage.findMany({
+	// 		where: {
+	// 			roomId: this._roomId,
+	// 			senderId: {
+	// 				not: llmName
+	// 			}
+	// 		},
+	// 		orderBy: {
+	// 			timestamp: "asc"
+	// 		},
+	// 		select: {
+	// 			senderId: true,
+	// 			content: true,
+	// 			timestamp: true
+	// 		}
+	// 	});
+	// 	this._llmHistory.addMessageAsUser(logs)
+	// 	return logs;
+	// }
+
+	private async nextTick(): Promise<void> {
+		this._timer = null;
+
+		if (!this._isListening || !this._roomIsInActionState || this._isAnswering) {
 			this.scheduleNextTick();
 			return;
 		}
 
-		this.isAnswering = true;
+		this._isAnswering = true;
 
 		try {
-			const chatHistory = await this.retrieveUserMessagesFromDb();
-			const reply = await pipeline({
-				llmPlayer: {
-					playerId: this.llmPlayerId,
-					playerName: this.llmPlayerName,
-					llmMood: this.llmMood,
-					gameRole: "llm"
-				},
-				chatHistory
-			});
+			const toProcess = [...this._lastMessages];
+			this._lastMessages.length = 0;
 
-			this.roomEmitter.emit("message", {
-				senderId: this.llmPlayerId,
-				content: reply,
-				timestamp: Date.now()
-			});
-		} 
-        finally 
-        {
-			this.isAnswering = false;
+			if (toProcess.length > 0) 
+			{
+				let reply = await pipeline(this.getLlmHistory(), parseMessages(toProcess), this.getPersonnality());
+				if (reply) 
+					this._roomEmitter.emit("message", reply);
+			}
+		}
+		finally {
+			this._isAnswering = false;
 			this.scheduleNextTick();
 		}
 	}
-
-	private async retrieveUserMessagesFromDb(): Promise<RoomChatMessages[]> {
-        
-		return [];
+	public getPersonnality(): llmPersonnality {
+		return (this._llmPersonnality);
 	}
+	public getLlmHistory(): llmHistory {
+		return (this._llmHistory);
+	}
+	public getRoomId(): string {
+		return (this._roomId);
+	}
+}
+
+function parseMessages(messages: Message[]): string {
+	return messages.map(m => `${m.senderId}: ${m.content}`).join("\n");
 }

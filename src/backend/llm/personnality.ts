@@ -1,233 +1,44 @@
-import EventEmitter from "node:events";
-import { ConversationContext } from "./context.js";
-import { giveSystemPrompt } from "./prompt.js";
-import { PrismaClient } from "@prisma/client";
-
-export class llmPersonnality {
-    private _emitter: EventEmitter;
-    private _coversationHistory: ConversationContext;
-    private _roomId: string;
-    private _llmName?: string;
-    private _otherPlayers?: string;
-    private _personnality: string;
+export class llmPersonnality
+{
+    private _name?: string;
+    private _players?: string[];
+    private _temper: string;
     private _wayOfSpeaking: string;
     private _iaStrategie: string;
-    private _fullprompt: string;
 
-    public constructor(roomId: string, emitter: EventEmitter) {
-        this._emitter = emitter;
-        this._roomId = roomId;
-        this._coversationHistory = new ConversationContext();
-        
-        this._personnality = givePersonnality();
+    public constructor(players: string[], llmName: string)
+    {
+        this._players = players;
+        this._name = llmName;
+        this._temper = giveTemper();
         this._wayOfSpeaking = giveWayOfSpeaking();
         this._iaStrategie = giveIaStrategie();
-        this._fullprompt = giveSystemPrompt(this._llmName, this._personnality, this._wayOfSpeaking , this._iaStrategie)
-        
+    }
+    public getName(): string | undefined {
+        return (this._name);
     }
 
-    public get roomId(): string {
-        return this._roomId;
-    }
-    public giveRoomContent(roomId : string)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    {
-        
+    public getPlayers(): string[] | undefined {
+        return (this._players);
     }
 
+    public getWayOfSpeaking(): string {
+        return (this._wayOfSpeaking);
+
+    }
+    public getIaStrategie(): string {
+        return (this._iaStrategie);
+    }
+    
+    public getTemper(): string {
+        return (this._temper);
+    }
 };
 
-
-export function giveRoomContent(roomId : string): string
-{
-    const LlmName : string 
-    return ("");
-}
-
-
-export function givePersonnality(): string
-{
-    var str : string = "";
+export function giveTemper(): string {
+    var str: string = "";
     const random = (Math.random() * 4);
-    switch(random)
-    {
+    switch (random) {
         case 1:
             str = "tu t'enerves tres vite.";
         case 2:
@@ -240,12 +51,10 @@ export function givePersonnality(): string
     return (str);
 }
 
-export function giveWayOfSpeaking(): string
-{
-    var str : string = "";
+export function giveWayOfSpeaking(): string {
+    var str: string = "";
     const random = (Math.random() * 4);
-    switch(random)
-    {
+    switch (random) {
         case 1:
             str = "Tu t'exprimes avec politesse et retenue. Jamais d'argot.";
         case 2:
@@ -258,13 +67,10 @@ export function giveWayOfSpeaking(): string
     return (str);
 }
 
-
-export function giveIaStrategie(): string
-{
-    var str : string = "";
+export function giveIaStrategie(): string {
+    var str: string = "";
     const random = (Math.random() * 4);
-    switch(random)
-    {
+    switch (random) {
         case 1:
             str = "Tu n'es pas une ia tu le prend mal qu'on te le dise ";
         case 2:
