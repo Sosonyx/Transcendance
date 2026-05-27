@@ -4,6 +4,7 @@ import { blockBadPatterns } from "./guardrails/input.js";
 import { askClaude } from "./claude.js";
 import { getOrCreateSession } from "./sessionStore.js";
 import type { RoomChatMessages } from "./types/messages.js";
+import {prisma} from "../lib/prisma.js";
 
 // Extends means that LlmRoomContext has all properties of LlmPersona, 
 // plus the additional ones defined in LlmRoomContext
@@ -46,6 +47,6 @@ export async function pipeline(input: PipelineInput): Promise<string>
     const llmReply: string = await askClaude(myPromptStr, mySession.getMessageHistory());
     mySession.addMessageAsAssistant(llmReply);
 
-    console.log(`\x1b[36m\n${input.llmPlayer.playerName} : ${llmReply}\n\x1b[0m`);
+    // console.log(`\x1b[36m\n${input.llmPlayer.playerName} : ${llmReply}\n\x1b[0m`);
     return llmReply;
 }
