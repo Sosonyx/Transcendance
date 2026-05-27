@@ -1,12 +1,14 @@
 import EventEmitter from "node:events";
 import { ConversationContext } from "./context.js";
 import { giveSystemPrompt } from "./prompt.js";
+import { PrismaClient } from "@prisma/client";
 
-export class Llm {
+export class llmPersonnality {
     private _emitter: EventEmitter;
     private _coversationHistory: ConversationContext;
     private _roomId: string;
-    private _llmName: string;
+    private _llmName?: string;
+    private _otherPlayers?: string;
     private _personnality: string;
     private _wayOfSpeaking: string;
     private _iaStrategie: string;
@@ -16,23 +18,206 @@ export class Llm {
         this._emitter = emitter;
         this._roomId = roomId;
         this._coversationHistory = new ConversationContext();
-        this._llmName = giveLlmName(roomId);
+        
         this._personnality = givePersonnality();
         this._wayOfSpeaking = giveWayOfSpeaking();
         this._iaStrategie = giveIaStrategie();
         this._fullprompt = giveSystemPrompt(this._llmName, this._personnality, this._wayOfSpeaking , this._iaStrategie)
+        
     }
 
     public get roomId(): string {
         return this._roomId;
     }
+    public giveRoomContent(roomId : string)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    {
+        
+    }
 
 };
 
 
-export function giveLlmName(num : number): string
+export function giveRoomContent(roomId : string): string
 {
-    //find in db 
+    const LlmName : string 
     return ("");
 }
 
