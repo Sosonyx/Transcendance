@@ -75,6 +75,38 @@ export	class RoomManager implements RoomManagerInterface
 		room.onReady(player);
 	}
 
+	public onInputEvent(playerId : string, roomId : RoomId, message : string, isTTY : boolean = false)
+	{
+		if (roomId === null)
+			return ;
+
+		let room : Room | undefined;
+		let player : Player | undefined;
+
+		if (isTTY)
+		{
+			room = this._accessRoomByNumber(parseInt(roomId));
+			// player = room?.accessPlayerByName(playerId);
+			player = room?.accessPlayerById(playerId);
+		}
+		else
+		{
+			room = this._accessRoomById(roomId);
+			player = room?.accessPlayerById(playerId);
+		}
+		if (room === undefined)
+		{
+			console.error(`\n\x1b[41mNo room found with ID ${roomId}\x1b[0m\n`);
+			return ;
+		}
+		if (player === undefined)
+		{
+			console.error(`\n\x1b[41mNo player with ID ${playerId} in room ${roomId}\x1b[0m\n`);
+			return ;
+		}
+		room.onInput(player, message);
+	}
+
 	public onChatEvent(playerId : string, roomId : RoomId, message : string, isTTY : boolean = false)
 	{
 		if (roomId === null)
@@ -104,7 +136,6 @@ export	class RoomManager implements RoomManagerInterface
 			console.error(`\n\x1b[41mNo player with ID ${playerId} in room ${roomId}\x1b[0m\n`);
 			return ;
 		}
-		// TODO: implement logic 
 		room.onChat(player, message);
 	}
 
@@ -227,7 +258,6 @@ export	class RoomManager implements RoomManagerInterface
 			return ;
 		}
 		room.onSkip();
-
 	}
 
 	public 	getRoomState(roomId : RoomId) : string | null

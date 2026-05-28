@@ -8,12 +8,20 @@
 <body>
     <ul id="messages"></ul>
     <form id="form">
-<!-- State: Action -->
-        <input id="input" type="text" placeholder="Message..." autocomplete="off" />
-        <button id="send-btn">Send</button>
 
-        <!-- State: Lobby -->
+		<!-- State: Lobby -->
         <button id="ready-btn" type="button">Ready</button>
+
+		<!-- State: Chat -->
+        <input id="input" type="text" placeholder="Message..." autocomplete="off" />
+		<!-- State: Action_1 / Action_2-->
+		<div class="vbox">
+			<p id="prompt-label" class="label"> Ask a question ! </p>
+			<input id="prompt-input" type="text" placeholder="What..." autocomplete="off" />
+		</div>
+        
+		<!-- All of the above -->
+        <button id="send-btn">Send</button>
 
         <!-- State: Vote -->
         <div id="vote-container"></div>
@@ -25,6 +33,9 @@
     <script>
         const socket = io('http://localhost:3000')
         const form = document.getElementById("form");
+		const vbox = document.querySelector(".vbox");
+		const promptLabel = document.getElementById("prompt-label");
+		const promptInput = document.getElementById("prompt-input");
         const input = document.getElementById("input");
         const sendBtn = document.getElementById('send-btn');
         const readyBtn = document.getElementById('ready-btn');
@@ -33,11 +44,11 @@
         const newGameBtn = document.getElementById('new-game-btn');
 
         // -- Helpers --
-        const ALL = [input, sendBtn, readyBtn, voteContainer, replayBtn, newGameBtn];
+        const ALL = [vbox, promptLabel, promptInput, input, sendBtn, readyBtn, voteContainer, replayBtn, newGameBtn];
         const hide = (...els) => els.forEach(el => el.style.display = 'none');
         const show = (...els) => els.forEach(el => el.style.display = '');
 
-        function setState(state, players = []) {
+        function setState(state, data = []) {
             hide(...ALL);
             switch (state) {
                 case 'lobby':
@@ -45,12 +56,22 @@
                     readyBtn.textContent = 'Ready';
                     show(readyBtn);
                     break;
-                case 'action':
+				case 'action_1':
+					promptLabel.textContent = ` Ask a question ! `;
+					promptInput.placeholder = 'Your question...';
+					show(vbox, promptLabel, promptInput, sendBtn);
+					break;
+				case 'action_2':
+					promptLabel.textContent = data;
+					promptInput.placeholder = 'Your response...';
+					show(vbox, promptLabel, promptInput, sendBtn);
+					break;
+                case 'chat':
                     show(input, sendBtn);
                     break;
                 case 'vote':
                     voteContainer.innerHTML = '';
-                    players.forEach(player => {
+                    data.forEach(player => {
                         const btn = document.createElement('button');
                         btn.textContent = player;
                         btn.classList.add('vote-btn');
@@ -79,10 +100,12 @@
         setState('lobby');
 
         // Events socket
-        socket.on('startLobby',  ()        => setState('lobby'));
-        socket.on('startAction', ()        => setState('action'));
-        socket.on('startVote',   (players) => setState('vote', players));
-        socket.on('startResult', ()        => setState('result'));
+        socket.on('startLobby', ()        	=> setState('lobby'));
+		socket.on('startAction1', ()		=> setState('action_1'));
+		socket.on('startAction2', (prompt)	=> setState('action_2', prompt));
+        socket.on('startChat', ()			=> setState('chat'));
+        socket.on('startVote', (players) 	=> setState('vote', players));
+        socket.on('startResult', ()        	=> setState('result'));
 
         // Clicker sur ready
         readyBtn.addEventListener('click', () => {
@@ -94,7 +117,13 @@
         // Envoyer un message
         form.addEventListener('submit', (e) =>{
             e.preventDefault();
-            if (input.value){
+			// action 1 & action 2
+			if (promptInput.value) {
+				socket.emit('input', promptInput.value);
+				promptInput.value = '';
+			}
+			// chat
+            else if (input.value ){
                 socket.emit('message', input.value);
                 input.value = '';
             }
@@ -118,7 +147,6 @@
             replayBtn.disabled = true;
             newGameBtn.disabled = true;
         });
-
         // Time out du replay
         socket.on('timedOut', () => {
             replayBtn.disabled = true;

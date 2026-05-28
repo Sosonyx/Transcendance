@@ -2,18 +2,27 @@ import { Player } from "./Player.js";
 import {v4 as uuid} from 'uuid';
 import { EventEmitter } from "node:events";
 
-const voteTime : number = 30000;
-const actionTime : number = 30000;
+const action_1_Time : number = 30 * 1000; // 30 seconds
+const action_2_Time : number = 30 * 1000; // 30 seconds
+const chatTime : number = 30 * 1000; // 30 seconds
+const voteTime : number = 30 * 1000; // 30 seconds
+const replayTime : number = 30 * 1000; // 30 seconds
 const maxPlayerCount : number = 3;
+const scoreCorrectVote : number = 3;
+const scoreGetVoted : number = 1;
 
 export enum roomStates {
 	INIT = "INIT",
 	LOBBY = "LOBBY",
-	ACTION = "ACTION",
+	ACTION_1 = "ACTION_1",
+	ACTION_2 = "ACTION_2",
+	CHAT = "CHAT",
 	VOTE = "VOTE",
 	RESULT = "RESULT",
 	ERROR = "ERROR"
 }
+
+type playerInput =  { name : string, input : string};
 
 export class Room extends EventEmitter
 {
@@ -21,6 +30,7 @@ export class Room extends EventEmitter
 	private _number : number;
 	private _state : roomStates;
 	private	_players : Player[];
+	private _inputs : playerInput[];
 	private _playerCount : number;
 	private _maxPlayerCount : number;
 	private _isAccessible : boolean;
@@ -56,28 +66,56 @@ export class Room extends EventEmitter
 		return this._isAccessible;
 	}
 
-	private _setPlayersAsVoters() {
-		this._players.forEach((player : Player) => player.setShouldVote(true));
+	private _allPlayersShouldAct() {
+		this._players.forEach((player : Player) => player.setActed(false));
 	}
 
 	// STATE LOGIC
 
-	public stateSwitch(newState : roomStates) : void {
+	public stateSwitch(newState : roomStates) : void 
+	{
+		let data : string | null = null;
+
 		if (!(newState in roomStates))
 			newState = roomStates.ERROR;
 		clearTimeout(this._timerId);
 
-		if (newState === roomStates.ACTION)
-			this._timerId = setTimeout(() => { this.stateSwitch(roomStates.VOTE) }, actionTime);
-		else if (newState === roomStates.VOTE)
-		{
-			this._setPlayersAsVoters();
-			this._timerId = setTimeout(() => { this.stateSwitch(roomStates.RESULT) }, voteTime);
+		switch (newState) {
+
+			case (roomStates.LOBBY) : break ;
+
+			case (roomStates.ACTION_1) :
+				this._allPlayersShouldAct();
+				this._addLLMPLayer();
+				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.ACTION_2) }, action_1_Time);
+				break ;
+
+			case (roomStates.ACTION_2) :
+				this._allPlayersShouldAct();
+				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.CHAT) }, action_2_Time);
+				data = this._pickAnInput();
+				break ;
+
+			case (roomStates.CHAT) :
+				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.VOTE) }, chatTime);
+				break ;
+
+			case (roomStates.VOTE) :
+				this._allPlayersShouldAct();
+				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.RESULT) }, voteTime);
+				break ;
+
+			case (roomStates.RESULT) :
+				this._computeResult();
+				this._timerId = setTimeout(() => { this._onReplayTimerEnded() }, replayTime);
+				break ;
+
+			default : break ;
 		}
-		
+
 		console.log(`\x1b[33m-> Room ${this._number} : switching from ${this._state} to ${newState}\x1b[0m`)
 		this._state = newState;
-		this.emit('stateChanged', this._state)
+		this.emit('stateChanged', this._state, data)
 	}
 
 	public start() {
@@ -106,8 +144,31 @@ export class Room extends EventEmitter
 		this._checkLobbyStatus();
 	}
 
+	public onInput(player : Player, input : string) {
+		if (this._state != roomStates.ACTION_1 && this._state != roomStates.ACTION_2)
+		{
+			this.stateSwitch(roomStates.ERROR);
+			return ;
+		}
+		if (player.hasActed())
+			return ;
+		if (this._state == roomStates.ACTION_1)
+		{
+			let name : string = player.getName();
+			this._inputs.push({name, input});
+			console.log(`Player ${player.getName()} (room ${this._number}) : ${input}`);
+			player.setActed(true);
+		}
+		if (this._state == roomStates.ACTION_2)
+		{
+			console.log(`Player ${player.getName()} (room ${this._number}) : ${input}`);
+			player.setActed(true);
+		}
+		this._checkActionStatus();
+	}
+
 	public onChat(player : Player, message : string) {
-		if (this._state != roomStates.ACTION)
+		if (this._state != roomStates.CHAT)
 		{
 			this.stateSwitch(roomStates.ERROR);
 			return ;
@@ -122,14 +183,15 @@ export class Room extends EventEmitter
 			this.stateSwitch(roomStates.ERROR);
 			return ;
 		}
-		if (!playerFrom.shouldVote())
+		if (playerFrom.hasActed())
 		{
-			// console.log(`Player ${playerFrom.getName} has already voted.`);
+			console.log(`Player ${playerFrom.getName} has already voted.`);
 			return ;
 		}
-		playerFrom.setShouldVote(false);
+		playerFrom.setVoteAgainst(playerTo);
+		playerFrom.setActed(true);
 		console.log(`Room ${this._number} : Player ${playerFrom.getName()} is voting against player ${playerTo.getName()}`);
-		if (this._haveAllPlayersVoted())
+		if (this._haveAllPlayersActed())
 			this.stateSwitch(roomStates.RESULT)
 	}
 
@@ -146,21 +208,17 @@ export class Room extends EventEmitter
 
 	public onSkip()
 	{
-		if (this._state != roomStates.ACTION && this._state != roomStates.VOTE)
-		{
-			this.stateSwitch(roomStates.ERROR);
-			return ;
+		let newState : roomStates;
+
+		switch (this._state) {
+
+			case (roomStates.ACTION_1) :	newState = roomStates.ACTION_2 ; break ;
+			case (roomStates.ACTION_2) :	newState = roomStates.CHAT ; break ;
+			case (roomStates.CHAT) :		newState = roomStates.VOTE ; break ;
+			case (roomStates.VOTE) :		newState = roomStates.RESULT ; break ;
+			default : 						newState = roomStates.ERROR ; break ;
 		}
-		if (this._state === roomStates.ACTION)
-		{
-			this.stateSwitch(roomStates.VOTE);
-			return ;
-		}
-		if (this._state === roomStates.VOTE)
-		{
-			this.stateSwitch(roomStates.RESULT);
-			return ;
-		}
+		this.stateSwitch(newState);
 	}
 
 	public onDisconnect(player : Player) {
@@ -187,10 +245,61 @@ export class Room extends EventEmitter
 		}
 	}
 
+	private	_addLLMPLayer() {
+		this._players.push(new Player(uuid(), true));
+	}
+
+	private	_removeLLMPlayers() {
+		this._players = this._players.filter(player => !player.getIsLLM());
+	}
+
 	private _restartRoom() {
+		this._removeLLMPlayers();
+		this._inputs = [];
 		this._players.forEach(player => {player.reset()});
-		this.stateSwitch(roomStates.LOBBY)
+		this.stateSwitch(roomStates.LOBBY);
 		this._checkLobbyStatus();
+	}
+
+	private _computeResult() : void
+	{
+		this._players.forEach(player => {
+			if (!player.getIsLLM() && player.getVoteAgainst() !== null)
+			{
+				let target : Player = player.getVoteAgainst() as Player;
+				if (target.getIsLLM())
+					player.incrementScore(scoreCorrectVote);
+				else 
+					target.incrementScore(scoreGetVoted);
+			}
+		});
+	}
+
+	private _onReplayTimerEnded()
+	{
+		clearTimeout(this._timerId);
+		let timedOut = this._players.filter(player => !player.getIsLLM() && !player.getWantReplay());
+		timedOut.forEach(player => {
+			player.emit('timedOut')
+		});
+	}
+
+	private _checkActionStatus() {
+		if (!this._haveAllPlayersActed())
+		{
+			console.log('Not all players have acted');
+			return ;
+		}
+		switch (this._state) {
+			case roomStates.ACTION_1 :
+				this.stateSwitch(roomStates.ACTION_2) ;
+				return ;
+			case roomStates.ACTION_2 :
+				this.stateSwitch(roomStates.CHAT) ;
+				return ;
+			default :
+				this.stateSwitch(roomStates.ERROR);
+		}
 	}
 
 	private _checkResultStatus() {
@@ -219,7 +328,7 @@ export class Room extends EventEmitter
 		if (this._isLobbyReady())
 		{
 			this._isAccessible = false;
-			this.stateSwitch(roomStates.ACTION);
+			this.stateSwitch(roomStates.ACTION_1);
 		}
 	}
 
@@ -241,16 +350,24 @@ export class Room extends EventEmitter
 		return (true);
 	}
 
-	private _haveAllPlayersVoted() : boolean {
-		if (this._players.find(player  => player.shouldVote() === true))
+	private _haveAllPlayersActed() : boolean {
+		if (this._players.find(player  => !player.hasActed() && !player.getIsLLM()))
 			return (false);
 		return (true);
 	}
 
 	private _doAllPlayersWannaReplay() : boolean {
-		if (this._players.find(player  => player.getWantReplay() === false))
+		if (this._players.find(player  => !player.getWantReplay() && !player.getIsLLM()))
 			return (false);
 		return (true);
+	}
+
+	private _pickAnInput() : string | null {
+		let input = this._inputs[Math.floor(Math.random() * this._inputs.length)]?.input;
+		console.log(`Chosen input is : ${input}`);
+		if (input === undefined)
+			return null;
+		return input as string;
 	}
 
 	// CONSTRUCTOR
@@ -263,6 +380,7 @@ export class Room extends EventEmitter
 		this._state = roomStates.INIT;
 		this._players = [];
 		this._playerCount = 0;
+		this._inputs = [];
 		this._maxPlayerCount = maxPlayerCount;
 		this._isAccessible = true;
 	}
