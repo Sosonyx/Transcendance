@@ -35,6 +35,7 @@ export class LlmController {
 		this._jitterMs = options.jitterMs ?? 2000;
 		this._llmHistory = new llmHistory();
 		this._llmPersonnality = new llmPersonnality(playerNames, llmName);
+		console.log(`LlmController for room ${roomId} initialized with interval ${this._intervalMs}ms and jitter ${this._jitterMs}ms.`);
 	}
 
 	private onStateChanged = (state: string): void => {
@@ -52,9 +53,6 @@ export class LlmController {
 			return;
 
 		this._isListening = true;
-		this._roomEmitter.on("message", (message: Message) => {
-			this._lastMessages.push(message);
-		});
 		this._roomEmitter.on("stateChanged", this.onStateChanged);
 	}
 
@@ -91,6 +89,16 @@ export class LlmController {
 
 		clearTimeout(this._timer);
 		this._timer = null;
+	}
+
+	public notifyLlm(message: Message): void {
+		if (message.senderId === this._llmPersonnality.getName())
+			return;
+
+		this._lastMessages.push(message);
+
+		if (this._isListening && this._roomIsInActionState)
+			this.scheduleNextTick();
 	}
 
 	// private async retrieveUserMessagesFromDb(): Promise<RoomChatMessage[]> {
@@ -140,8 +148,12 @@ export class LlmController {
 			if (toProcess.length > 0) 
 			{
 				let reply = await pipeline(this.getLlmHistory(), parseMessages(toProcess), this.getPersonnality());
-				if (reply) 
-					this._roomEmitter.emit("message", reply);
+				if (reply)
+				{
+					const msg: Message = { senderId: this._llmPersonnality.getName() ?? `Llm`, content: reply, timestamp: Date.now() };
+					this._roomEmitter.emit("message", msg);
+					console.log(`LlmController: emitted message: ${JSON.stringify(msg)}`);
+				}
 			}
 		}
 		finally {

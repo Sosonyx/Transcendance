@@ -40,10 +40,10 @@ run-llm:
 	npm run chat --prefix $(LLM_DIR)
 
 run-backend: deps-backend
-	cd build/backend && node server.js
+	node build/backend/backend/server.js
 
 run-game: deps-game
-	cd build/game && node server.js
+	node build/game/game/server.js
 
 clean:
 	rm -rf build

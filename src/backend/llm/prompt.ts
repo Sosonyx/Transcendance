@@ -11,6 +11,9 @@ export function systemPrompt(llm : llmPersonnality, lastmessage : string): strin
     ${llm.getTemper()}
     
     TA FAÇON DE PARLER :
+    - tu n'utilise jamais de smiley 
+    - des reponse tres courtes 1 - 2 phrases grand maximum
+    - tu fais des fautes de frappes comme un humain  qui tape tres vite sur un clavier
     ${llm.getWayOfSpeaking()}
 
 

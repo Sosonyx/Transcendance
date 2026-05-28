@@ -1,6 +1,8 @@
 import { Player } from "./Player.js";
 import {v4 as uuid} from 'uuid';
 import { EventEmitter } from "node:events";
+import { LlmController } from "../../backend/llm/llmController.js";
+import type { Message } from "../../backend/llm/types/messages.js";
 
 const voteTime : number = 30000;
 const actionTime : number = 30000;
@@ -17,6 +19,7 @@ export enum roomStates {
 
 export class Room extends EventEmitter
 {
+	private _llmController: LlmController | null;
 	private	_id : string;
 	private _number : number;
 	private _state : roomStates;
@@ -112,8 +115,10 @@ export class Room extends EventEmitter
 			this.stateSwitch(roomStates.ERROR);
 			return ;
 		}
-		// TODO : define logic
-		console.log(`Player ${player.getName()} (room ${this._number}) : ${message}`);
+		// const msg: Message = { senderId: player.getId(), content: message, timestamp: Date.now() };
+		// // this.emit("message", msg);
+		// this._llmController?.notifyLlm(msg);
+		// console.log(`Player ${player.getName()} (room ${this._number}) : ${message}`);
 	}
 
 	public onVote(playerFrom : Player, playerTo : Player) {
@@ -265,5 +270,8 @@ export class Room extends EventEmitter
 		this._playerCount = 0;
 		this._maxPlayerCount = maxPlayerCount;
 		this._isAccessible = true;
+
+		// this._llmController = new LlmController(this._id, this as EventEmitter, {}, [], `LlmPlayer${nb}`);
+		// this._llmController.startListening();
 	}
 }

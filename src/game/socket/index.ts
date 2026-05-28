@@ -54,10 +54,12 @@ export function registerSocketHandlers(io: Server) {
 		});
 
 		// Relay messages emitted on the roomEmitter to socket.io clients
-		roomEmitter.on('message', (message: Message) => {
-			if (roomId === null) return;
-			io.to(roomId).emit('message', message);
-		});
+		if (roomEmitter.listenerCount('message') === 0) {
+			roomEmitter.on('message', (message: Message) => {
+				if (roomId === null) return;
+				io.to(roomId).emit('message', message);
+			});
+		}
 
 		/* ==========LOBBY==========*/
 		// Joueur pret

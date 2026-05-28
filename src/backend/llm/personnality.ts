@@ -46,7 +46,7 @@ export function giveTemper(): string {
         case 3:
             str = "hyper sympa";
         case 4:
-            str = "completent decaler";
+            str = "completent decaler tu dis vraiment n'importe quoi ";
     }
     return (str);
 }
