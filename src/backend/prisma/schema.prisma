@@ -1,3 +1,4 @@
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -20,7 +21,6 @@ model User {
 
   friends  Friendship[] @relation("UserFriends")
   friendOf Friendship[] @relation("FriendOf")
-  Stats    GameStats?
   OAuthAccount OAuthAccount[]
 
   playedAs  Player[]
@@ -44,17 +44,6 @@ model BlacklistedToken {
   createdAt DateTime @default(now())
 
   @@index([token])
-}
-
-model GameStats {
-  id            String @id @default(cuid())
-  numberOfGames Int    @default(0)
-  gamesWin      Int    @default(0)
-  gamesLose     Int    @default(0)
-  winrate       Float  @default(0.0)
-
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Friendship {
