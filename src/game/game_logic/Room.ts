@@ -6,10 +6,10 @@ import type { Message } from "../../backend/llm/types/messages.js";
 
 const action_1_Time : number = 30 * 1000; // 30 seconds
 const action_2_Time : number = 30 * 1000; // 30 seconds
-const chatTime : number = 30 * 1000; // 30 seconds
+const chatTime : number = 60 * 1000; // 30 seconds
 const voteTime : number = 30 * 1000; // 30 seconds
 const replayTime : number = 30 * 1000; // 30 seconds
-const maxPlayerCount : number = 3;
+const maxPlayerCount : number = 7;
 const scoreCorrectVote : number = 3;
 const scoreGetVoted : number = 1;
 
@@ -176,10 +176,10 @@ export class Room extends EventEmitter
 			this.stateSwitch(roomStates.ERROR);
 			return ;
 		}
-		// const msg: Message = { senderId: player.getId(), content: message, timestamp: Date.now() };
-		// // this.emit("message", msg);
-		// this._llmController?.notifyLlm(msg);
-		// console.log(`Player ${player.getName()} (room ${this._number}) : ${message}`);
+		const msg: Message = { senderId: player.getId(), content: message, timestamp: Date.now() };
+		// this.emit("message", msg);
+		this._llmController?.notifyLlm(msg);
+		console.log(`Player ${player.getName()} (room ${this._number}) : ${message}`);
 	}
 
 	public onVote(playerFrom : Player, playerTo : Player) {
@@ -389,7 +389,7 @@ export class Room extends EventEmitter
 		this._maxPlayerCount = maxPlayerCount;
 		this._isAccessible = true;
 
-		// this._llmController = new LlmController(this._id, this as EventEmitter, {}, [], `LlmPlayer${nb}`);
-		// this._llmController.startListening();
+		this._llmController = new LlmController(this._id, this as EventEmitter, {}, [], `LlmPlayer${nb}`);
+		this._llmController.startListening();
 	}
 }

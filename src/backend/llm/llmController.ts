@@ -39,7 +39,7 @@ export class LlmController {
 	}
 
 	private onStateChanged = (state: string): void => {
-		this._roomIsInActionState = (state === "ACTION");
+		this._roomIsInActionState = (state === "CHAT");
 
 		if (this._roomIsInActionState) {
 			this.scheduleNextTick();
@@ -100,36 +100,6 @@ export class LlmController {
 		if (this._isListening && this._roomIsInActionState)
 			this.scheduleNextTick();
 	}
-
-	// private async retrieveUserMessagesFromDb(): Promise<RoomChatMessage[]> {
-	// 	let llmName = await prisma.room.findUnique({
-	// 		where: {
-	// 			id: this._roomId
-	// 		},
-	// 		select: {
-	// 			llmName: true
-	// 		}
-	// 	});
-
-	// 	let logs = await prisma.roomChatMessage.findMany({
-	// 		where: {
-	// 			roomId: this._roomId,
-	// 			senderId: {
-	// 				not: llmName
-	// 			}
-	// 		},
-	// 		orderBy: {
-	// 			timestamp: "asc"
-	// 		},
-	// 		select: {
-	// 			senderId: true,
-	// 			content: true,
-	// 			timestamp: true
-	// 		}
-	// 	});
-	// 	this._llmHistory.addMessageAsUser(logs)
-	// 	return logs;
-	// }
 
 	private async nextTick(): Promise<void> {
 		this._timer = null;
