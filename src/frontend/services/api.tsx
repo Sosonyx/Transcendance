@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:3000'
+const API_BASE_URL = 'http://localhost:3000' //TMP METTRE URL SUR LEQUEL LE BACK ECOUTES
 
 export async function logout(){
 	const res = await fetch(`${API_BASE_URL}/api/logout`, {method: 'POST', credentials: 'include'})
@@ -11,6 +11,26 @@ export async function getProfile(){
 	const res = await fetch(`${API_BASE_URL}/api/profile`, {method: 'GET', credentials: 'include'})
 	if (!res.ok) 
 		return null
+	return res.json()
+}
+
+export async function getLeaderbord(){
+	const res = await fetch(`${API_BASE_URL}/api/leaderbord}`, {
+		method: 'GET',
+		credentials: 'include'
+	})
+	if (!res.ok)
+		throw new Error("User not found")
+	return res.json()
+}
+
+export async function getOtherProfiles(username: string){
+	const res = await fetch(`${API_BASE_URL}/api/profile/${encodeURIComponent(username)}`, {
+		method: 'GET',
+		credentials: 'include'
+	})
+	if (!res.ok)
+		throw new Error("User not found")
 	return res.json()
 }
 

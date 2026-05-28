@@ -1,5 +1,6 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import { prisma } from "../lib/prisma.js";
+import { type userInterface } from "../types/interfaces.js";
 
 export async function getProfileController(req: FastifyRequest, reply: FastifyReply){
 	try 
@@ -18,8 +19,8 @@ export async function getProfileController(req: FastifyRequest, reply: FastifyRe
 }
 
 export async function getOtherProfileController(req: FastifyRequest, reply: FastifyReply){
-	const {userId} = req.params as {userId: string}
-	const user = await prisma.user.findUnique({where: {id : userId}})
+	const {username} = req.params as {username: string}
+	const user = await prisma.user.findUnique({where: {username : username}})
 	if (!user)
 	{
 		console.error("Inexistant user!")
@@ -28,27 +29,3 @@ export async function getOtherProfileController(req: FastifyRequest, reply: Fast
 	const {hashedPassword, ...safeProfile} = user;
 	return (safeProfile)
 }
-
-// export async function getLeaderbordController(req: FastifyRequest, reply: FastifyReply)
-// {
-// 	req;
-// 	try
-// 	{	
-// 		const leaderbord = await prisma.gameStats.findMany({
-// 			orderBy:{winrate : 'desc' },
-// 			take : 10,
-// 			include: {
-// 				user: {
-// 					select: {
-// 						username : true,
-// 						avatar: true
-// 					}
-// 				}
-// 			}})
-// 		return (reply.send(leaderbord))
-// 	}
-// 	catch (error){
-// 		console.error("Erreur leaderboard:", error);
-//     	return reply.status(500).send({ error: "Erreur serveur" });
-// 	}
-// }

@@ -8,7 +8,7 @@ export async function publicRoutes(fastify: FastifyInstance){
 	fastify.post('/api/register', registerController);
 	fastify.post('/api/login', loginController);
 	fastify.post('/api/logout', logoutController);	
-	fastify.post('/api/profile/:username', getOtherProfileController);
+	fastify.get('/api/profile/:username', getOtherProfileController);
 	// fastify.get('/api/leaderboard', getLeaderbordController);
 	fastify.get('/api/auth/42/callback', intraHandler)
 	fastify.get('/api/auth/google/callback', googleHandler)

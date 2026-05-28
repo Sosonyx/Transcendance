@@ -8,13 +8,35 @@ import { registerSocketHandlers } from './game/socket/index.js';
 
 export const fastify = Fastify();
 
+fastify.addHook('onRequest', (request, reply, done) => {
+    reply.header('Access-Control-Allow-Origin', 'http://localhost:5174');
+    reply.header('Access-Control-Allow-Credentials', 'true');
+    reply.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    reply.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+
+    if (request.method === 'OPTIONS') {
+        reply.code(204).send();
+        return;
+    }
+
+    done();
+}); // TEMP, Autoriser fastify a call vite serv
+
 fastify.register(fastifyStatic, {
-    root: join(process.cwd(), 'public')
+    root: join(process.cwd(), 'build/frontend')
 });
 
 fastify.get('/', (request, reply) => {
     request;
-    return reply.sendFile('index_2.html');
+    return reply.sendFile('index.html');
+});
+
+fastify.setNotFoundHandler((request, reply) => {
+    if (request.method === 'GET' && !request.url.startsWith('/api') && !request.url.startsWith('/health')) {
+        return reply.sendFile('index.html');
+    }
+
+    return reply.code(404).send({ message: 'Not Found' });
 });
 
 await fastify.register(initRoutes);

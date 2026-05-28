@@ -22,7 +22,7 @@ build:
 	make build-game
 
 build-frontend:
-	npm run build
+	npm run build --workspace src/frontend
 
 build-backend:
 	docker compose up -d
@@ -33,8 +33,8 @@ build-game:
 
 run:
 	make deps
-	BACKEND_PORT=$${BACKEND_PORT:-3000} npm run dev & \
-	npm run dev --workspace src/frontend
+	make build-frontend
+	BACKEND_PORT=$${BACKEND_PORT:-3000} npm run dev
 
 run-backend:
 	BACKEND_PORT=$${BACKEND_PORT:-3000} npm run dev

@@ -21,7 +21,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
       if (onSuccess) 
 		await onSuccess();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur lors de l'inscription");
+      setError(err instanceof Error ? err.message : "Erreur lors de l'inscription"); // True if err throwed
     } finally {
       setSubmitting(false);
     }
@@ -35,6 +35,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
         value={email}
         onChange={(input) => setEmail(input.target.value)}
       />
+      {email}
       <input
         type="text"
         placeholder="Username"
