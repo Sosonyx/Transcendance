@@ -1,4 +1,7 @@
 {
+  "name": "@transcendance/game",
+  "version": "1.0.0",
+  "private": true,
   "devDependencies": {
     "@types/node": "^25.9.0",
     "ts-node": "^10.9.2",

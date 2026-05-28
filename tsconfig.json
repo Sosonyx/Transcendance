@@ -4,6 +4,7 @@
     // File Layout
     "rootDir": "./src",
     "outDir": "./build",
+    "jsx": "react-jsx",
     
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
@@ -11,6 +12,11 @@
     "target": "esnext",
     "types": ["node"],
     "lib": ["esnext"],
+    "lib": [
+      "DOM",          /* <-- C'est ça qui donne accès à 'document' et 'window' */
+      "DOM.Iterable", 
+      "ES2022"
+    ],
 
     // Other Outputs
     "sourceMap": true,

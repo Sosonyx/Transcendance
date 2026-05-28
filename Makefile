@@ -1,46 +1,53 @@
 SHELL := /bin/sh
 
-BACKEND_DIR := src/backend
-GAME_DIR := src/game
-
-.PHONY: help deps deps-backend deps-game build build-backend build-game run run-backend run-game clean
+.PHONY: help deps build build-backend build-game run run-backend clean fclean distclean
 
 help:
 	@printf '%s\n' \
 		"Targets:" \
-		"  make deps           Install dependencies for backend and game" \
-		"  make build          Compile backend and game" \
-		"  make run            Launch the backend server with tsx" \
-		"  make run-game       Launch the game server" \
-		"  make clean          Remove generated build output"
+		"  make deps           Install all workspace dependencies" \
+		"  make build          Compile the monorepo" \
+		"  make run            Launch the main server with tsx" \
+		"  make run-backend    Launch only the backend workspace" \
+		"  make clean          Remove generated build output" \
+		"  make fclean         Remove generated build output and Prisma artifacts" \
+		"  make distclean      Remove build output and all node_modules"
 
-deps: deps-backend deps-game
+deps:
+	npm install
 
-deps-backend:
-	npm install --prefix $(BACKEND_DIR)
+build:
+	make build-frontend
+	make build-backend
+	make build-game
 
-deps-game:
-	npm install --prefix $(GAME_DIR)
+build-frontend:
+	npm run build
 
-build: build-backend build-game
+build-backend:
+	docker compose up -d
+	npm run build --workspace src/backend
 
-build-backend: deps-backend
-	npm --prefix $(BACKEND_DIR) run build
-	mkdir -p build/backend
-	ln -sfn ../../src/backend/node_modules build/backend/node_modules
+build-game:
+	npm run build --workspace src/game
 
-build-game: deps-game
-	npm --prefix $(GAME_DIR) run build
-	mkdir -p build/game
-	ln -sfn ../../src/game/node_modules build/game/node_modules
+run:
+	make deps
+	make build
+	npm run dev
 
-run: run-backend
-
-run-backend: deps-backend
-	cd build/backend && node server.js
-
-run-game: deps-game
-	cd build/game && node server.js
+run-backend:
+	npm run dev --workspace src/backend
 
 clean:
 	rm -rf build
+	rm -f tsconfig.tsbuildinfo
+	rm -rf src/backend/.prisma
+
+fclean: clean
+
+distclean: fclean
+	rm -rf node_modules
+	rm -rf src/backend/node_modules
+	rm -rf src/game/node_modules
+	rm -rf src/backend/llm/node_modules

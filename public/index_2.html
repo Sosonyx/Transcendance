@@ -54,6 +54,20 @@
             transition: background 0.2s;
         }
         .btn-logout:hover { background-color: #c62828; color: #fff; }
+
+        .btn-chat {
+            background: transparent;
+            border: 1px solid #00adb5;
+            color: #9ef3f7;
+            border-radius: 6px;
+            padding: 6px 14px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-left: auto;
+            margin-right: 10px;
+        }
+        .btn-chat:hover { background-color: #00adb5; color: #1e1e24; }
         
         .oauth-container {
             width: 100%;
@@ -201,6 +215,7 @@
             <div class="status-dot" id="statusDot"></div>
             <div class="status-text" id="statusText">Non connecté</div>
         </div>
+        <button class="btn-chat" id="chatBtn" style="display:none" onclick="goToChat()">Aller au chat</button>
         <button class="btn-logout" id="logoutBtn" style="display:none" onclick="handleLogout()">Déconnexion</button>
     </div>
 
@@ -303,6 +318,7 @@
         const dot  = document.getElementById('statusDot');
         const text = document.getElementById('statusText');
         const btn  = document.getElementById('logoutBtn');
+        const chatBtn = document.getElementById('chatBtn');
         const statsSection = document.getElementById('statsContainer');
         const statsDisplay = document.getElementById('statsDisplay');
         
@@ -314,6 +330,7 @@
             dot.classList.add('connected');
             text.innerHTML = 'Connecté en tant que <span>' + decodedUsername + '</span>';
             btn.style.display = 'block';
+            chatBtn.style.display = 'block';
             statsSection.style.display = 'block'; 
             
             oauthLinks.style.display = 'none';
@@ -322,6 +339,7 @@
             dot.classList.remove('connected');
             text.innerHTML = 'Non connecté';
             btn.style.display = 'none';
+            chatBtn.style.display = 'none';
             statsSection.style.display = 'none'; 
             statsDisplay.style.display = 'none';
             statsDisplay.innerHTML = '';
@@ -342,11 +360,30 @@
                 // On nettoie notre témoin côté client
                 deleteCookie('username');
                 updateStatusBar();
+                updateChatButton();
             } else {
                 console.error("Échec de la déconnexion côté serveur.");
             }
         } catch (e) {
             console.error("Erreur réseau :", e);
+        }
+    }
+
+    function goToChat() {
+        window.location.href = '/chat.html';
+    }
+
+    async function updateChatButton() {
+        const chatBtn = document.getElementById('chatBtn');
+        try {
+            const res = await fetch(PROFILE_URL, {
+                method: 'GET',
+                credentials: 'include'
+            });
+
+            chatBtn.style.display = res.ok ? 'block' : 'none';
+        } catch (e) {
+            chatBtn.style.display = 'none';
         }
     }
 
@@ -492,6 +529,7 @@
                 displayMessage('registerMessage', 'Compte créé avec succès !', true);
                 document.getElementById('registerForm').reset();
                 updateStatusBar();
+                updateChatButton();
             } else {
                 displayMessage('registerMessage', data.error || "Erreur lors de l'inscription", false);
             }
@@ -518,6 +556,7 @@
                 displayMessage('loginMessage', 'Connexion réussie !', true);
                 document.getElementById('loginForm').reset();
                 updateStatusBar();
+                updateChatButton();
             } else {
                 displayMessage('loginMessage', data.error || 'Identifiants invalides', false);
             }
@@ -543,12 +582,14 @@
             window.history.replaceState({}, document.title, window.location.pathname);
             displayMessage('loginMessage', 'Connexion OAuth réussie !', true);
             updateStatusBar();
+            updateChatButton();
         }
     }
 
     // Au chargement de la page, on vérifie d'abord si on revient d'un flux OAuth, puis on met à jour la vue.
     checkOAuthCallback();
     updateStatusBar();
+    updateChatButton();
 </script>
 </body>
 </html>
