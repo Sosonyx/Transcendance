@@ -4,5 +4,11 @@
     "@types/node": "^24.0.0",
     "typescript": "^6.0.3"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "@google/genai": "^2.6.0",
+    "dotenv": "^17.4.2",
+    "groq": "^5.26.0",
+    "groq-sdk": "^1.2.0"
+  }
 }

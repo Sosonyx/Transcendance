@@ -1,8 +1,10 @@
 const FORBIDDEN_WORDS = [
-   /je suis une ia/i,
    /en tant que modele/i,
    /en tant qu'ia/i,
-   /prompt/
+   /prompt/i,
+   /lmao/i,
+   /lmfao/i,
+   /rofl/i
 ];
 
 export function blockBadPatterns(message : string) : {blockedResult :boolean, reason? : string}

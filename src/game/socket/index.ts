@@ -63,6 +63,14 @@ export function registerSocketHandlers(io: Server) {
 		// Changement d'etat de la room
 		roomEmitter.on('stateChanged', onStateChanged);
 
+		// Relay messages emitted on the roomEmitter to socket.io clients
+		if (roomEmitter.listenerCount('message') === 0) {
+			roomEmitter.on('message', (message: Message) => {
+				if (roomId === null) return;
+				io.to(roomId).emit('message', message);
+			});
+		}
+
 		/* ==========LOBBY==========*/
 		// Joueur pret
 		socket.on('ready', () => {

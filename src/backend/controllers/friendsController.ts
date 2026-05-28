@@ -39,6 +39,8 @@ export async function addFriend(request: FastifyRequest, reply: FastifyReply) {
 
     const idA = currentUser.id;
     const idB = targetUser.id;
+    // We order the IDs to ensure that the friendship is
+    // always stored in the same way to prevent duplicates (A-B and B-A)
     const [uId, vId] = idA < idB ? [idA, idB] : [idB, idA];
 
     const friendshipAlreadyExist = await prisma.friendship.findFirst({
