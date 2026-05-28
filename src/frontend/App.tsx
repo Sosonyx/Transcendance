@@ -20,7 +20,7 @@ export function App() {
       {loading ? "Loading..." : "Connected"}
       {!user && !isAuthenticated && <p>Pas de cookie token, merci de vous connecter.</p>}
       {!user && !isAuthenticated && <RegisterForm onSuccess={refreshAuth}/>}
-      {/* {user && hasToken && <Profile user={user}/>} */}
+      {/* {user && isAuthenticated && <Profile user={user}/>} */}
       <Statusbar user={user} onLogout={handleLogout} />
     </>
   )

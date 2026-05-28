@@ -7,8 +7,8 @@ function hasTokenCookie(): boolean {
 }
 
 export function useAuth() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true); //Loading dans toutes les fct front qui font des calls API (Pas rerender avec des etats intermediaire)
+  const [user, setUser] = useState<User | null>(null); //useState(InitialValue) -> creer une variable readOnly, modifiable avec la fct setState, React rerender lors que cest modifier
+  const [loading, setLoading] = useState(true); //Loading/Submitting dans toutes les fct front qui font des calls API (Pas rerender avec des etats intermediaire)
 
   const refreshAuth = async () => {
     setLoading(true);

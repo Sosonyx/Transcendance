@@ -17,9 +17,8 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
 
     try {
       await login(username, password);
-      if (onSuccess) {
+      if (onSuccess)
         await onSuccess();
-      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {

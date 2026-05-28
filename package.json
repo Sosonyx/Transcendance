@@ -4,17 +4,22 @@
   "type": "module",
   "workspaces": [
     "src/backend",
-    "src/game"
+    "src/game",
+    "src/frontend"
   ],
   "scripts": {
     "postinstall": "npm run prisma:generate --workspace src/backend",
     "predev": "npm run prisma:generate --workspace src/backend",
     "dev": "tsx watch src/server.ts",
     "build": "tsc -p tsconfig.json",
+    "build-frontend": "npm run build --workspace src/frontend",
+    "dev-frontend": "npm run dev --workspace src/frontend",
     "start": "node build/server.js",
     "prisma:generate": "npm run prisma:generate --workspace src/backend",
     "build:backend": "npm run build --workspace src/backend",
     "build:game": "npm run build --workspace src/game"
+    ,"start:all": "make start-all",
+    "dev:all": "make run"
   },
   "dependencies": {
     "@fastify/static": "^9.1.3",

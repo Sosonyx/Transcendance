@@ -10,7 +10,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+  const [submitting, setSubmitting] = useState(false); // Si le buttun a ete cliquer le disable le temps du call api
 
   const handleSubmit = async () => {
     setSubmitting(true);

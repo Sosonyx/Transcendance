@@ -8,27 +8,13 @@ import { registerSocketHandlers } from './game/socket/index.js';
 
 export const fastify = Fastify();
 
-fastify.addHook('onRequest', (request, reply, done) => {
-    reply.header('Access-Control-Allow-Origin', 'http://localhost:5173');
-    reply.header('Access-Control-Allow-Credentials', 'true');
-    reply.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    reply.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
-
-    if (request.method === 'OPTIONS') {
-        reply.code(204).send();
-        return;
-    }
-
-    done();
-});
-
 fastify.register(fastifyStatic, {
-    root: join(process.cwd(), '.')
+    root: join(process.cwd(), 'public')
 });
 
 fastify.get('/', (request, reply) => {
     request;
-    return reply.sendFile('index.html');
+    return reply.sendFile('index_2.html');
 });
 
 await fastify.register(initRoutes);
@@ -41,6 +27,8 @@ const io = new Server(fastify.server, {
 
 registerSocketHandlers(io);
 
-fastify.listen({ port: 3000 }, () => {
-    console.log('Serveur lancé sur le port 3000');
+const BACKEND_PORT = process.env.BACKEND_PORT ? parseInt(process.env.BACKEND_PORT) : 3000;
+
+fastify.listen({ port: BACKEND_PORT }, () => {
+    console.log(`Serveur lancé sur le port ${BACKEND_PORT}`);
 });

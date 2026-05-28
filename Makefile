@@ -33,11 +33,11 @@ build-game:
 
 run:
 	make deps
-	make build
-	npm run dev
+	BACKEND_PORT=$${BACKEND_PORT:-3000} npm run dev & \
+	npm run dev --workspace src/frontend
 
 run-backend:
-	npm run dev --workspace src/backend
+	BACKEND_PORT=$${BACKEND_PORT:-3000} npm run dev
 
 clean:
 	rm -rf build
@@ -51,3 +51,10 @@ distclean: fclean
 	rm -rf src/backend/node_modules
 	rm -rf src/game/node_modules
 	rm -rf src/backend/llm/node_modules
+
+
+start-all:
+	# Build everything then run the production server which serves built frontend
+	make build
+	# Use root start script (node build/server.js)
+	npm run start
