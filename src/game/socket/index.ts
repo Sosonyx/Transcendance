@@ -15,13 +15,12 @@ export function registerSocketHandlers(io: Server) {
 
 		// Recupere la room
 		let [roomId, roomEmitter, playerEmitter] : [RoomId, EventEmitter, EventEmitter] = roomManager.connectPlayer(socket.id);
-		// let gamestate : string = roomStates.LOBBY;
 
 		// Rejoins sa room
 		if (roomId !== null)
 			socket.join(roomId);
 
-		const onStateChanged = (state: string) => {
+		const onStateChanged = (state: string, data: undefined) => {
 			if (roomId === null) return;
 		    switch (state) {
 				case roomStates.LOBBY: {
@@ -29,8 +28,18 @@ export function registerSocketHandlers(io: Server) {
 					// console.log(`${roomId}: lobby phase, waiting for the players to be ready`);
 					break;
 				}
-				case roomStates.ACTION: {
-					io.to(roomId).emit('startAction');
+				case roomStates.ACTION_1: {
+					io.to(roomId).emit('startAction1');
+					// console.log(`${roomId}: starting action_1 phase`);
+					break ;
+				}
+				case roomStates.ACTION_2: {
+					io.to(roomId).emit('startAction2', data);
+					break ;
+				}
+
+				case roomStates.CHAT: {
+					io.to(roomId).emit('startChat');
 					// console.log(`${roomId}: starting action phase`);
 					break;
 				}
@@ -63,11 +72,25 @@ export function registerSocketHandlers(io: Server) {
 			roomManager.onReadyEvent(socket.id, roomId);
 		});
 
-		/* ==========ACTION==========*/
+		/* ==========ACTION_1==========*/
+		// Joueur interragit action_1
+		socket.on('input', (content: string) => {
+
+			// console.log(`socket backend received an input info !`);
+			if (roomId === null) return;
+			if (roomManager.getRoomState(roomId) !== roomStates.ACTION_1 && roomManager.getRoomState(roomId) !== roomStates.ACTION_2 ) return;
+			if (typeof content !== 'string') return;
+			if (content.trim() === '') return;
+			if (content.length > 500) return;
+			
+			roomManager.onInputEvent(socket.id, roomId, content);
+		});
+
+		/* ==========CHAT==========*/
 		// Joueur envoie un message
 		socket.on('message', (content: string) => {
 			if (roomId === null) return;
-			if (roomManager.getRoomState(roomId) !== roomStates.ACTION) return;
+			if (roomManager.getRoomState(roomId) !== roomStates.CHAT) return;
 			if (typeof content !== 'string') return;
 			if (content.trim() === '') return;
 			if (content.length > 500) return;

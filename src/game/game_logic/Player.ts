@@ -6,7 +6,7 @@ export class Player extends EventEmitter
 	private _name : string;
 	private	_isLLM : boolean;
 	private _isReady : boolean;
-	private _shouldVote : boolean;
+	private _acted : boolean;
 	private _wantReplay : boolean;
 	private	_voteAgainst : Player | null;
 	private	_score : number;
@@ -27,8 +27,8 @@ export class Player extends EventEmitter
 		return this._isReady;
 	}
 
-	public shouldVote() : boolean {
-		return this._shouldVote;
+	public hasActed() : boolean {
+		return this._acted;
 	}
 
 	public getWantReplay() : boolean {
@@ -49,14 +49,14 @@ export class Player extends EventEmitter
 
 	public reset() {
 		this._isReady = false;
-		this._shouldVote = false;
+		this._acted = false;
 		this._wantReplay = false;
 		this._voteAgainst = null;
 		this._score = 0;
 	}
 
-	public setShouldVote(status : boolean) {
-		this._shouldVote = status;
+	public setActed(status : boolean) {
+		this._acted = status;
 	}
 
 	public setWantReplay(status : boolean) {
@@ -75,7 +75,7 @@ export class Player extends EventEmitter
 		this._name = 'no-name';
 		this._isLLM = isLLM;
 		this._isReady = false;
-		this._shouldVote = false;
+		this._acted = false;
 		this._wantReplay = false;
 		this._voteAgainst = null;
 		this._score = 0;
