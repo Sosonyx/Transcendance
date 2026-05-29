@@ -46,34 +46,22 @@ export function giveTemper(): string {
     return (temper[random]!);
 }
 
-export function giveWayOfSpeaking(): string {
-    var str: string = "";
-    const random = (Math.random() * 4);
-    switch (random) {
-        case 1:
-            str = "Tu t'exprimes avec politesse et retenue. Jamais d'argot.";
-        case 2:
-            str = "Tu parles cash, sans fioritures. Langage direct et populaire.";
-        case 3:
-            str = "Tu es brusque, tu coupes la parole, tu intimides.";
-        case 4:
-            str = "Tu parles par énigmes, tu ne donnes jamais de réponse directe.";
-    }
-    return (str);
+export function giveWayOfSpeaking(): string  {
+    const current_path = dirname(fileURLToPath(import.meta.url));
+    const path_file = join(current_path, "/personnality/wayOfSpeaking.json");
+    const json_data = readFileSync(path_file, "utf-8");
+    const wayOfSpeaking: string[] = JSON.parse(json_data);
+
+    const random = Math.floor(Math.random() * wayOfSpeaking.length);
+    return (wayOfSpeaking[random]!);
 }
 
 export function giveIaStrategie(): string {
-    var str: string = "";
-    const random = (Math.random() * 4);
-    switch (random) {
-        case 1:
-            str = "Tu n'es pas une ia tu le prend mal qu'on te le dise ";
-        case 2:
-            str = "Tu es peut etre une ia qui sait ?";
-        case 3:
-            str = "Tu es un humain qui se fait passer pour une ia";
-        case 4:
-            str = "tu ne sais pas trop";
-    }
-    return (str);
+    const current_path = dirname(fileURLToPath(import.meta.url));
+    const path_file = join(current_path, "/personnality/personnalities.json");
+    const json_data = readFileSync(path_file, "utf-8");
+    const iaStrategie: string[] = JSON.parse(json_data);
+
+    const random = Math.floor(Math.random() * iaStrategie.length);
+    return (iaStrategie[random]!);
 }
