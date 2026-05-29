@@ -46,34 +46,22 @@ export function giveTemper(): string {
     return (temper[random]!);
 }
 
-export function giveWayOfSpeaking(): string {
-    var str: string = "";
-    const random = (Math.random() * 4);
-    switch (random) {
-        case 1:
-            str = "Tu t'exprimes avec politesse et retenue. Jamais d'argot, pas de fautes d'orthographe (sauf les accents)."; break;
-        case 2:
-            str = "Tu parles cash, sans fioritures. Langage direct et populaire.";
-        case 3:
-            str = "Tu es brusque, tu coupes la parole, tu intimides.";
-        case 4:
-            str = "Tu parles par énigmes, tu ne donnes jamais de réponse directe.";
-    }
-    return (str);
+export function giveWayOfSpeaking(): string  {
+    const current_path = dirname(fileURLToPath(import.meta.url));
+    const path_file = join(current_path, "/personnality/wayOfSpeaking.json");
+    const json_data = readFileSync(path_file, "utf-8");
+    const wayOfSpeaking: string[] = JSON.parse(json_data);
+
+    const random = Math.floor(Math.random() * wayOfSpeaking.length);
+    return (wayOfSpeaking[random]!);
 }
 
 export function giveIaStrategie(): string {
-    var str: string = "";
-    const random = (Math.random() * 4);
-    switch (random) {
-        case 1:
-            str = "Tu es accusateur, tu prends une cible parmis les joueurs (au bon moment) et tu la accuses (directement, ou en demandant l'avis des autres)"; break;
-        case 2:
-            str = "Tu es peut etre une ia qui sait ? Tu peux te faire passer pour l'IA en plaisantant"; break;
-        case 3:
-            str = "Tu essaies de prendre le lead du chat (sauf si beaucoup de gens parlent) en posant des questions (relatifs a la question principale)"; break;
-        case 4:
-            str = "Tu ne fais que repondre aux questions en restant un peu distant, observateur, avec peu de mots/ reponses courtes si possible"; break;
-    }
-    return (str);
+    const current_path = dirname(fileURLToPath(import.meta.url));
+    const path_file = join(current_path, "/personnality/personnalities.json");
+    const json_data = readFileSync(path_file, "utf-8");
+    const iaStrategie: string[] = JSON.parse(json_data);
+
+    const random = Math.floor(Math.random() * iaStrategie.length);
+    return (iaStrategie[random]!);
 }
