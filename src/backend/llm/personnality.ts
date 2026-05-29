@@ -1,13 +1,14 @@
-export class llmPersonnality
-{
+import { readFileSync } from "fs";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
+export class llmPersonnality {
     private _name?: string;
     private _players?: string[];
     private _temper: string;
     private _wayOfSpeaking: string;
     private _iaStrategie: string;
 
-    public constructor(players: string[], llmName: string)
-    {
+    public constructor(players: string[], llmName: string) {
         this._players = players;
         this._name = llmName;
         this._temper = giveTemper();
@@ -29,26 +30,20 @@ export class llmPersonnality
     public getIaStrategie(): string {
         return (this._iaStrategie);
     }
-    
+
     public getTemper(): string {
         return (this._temper);
     }
 };
 
 export function giveTemper(): string {
-    var str: string = "";
-    const random = (Math.random() * 4);
-    switch (random) {
-        case 1:
-            str = "tu t'enerves tres vite."; break;
-        case 2:
-            str = "tres calme"; break;
-        case 3:
-            str = "hyper sympa"; break;
-        case 4:
-            str = "completement decale tu dis vraiment n'importe quoi "; break;
-    }
-    return (str);
+    const current_path = dirname(fileURLToPath(import.meta.url));
+    const path_file = join(current_path, "/personnality/temper.json");
+    const json_data = readFileSync(path_file, "utf-8");
+    const temper: string[] = JSON.parse(json_data);
+
+    const random = Math.floor(Math.random() * temper.length);
+    return (temper[random]!);
 }
 
 export function giveWayOfSpeaking(): string {
@@ -58,11 +53,11 @@ export function giveWayOfSpeaking(): string {
         case 1:
             str = "Tu t'exprimes avec politesse et retenue. Jamais d'argot, pas de fautes d'orthographe (sauf les accents)."; break;
         case 2:
-            str = "Tu parles cash, sans fioritures. Langage direct et populaire."; break;
+            str = "Tu parles cash, sans fioritures. Langage direct et populaire.";
         case 3:
-            str = "Tu es brusque, tu coupes la parole, tu intimides."; break;
+            str = "Tu es brusque, tu coupes la parole, tu intimides.";
         case 4:
-            str = "Tu parles par énigmes, tu ne donnes jamais de réponse directe."; break;
+            str = "Tu parles par énigmes, tu ne donnes jamais de réponse directe.";
     }
     return (str);
 }

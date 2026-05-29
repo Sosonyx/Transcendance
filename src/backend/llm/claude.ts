@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { MessageParam } from "@anthropic-ai/sdk/resources";
-import { debugLLMResponse } from "./src/debug_llm.js";
+// import { debugLLMResponse } from "./src/debug_llm.js";
 
 import dotenv from "dotenv";
 import { existsSync } from "fs";
@@ -57,10 +57,10 @@ export async function askClaude(myPromptStr: string, conversationHistory: Messag
 
     // console.log("content complet:", JSON.stringify(llmResponse.content, null, 2));
     // const block = llmResponse.content[0];
-    const block = llmResponse.content.find( b => b.type === "text")
+    const block = llmResponse.content.find( (b: Anthropic.Messages.ContentBlock) => b.type === "text")
     if(block === undefined || block.type !== "text")
     {
-        debugLLMResponse(llmResponse);
+        // debugLLMResponse(llmResponse);
         throw new Error("Unexpected response type");
     }
     return block.text;

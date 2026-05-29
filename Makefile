@@ -16,13 +16,16 @@ help:
 
 deps: deps-backend deps-game
 
+deps-root:
+	npm install
+
 deps-backend:
 	npm install --prefix $(BACKEND_DIR)
 
 deps-game:
 	npm install --prefix $(GAME_DIR)
 
-build: build-backend build-game
+build: deps-root build-backend build-game
 
 build-backend: deps-backend
 	npm --prefix $(BACKEND_DIR) run build
@@ -40,10 +43,10 @@ run-llm:
 	npm run chat --prefix $(LLM_DIR)
 
 run-backend: deps-backend
-	node build/backend/backend/server.js
+	node build/backend/server.js
 
 run-game: deps-game
-	node build/game/game/server.js
+	node build/game/server.js
 
 clean:
 	rm -rf build
