@@ -3,11 +3,7 @@ import { pipeline } from "./pipeline.js";
 import { llmHistory as llmHistory } from "./llmHistory.js";
 import { llmPersonnality } from "./personnality.js";
 import type { Message } from "./types/messages.js";
-
-export type timerOptions = {
-	intervalMs?: number;
-	jitterMs?: number;
-};
+// import type { privateDecrypt } from "node:crypto";
 
 export class LlmController {
 	private readonly	_roomId: string;
@@ -16,53 +12,45 @@ export class LlmController {
 	private readonly	_intervalMs: number;
 	private readonly	_jitterMs: number;
 
-	private readonly	_lastMessages: Message[] = [];
+	private readonly	_nbPlayers: number;
+	private				_lastMessages: Message[] = [];
 	private 			_llmHistory: llmHistory;
+	private             _currentQuestion: string | undefined;
 
-	private				_isListening = false;
-	private				_roomIsInActionState = false;
+	private				_isPlaying = false;
 	private				_isAnswering = false;
 	private				_timer: NodeJS.Timeout | null = null;
 
 	private				_llmPersonnality: llmPersonnality;
 
-	public constructor(roomId: string, roomEmitter: EventEmitter, options: timerOptions = {},
+	public constructor(roomId: string, roomEmitter: EventEmitter,
 	playerNames: string[] = [], llmName: string) 
 	{
 		this._roomId = roomId;
 		this._roomEmitter = roomEmitter;
-		this._intervalMs = options.intervalMs ?? 5000;
-		this._jitterMs = options.jitterMs ?? 2000;
+
+		this._nbPlayers = playerNames.length;
+		this._intervalMs = 5000;
+		this._jitterMs = 2000;
 		this._llmHistory = new llmHistory();
 		this._llmPersonnality = new llmPersonnality(playerNames, llmName);
-		console.log(`LlmController for room ${roomId} initialized with interval ${this._intervalMs}ms and jitter ${this._jitterMs}ms.`);
+	}
+	// To set when the room is in a state where the LLM should answer
+	public startPlaying(): void {
+		if (this._isPlaying)
+			return;
+		this._isPlaying = true;
+
+		this.scheduleNextTick();
 	}
 
-	private onStateChanged = (state: string): void => {
-		this._roomIsInActionState = (state === "CHAT");
-
-		if (this._roomIsInActionState) {
-			this.scheduleNextTick();
+	public stopPlaying(): void {
+		if (!this._isPlaying)
 			return;
-		}
+
+		this._isPlaying = false;
 		this.clearTimer();
-	};
-
-	public startListening(): void {
-		if (this._isListening)
-			return;
-
-		this._isListening = true;
-		this._roomEmitter.on("stateChanged", this.onStateChanged);
-	}
-
-	public stopListening(): void {
-		if (!this._isListening)
-			return;
-
-		this._isListening = false;
-		this._roomEmitter.off("stateChanged", this.onStateChanged);
-		this.clearTimer();
+		this._timer = null;
 	}
 
 	private computeDelay(): number {
@@ -76,14 +64,13 @@ export class LlmController {
 	}
 
 	private scheduleNextTick(): void {
-		if (this._timer !== null || !this._isListening || !this._roomIsInActionState)
+		if (this._timer)
 			return;
 
-		this._timer = setTimeout(() => { void this.nextTick(); }
-			, this.computeDelay());
+		this._timer = setTimeout(() => { void this.llmAnswer(); } ,this.computeDelay());
 	}
 
-	private clearTimer(): void {
+	private	clearTimer(): void {
 		if (!this._timer)
 			return;
 
@@ -91,54 +78,102 @@ export class LlmController {
 		this._timer = null;
 	}
 
-	public notifyLlm(message: Message): void {
-		if (message.senderId === this._llmPersonnality.getName())
-			return;
+	private getCutoffTime(): number {
+		return Date.now() - 1500;
+	}
 
+	private collectMessagesForAnswer(cutoff: number): Message[] {
+		return this._lastMessages.filter(m => m.timestamp <= cutoff);
+	}
+
+	private clearProcessedMessages(cutoff: number): void {
+		this._lastMessages = this._lastMessages.filter(m => m.timestamp > cutoff);
+	}
+
+	private shouldSpontaneouslyAnswer(): boolean {
+		const prob = Math.min(0.4, 1 / this._nbPlayers);
+
+		return Math.random() < prob;
+	}
+
+	private consumeCurrentQuestion(): string | undefined {
+		const currentQuestion = this._currentQuestion;
+		this._currentQuestion = undefined;
+		return currentQuestion;
+	}
+
+	public	addMessage(message: Message): void {
 		this._lastMessages.push(message);
 
-		if (this._isListening && this._roomIsInActionState)
+		if (this._isPlaying)
 			this.scheduleNextTick();
 	}
 
-	private async nextTick(): Promise<void> {
+	private async llmAnswer(): Promise<void> {
 		this._timer = null;
 
-		if (!this._isListening || !this._roomIsInActionState || this._isAnswering) {
+		if (!this._isPlaying || this._isAnswering) {
 			this.scheduleNextTick();
 			return;
 		}
-
 		this._isAnswering = true;
 
-		try {
-			const toProcess = [...this._lastMessages];
-			this._lastMessages.length = 0;
+		// "Seuil" minimum
+		const cutoff = this.getCutoffTime();
 
-			if (toProcess.length > 0) 
-			{
-				let reply = await pipeline(this.getLlmHistory(), parseMessages(toProcess), this.getPersonnality());
-				if (reply)
-				{
-					const msg: Message = { senderId: this._llmPersonnality.getName() ?? `Llm`, content: reply, timestamp: Date.now() };
-					this._roomEmitter.emit("message", msg);
-					console.log(`LlmController: emitted message: ${JSON.stringify(msg)}`);
+		try {
+			const messagesUsedToAnswer = this.collectMessagesForAnswer(cutoff);
+
+			if (!messagesUsedToAnswer.length) {
+				// No recent user messages, decide whether the LLM should speak spontaneously
+				if (!this.shouldSpontaneouslyAnswer()) {
+					this.scheduleNextTick();
+					return;
 				}
+				const currQuestion = this.consumeCurrentQuestion();
+				if (!currQuestion) {
+					this.scheduleNextTick();
+					return;
+				}
+
+				messagesUsedToAnswer.push({ senderId: "system", content: currQuestion, timestamp: Date.now() });
 			}
+			this.clearProcessedMessages(cutoff);
+
+			const reply = await pipeline(this.getLlmHistory(), parseMessages(messagesUsedToAnswer), this.getPersonnality());
+			if (reply) {
+				// TODO: check if the room is still in a state where the LLM should answer before emitting the message
+				const msg: Message = { senderId: this._llmPersonnality.getName() ?? 'Llm', content: reply, timestamp: Date.now() };
+				this._roomEmitter.emit("message", msg);
+			}
+		}
+		catch (error) {
+			console.error("Error in LLM pipeline:", error);
 		}
 		finally {
 			this._isAnswering = false;
 			this.scheduleNextTick();
 		}
 	}
+
+	public resetHistory(): void {
+		this._llmHistory.reset();
+	}
+
 	public getPersonnality(): llmPersonnality {
 		return (this._llmPersonnality);
 	}
+
 	public getLlmHistory(): llmHistory {
 		return (this._llmHistory);
 	}
+
 	public getRoomId(): string {
 		return (this._roomId);
+	}
+
+	public setCurrentQuestion(question: string): void {
+		this._currentQuestion = question;
 	}
 }
 
