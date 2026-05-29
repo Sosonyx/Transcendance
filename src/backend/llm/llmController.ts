@@ -142,6 +142,7 @@ export class LlmController {
 
 			const reply = await pipeline(this.getLlmHistory(), parseMessages(messagesUsedToAnswer), this.getPersonnality());
 			if (reply) {
+				// TODO: check if the room is still in a state where the LLM should answer before emitting the message
 				const msg: Message = { senderId: this._llmPersonnality.getName() ?? 'Llm', content: reply, timestamp: Date.now() };
 				this._roomEmitter.emit("message", msg);
 			}

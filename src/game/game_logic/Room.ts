@@ -28,7 +28,7 @@ type playerInput =  { name : string, input : string};
 
 export class Room extends EventEmitter
 {
-	private _llmController: LlmController | null;
+	private _llmController?: LlmController | null;
 	private	_id : string;
 	private _number : number;
 	private _state : roomStates;
@@ -177,7 +177,6 @@ export class Room extends EventEmitter
 			return ;
 		}
 		const msg: Message = { senderId: player.getId(), content: message, timestamp: Date.now() };
-		// this.emit("message", msg);
 		this._llmController?.addMessage(msg);
 		console.log(`Player ${player.getName()} (room ${this._number}) : ${message}`);
 	}
@@ -251,10 +250,15 @@ export class Room extends EventEmitter
 	}
 
 	private	_addLLMPLayer() {
-		this._players.push(new Player(uuid(), true));
+		let LLMPlayer = new Player(uuid(), true);
+		this._llmController = new LlmController(this._id, this as EventEmitter, this._players.map(player => player.getName()), LLMPlayer.getName());
+		this._llmController.startPlaying();
+		this._players.push(LLMPlayer);
 	}
 
 	private	_removeLLMPlayers() {
+		this._llmController?.stopPlaying();
+		this._llmController = null;
 		this._players = this._players.filter(player => !player.getIsLLM());
 	}
 
@@ -372,6 +376,7 @@ export class Room extends EventEmitter
 		console.log(`Chosen input is : ${input}`);
 		if (input === undefined)
 			return null;
+		this._llmController?.setCurrentQuestion(input);
 		return input as string;
 	}
 
@@ -388,8 +393,5 @@ export class Room extends EventEmitter
 		this._inputs = [];
 		this._maxPlayerCount = maxPlayerCount;
 		this._isAccessible = true;
-
-		this._llmController = new LlmController(this._id, this as EventEmitter, [], `LlmPlayer${nb}`);
-		// this._llmController.startListening();
 	}
 }

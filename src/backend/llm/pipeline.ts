@@ -12,7 +12,7 @@ export async function pipeline(history: llmHistory, lastMessages: string,  perso
     const myPromptStr: string = systemPrompt(personnality, lastMessages);
     const requestMessages = [...history.getMessageHistory(), { role: 'user', content: lastMessages }];
     if (!blockBadPatterns(lastMessages).blockedResult === true)
-            console.log('error in usr msg\n');
+        console.log('error in usr msg\n');
     // TODO: fix "as any"
     const llmReply: string = await askClaude(myPromptStr, requestMessages as any);
 

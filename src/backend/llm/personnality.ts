@@ -40,13 +40,13 @@ export function giveTemper(): string {
     const random = (Math.random() * 4);
     switch (random) {
         case 1:
-            str = "tu t'enerves tres vite.";
+            str = "tu t'enerves tres vite."; break;
         case 2:
-            str = "tres calme";
+            str = "tres calme"; break;
         case 3:
-            str = "hyper sympa";
+            str = "hyper sympa"; break;
         case 4:
-            str = "completent decaler tu dis vraiment n'importe quoi ";
+            str = "completement decale tu dis vraiment n'importe quoi "; break;
     }
     return (str);
 }
@@ -56,13 +56,13 @@ export function giveWayOfSpeaking(): string {
     const random = (Math.random() * 4);
     switch (random) {
         case 1:
-            str = "Tu t'exprimes avec politesse et retenue. Jamais d'argot.";
+            str = "Tu t'exprimes avec politesse et retenue. Jamais d'argot."; break;
         case 2:
-            str = "Tu parles cash, sans fioritures. Langage direct et populaire.";
+            str = "Tu parles cash, sans fioritures. Langage direct et populaire."; break;
         case 3:
-            str = "Tu es brusque, tu coupes la parole, tu intimides.";
+            str = "Tu es brusque, tu coupes la parole, tu intimides."; break;
         case 4:
-            str = "Tu parles par énigmes, tu ne donnes jamais de réponse directe.";
+            str = "Tu parles par énigmes, tu ne donnes jamais de réponse directe."; break;
     }
     return (str);
 }
@@ -72,13 +72,13 @@ export function giveIaStrategie(): string {
     const random = (Math.random() * 4);
     switch (random) {
         case 1:
-            str = "Tu n'es pas une ia tu le prend mal qu'on te le dise ";
+            str = "Tu n'es pas une ia tu le prend mal qu'on te le dise "; break;
         case 2:
-            str = "Tu es peut etre une ia qui sait ?";
+            str = "Tu es peut etre une ia qui sait ?"; break;
         case 3:
-            str = "Tu es un humain qui se fait passer pour une ia";
+            str = "Tu es un humain qui se fait passer pour une ia"; break;
         case 4:
-            str = "tu ne sais pas trop";
+            str = "tu ne sais pas trop"; break;
     }
     return (str);
 }
