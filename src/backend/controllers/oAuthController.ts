@@ -13,7 +13,7 @@ export async function intraHandler(req: FastifyRequest, reply: FastifyReply){
   let profile : Profile;
   profile = await response.json() as Profile;
   if (!profile)
-    return (1);
+    throw new Error("42 user not found");
 
   const result = await handleOAuthLogin(fastify, "google", {
     providerId: profile.id,
@@ -42,8 +42,7 @@ export async function googleHandler(req: FastifyRequest, reply: FastifyReply){
   profile = await response.json() as Profile;
 
   if (!profile)
-    return (1);
-  // TODO: handle error if profile is not valid
+    throw new Error("Google user not found");
 
   const result = await handleOAuthLogin(fastify, "google", {
     providerId: profile.id,
