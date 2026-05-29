@@ -178,7 +178,7 @@ export class Room extends EventEmitter
 		}
 		const msg: Message = { senderId: player.getId(), content: message, timestamp: Date.now() };
 		// this.emit("message", msg);
-		this._llmController?.notifyLlm(msg);
+		this._llmController?.addMessage(msg);
 		console.log(`Player ${player.getName()} (room ${this._number}) : ${message}`);
 	}
 
@@ -389,7 +389,7 @@ export class Room extends EventEmitter
 		this._maxPlayerCount = maxPlayerCount;
 		this._isAccessible = true;
 
-		this._llmController = new LlmController(this._id, this as EventEmitter, {}, [], `LlmPlayer${nb}`);
-		this._llmController.startListening();
+		this._llmController = new LlmController(this._id, this as EventEmitter, [], `LlmPlayer${nb}`);
+		// this._llmController.startListening();
 	}
 }

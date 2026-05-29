@@ -1,5 +1,5 @@
 import { systemPrompt } from "./prompt.js";
-// import { blockBadPatterns } from "./guardrails/input.js";
+import { blockBadPatterns } from "./guardrails/input.js";
 import { askClaude } from "./claude.js";
 import type { llmHistory } from "./llmHistory.js";
 import type { llmPersonnality } from "./personnality.js";
@@ -11,8 +11,8 @@ export async function pipeline(history: llmHistory, lastMessages: string,  perso
 {
     const myPromptStr: string = systemPrompt(personnality, lastMessages);
     const requestMessages = [...history.getMessageHistory(), { role: 'user', content: lastMessages }];
-    // if (!blockBadPatterns(lastMessages).blockedResult === true)
-    //         console.log('error in usr msg\n');
+    if (!blockBadPatterns(lastMessages).blockedResult === true)
+            console.log('error in usr msg\n');
     // TODO: fix "as any"
     const llmReply: string = await askClaude(myPromptStr, requestMessages as any);
 
