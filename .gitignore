@@ -8,3 +8,4 @@ test
 todo.txt
 build
 build/*
+src/backend/llm/src/debug_llm.ts
