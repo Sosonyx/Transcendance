@@ -100,10 +100,12 @@ export class Room extends EventEmitter
 				break ;
 
 			case (roomStates.CHAT) :
+				this._llmController?.startPlaying();
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.VOTE) }, chatTime);
 				break ;
 
 			case (roomStates.VOTE) :
+				this._llmController?.stopPlaying();
 				this._allPlayersShouldAct();
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.RESULT) }, voteTime);
 				break ;
@@ -251,14 +253,11 @@ export class Room extends EventEmitter
 
 	private	_addLLMPLayer() {
 		let LLMPlayer = new Player(uuid(), true);
-		this._llmController = new LlmController(this._id, this as EventEmitter, this._players.map(player => player.getName()), LLMPlayer.getName());
-		this._llmController.startPlaying();
+		this._llmController = new LlmController(this as EventEmitter, this._players.map(player => player.getName()), LLMPlayer.getName());
 		this._players.push(LLMPlayer);
 	}
 
 	private	_removeLLMPlayers() {
-		this._llmController?.stopPlaying();
-		this._llmController = null;
 		this._players = this._players.filter(player => !player.getIsLLM());
 	}
 
@@ -268,6 +267,7 @@ export class Room extends EventEmitter
 		this._players.forEach(player => {player.reset()});
 		this.stateSwitch(roomStates.LOBBY);
 		this._checkLobbyStatus();
+		this._llmController = null;
 	}
 
 	private _computeResult() : void

@@ -56,7 +56,7 @@ export function giveWayOfSpeaking(): string {
     const random = (Math.random() * 4);
     switch (random) {
         case 1:
-            str = "Tu t'exprimes avec politesse et retenue. Jamais d'argot."; break;
+            str = "Tu t'exprimes avec politesse et retenue. Jamais d'argot, pas de fautes d'orthographe (sauf les accents)."; break;
         case 2:
             str = "Tu parles cash, sans fioritures. Langage direct et populaire."; break;
         case 3:
@@ -72,13 +72,13 @@ export function giveIaStrategie(): string {
     const random = (Math.random() * 4);
     switch (random) {
         case 1:
-            str = "Tu n'es pas une ia tu le prend mal qu'on te le dise "; break;
+            str = "Tu es accusateur, tu prends une cible parmis les joueurs (au bon moment) et tu la accuses (directement, ou en demandant l'avis des autres)"; break;
         case 2:
-            str = "Tu es peut etre une ia qui sait ?"; break;
+            str = "Tu es peut etre une ia qui sait ? Tu peux te faire passer pour l'IA en plaisantant"; break;
         case 3:
-            str = "Tu es un humain qui se fait passer pour une ia"; break;
+            str = "Tu essaies de prendre le lead du chat (sauf si beaucoup de gens parlent) en posant des questions (relatifs a la question principale)"; break;
         case 4:
-            str = "tu ne sais pas trop"; break;
+            str = "Tu ne fais que repondre aux questions en restant un peu distant, observateur, avec peu de mots/ reponses courtes si possible"; break;
     }
     return (str);
 }
