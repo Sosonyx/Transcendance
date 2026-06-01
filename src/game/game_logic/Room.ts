@@ -1,8 +1,8 @@
 import { Player } from "./Player.js";
 import { v4 as uuid } from 'uuid';
 import { EventEmitter } from "node:events";
-import { LlmController } from "../../backend/llm/llmController.js";
-import type { Message } from "../../backend/llm/types/messages.js";
+import { LlmController } from "../../llm/llmController.js";
+import type { Message } from "../../llm/types/messages.js";
 // import { prisma } from "../lib/prisma.js" 
 
 const action_1_Time : number = 30 * 1000; // 30 seconds

@@ -16,43 +16,33 @@ help:
 		"  make run-game       Launch the game server" \
 		"  make clean          Remove generated build output"
 
-deps: deps-root deps-backend deps-game 
+db-push:
+	npx prisma db push --schema=src/prisma/schema.prisma --dotenv=.env
+
+db-studio:
+	npx prisma studio --schema=src/prisma/schema.prisma --url=$(DATABASE_URL)
 
 deps-root:
-	npm i
+	ln -sfn $(PWD)/.env $(PWD)/src/.env
+	npm install --prefix $(SRC_DIR)
+	npx --prefix src/ prisma generate --schema=src/prisma/schema.prisma --config=src/prisma.config.ts
+	
+build: deps-root
+	mkdir -p build
+	npx --prefix $(SRC_DIR) tsc -b $(SRC_DIR)tsconfig.json
+	ln -sfn $(PWD)/src/node_modules $(PWD)/build/node_modules
 
-deps-backend:
-	npm install --prefix $(BACKEND_DIR)
+run:
+	node build/server.js
 
-deps-game:
-	npm install --prefix $(GAME_DIR)
 
-build: deps-root build-backend build-game
-
-build-backend: deps-backend
-	npm --prefix $(BACKEND_DIR) run build
-	mkdir -p build/backend
-	ln -sfn ../../src/backend/node_modules build/backend/node_modules
-
-build-game: deps-game
-	npm --prefix $(GAME_DIR) run build
-	mkdir -p build/game
-	ln -sfn ../../src/game/node_modules build/game/node_modules
-
-run: run-backend
-
-run-llm:
-	npm run chat --prefix $(LLM_DIR)
-
-run-backend: deps-backend
+run-backend:
 	node build/backend/server.js
 
-run-game: deps-game
-	node build/game/src/game/server.js
+run-game:
+	node build/game/server.js
 
 clean:
 	rm -rf src/.env
 	rm -rf build
-	rm -rf node_modules 
-	rm -rf $(BACKEND_DIR)/node_modules
-	rm -rf $(GAME_DIR)/node_modules
+	rm -rf src/node_modules
