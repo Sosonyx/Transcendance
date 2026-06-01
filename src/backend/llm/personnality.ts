@@ -1,6 +1,25 @@
-import { readFileSync } from "fs";
-import { join, dirname } from "path";
-import { fileURLToPath } from "url";
+const TEMPER_OPTIONS = [
+    "calme et patient",
+    "curieux et attentif",
+    "plutot reserve",
+    "sociable et joueur"
+];
+
+const WAY_OF_SPEAKING_OPTIONS = [
+    "familier et concis",
+    "ludique et taquin",
+    "calme et pose",
+    "intelligent et analytique",
+    "rapide et direct"
+];
+
+const IA_STRATEGIE_OPTIONS = [
+    "Tu es accusateur, tu prends une cible parmis les joueurs (au bon moment) et tu la accuses (directement, ou en demandant l'avis des autres)",
+    "Tu es peut etre une ia qui sait ? Tu peux te faire passer pour l'IA en plaisantant",
+    "Tu essaies de prendre le lead du chat (sauf si beaucoup de gens parlent) en posant des questions (relatifs a la question principale)",
+    "Tu ne fais que repondre aux questions en restant un peu distant, observateur, avec peu de mots/ reponses courtes si possible"
+];
+
 export class llmPersonnality {
     private _name?: string;
     private _players?: string[];
@@ -37,31 +56,16 @@ export class llmPersonnality {
 };
 
 export function giveTemper(): string {
-    const current_path = dirname(fileURLToPath(import.meta.url));
-    const path_file = join(current_path, "/personnality/temper.json");
-    const json_data = readFileSync(path_file, "utf-8");
-    const temper: string[] = JSON.parse(json_data);
-
-    const random = Math.floor(Math.random() * temper.length);
-    return (temper[random]!);
+    const random = Math.floor(Math.random() * TEMPER_OPTIONS.length);
+    return (TEMPER_OPTIONS[random]!);
 }
 
 export function giveWayOfSpeaking(): string  {
-    const current_path = dirname(fileURLToPath(import.meta.url));
-    const path_file = join(current_path, "/personnality/wayOfSpeaking.json");
-    const json_data = readFileSync(path_file, "utf-8");
-    const wayOfSpeaking: string[] = JSON.parse(json_data);
-
-    const random = Math.floor(Math.random() * wayOfSpeaking.length);
-    return (wayOfSpeaking[random]!);
+    const random = Math.floor(Math.random() * WAY_OF_SPEAKING_OPTIONS.length);
+    return (WAY_OF_SPEAKING_OPTIONS[random]!);
 }
 
 export function giveIaStrategie(): string {
-    const current_path = dirname(fileURLToPath(import.meta.url));
-    const path_file = join(current_path, "/personnality/personnalities.json");
-    const json_data = readFileSync(path_file, "utf-8");
-    const iaStrategie: string[] = JSON.parse(json_data);
-
-    const random = Math.floor(Math.random() * iaStrategie.length);
-    return (iaStrategie[random]!);
+    const random = Math.floor(Math.random() * IA_STRATEGIE_OPTIONS.length);
+    return (IA_STRATEGIE_OPTIONS[random]!);
 }

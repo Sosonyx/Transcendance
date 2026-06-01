@@ -1,7 +1,7 @@
 import { Player } from "./Player.js";
 import {v4 as uuid} from 'uuid';
 import { EventEmitter } from "node:events";
-import { LlmController } from "../../backend/llm/llmController.js";
+import { Llm } from "../../backend/llm/llm.js";
 import type { Message } from "../../backend/llm/types/messages.js";
 
 const action_1_Time : number = 30 * 1000; // 30 seconds
@@ -28,7 +28,7 @@ type playerInput =  { name : string, input : string};
 
 export class Room extends EventEmitter
 {
-	private _llmController?: LlmController | null;
+	private _llmController?: Llm | null;
 	private	_id : string;
 	private _number : number;
 	private _state : roomStates;
@@ -253,7 +253,7 @@ export class Room extends EventEmitter
 
 	private	_addLLMPLayer() {
 		let LLMPlayer = new Player(uuid(), true);
-		this._llmController = new LlmController(this as EventEmitter, this._players.map(player => player.getName()), LLMPlayer.getName());
+		this._llmController = new Llm(this as EventEmitter, this._players.map(player => player.getName()), LLMPlayer.getName());
 		this._players.push(LLMPlayer);
 	}
 
