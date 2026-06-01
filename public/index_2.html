@@ -75,6 +75,7 @@
         }
         .btn-logout:hover { background-color: #c62828; color: #fff; }
         
+        /* Style ajouté pour harmoniser tes boutons OAuth avec ta charte */
         .oauth-container {
             width: 100%;
             max-width: 420px;
@@ -219,7 +220,7 @@
     <div class="status-bar">
         <div class="status-left">
             <div class="status-dot" id="statusDot"></div>
-            <div class="status-text" id="statusText">Vérification de la session...</div>
+            <div class="status-text" id="statusText">Non connecté</div>
         </div>
         <div class="status-actions">
             <a href="index.html" class="btn-nav" id="chatBtn" style="display:none">Chat</a>
@@ -227,7 +228,7 @@
         </div>
     </div>
 
-    <div class="oauth-container" id="oauthLinks" style="display: none;">
+    <div class="oauth-container" id="oauthLinks">
         <a href="/api/auth/42">
             <button class="btn-oauth">Connexion 42</button>
         </a>
@@ -236,7 +237,7 @@
         </a>
     </div>
 
-    <div class="container" id="authFormsContainer" style="display: none;">
+    <div class="container" id="authFormsContainer">
         <div class="form-section">
             <h2>Créer un compte</h2>
             <form id="registerForm">
@@ -300,6 +301,13 @@
     const PROFILE_URL     = '/api/profile';
     const LEADERBOARD_URL = '/api/leaderboard';
 
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+    }
+
     function displayMessage(id, text, ok) {
         const el = document.getElementById(id);
         el.innerText = text;
@@ -307,43 +315,25 @@
         el.className = 'message ' + (ok ? 'success' : 'error');
     }
 
-    // Fonction maîtresse : interroge le backend pour valider le cookie de session
-    async function checkAuthSession() {
-        try {
-            const res = await fetch(PROFILE_URL, {
-                method: 'GET',
-                credentials: 'include' // Transmet automatiquement le cookie de session au backend
-            });
-            
-            if (res.ok) {
-                const data = await res.json();
-                updateUI(true, data.username);
-            } else {
-                updateUI(false);
-            }
-        } catch (e) {
-            console.error("Erreur réseau lors de la vérification de session :", e);
-            updateUI(false);
-        }
-    }
-
-    // Alterne l'affichage des éléments uniquement selon l'état d'authentification valide
-    function updateUI(isConnected, username = '') {
+    function updateStatusBar() {
+        const token    = getCookie('jwt') || localStorage.getItem('token');
+        const username = localStorage.getItem('username');
+        
         const dot  = document.getElementById('statusDot');
         const text = document.getElementById('statusText');
-        const logoutBtn  = document.getElementById('logoutBtn');
-        const chatBtn = document.getElementById('chatBtn');
+        const btn  = document.getElementById('logoutBtn');
+        const chatBtn = document.getElementById('chatBtn'); // Récupération du bouton Chat
         const statsSection = document.getElementById('statsContainer');
         const statsDisplay = document.getElementById('statsDisplay');
         
         const oauthLinks   = document.getElementById('oauthLinks');
         const authFormsContainer = document.getElementById('authFormsContainer');
 
-        if (isConnected) {
+        if (token) {
             dot.classList.add('connected');
             text.innerHTML = username ? 'Connecté en tant que <span>' + username + '</span>' : 'Connecté';
-            logoutBtn.style.display = 'block';
-            chatBtn.style.display = 'block'; // Le bouton Chat s'affiche ici
+            btn.style.display = 'block';
+            chatBtn.style.display = 'block'; // Affiche le bouton Chat
             statsSection.style.display = 'block'; 
             
             oauthLinks.style.display = 'none';
@@ -351,8 +341,8 @@
         } else {
             dot.classList.remove('connected');
             text.innerHTML = 'Non connecté';
-            logoutBtn.style.display = 'none';
-            chatBtn.style.display = 'none'; // Le bouton Chat se cache ici
+            btn.style.display = 'none';
+            chatBtn.style.display = 'none'; // Masque le bouton Chat
             statsSection.style.display = 'none'; 
             statsDisplay.style.display = 'none';
             statsDisplay.innerHTML = '';
@@ -370,7 +360,9 @@
             });
 
             if (res.ok) {
-                updateUI(false);
+                localStorage.removeItem('token');
+                localStorage.removeItem('username');
+                updateStatusBar();
             } else {
                 console.error("Échec de la déconnexion côté serveur.");
             }
@@ -535,14 +527,14 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
             });
-            
+            const data = await res.json();
             if (res.ok) {
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('username', data.user?.username || username);
                 displayMessage('loginMessage', 'Connexion réussie !', true);
                 document.getElementById('loginForm').reset();
-                // Le serveur a envoyé le Set-Cookie, on relance la validation pour mettre à jour l'UI
-                checkAuthSession();
+                updateStatusBar();
             } else {
-                const data = await res.json();
                 displayMessage('loginMessage', data.error || 'Identifiants invalides', false);
             }
         } catch {
@@ -550,19 +542,22 @@
         }
     });
 
-    // Optionnel : Gestion de la redirection OAuth si des query params de secours sont passés,
-    // mais la session finale s'appuiera toujours sur checkAuthSession()
     function checkOAuthCallback() {
         const urlParams = new URLSearchParams(window.location.search);
-        const hasToken = urlParams.get('token'); // Si ton OAuth set le cookie mais passe une info dans l'URL
-        if (hasToken) {
+        const token = urlParams.get('token');
+        const username = urlParams.get('username');
+
+        if (token && username) {
+            localStorage.setItem('token', token);
+            localStorage.setItem('username', username);
             window.history.replaceState({}, document.title, window.location.pathname);
+            displayMessage('loginMessage', 'Connexion OAuth réussie !', true);
+            updateStatusBar();
         }
     }
 
-    // Initialisation au chargement de la page
     checkOAuthCallback();
-    checkAuthSession();
+    updateStatusBar();
 </script>
 </body>
 </html>
