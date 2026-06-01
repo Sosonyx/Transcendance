@@ -16,7 +16,8 @@ export	class RoomManager implements RoomManagerInterface
 		return room
 	}
 
-	public connectPlayer(playerId : string , isTTY : boolean = false) : [roomId : RoomId, room : EventEmitter, player : EventEmitter] {
+	public connectPlayer(playerId : string , isTTY : boolean = false) : [roomId : RoomId, room : EventEmitter, player : EventEmitter]
+	{
 		let player : Player | undefined;
 		let room : Room | undefined;
 
@@ -25,14 +26,16 @@ export	class RoomManager implements RoomManagerInterface
 		{
 			room = this._rooms.find(room => room.accessPlayerByName(playerId));
 			// player = room?.accessPlayerByName(playerId);
-			player = room?.accessPlayerById(playerId);
+			// player = room?.accessPlayerById(playerId);
+			player = room?.accessPlayerByUserId(playerId);
 			if (room)
 				console.log(`Found existing room ${room.getNumber()}`);
 		}
 		else
 		{
 			room = this._rooms.find(room => room.accessPlayerById(playerId));
-			player = room?.accessPlayerById(playerId);
+			// player = room?.accessPlayerById(playerId);
+			player = room?.accessPlayerByUserId(playerId);
 		}
 		if (room === undefined)
 		{
@@ -55,12 +58,14 @@ export	class RoomManager implements RoomManagerInterface
 		{
 			room = this._accessRoomByNumber(parseInt(roomId));
 			// player = room?.accessPlayerByName(playerId);
-			player = room?.accessPlayerById(playerId);
+			// player = room?.accessPlayerById(playerId);
+			player = room?.accessPlayerByUserId(playerId);
 		}
 		else
 		{
 			room = this._accessRoomById(roomId);
-			player = room?.accessPlayerById(playerId);
+			// player = room?.accessPlayerById(playerId);
+			player = room?.accessPlayerByUserId(playerId);
 		}
 		if (room === undefined)
 		{
@@ -87,12 +92,14 @@ export	class RoomManager implements RoomManagerInterface
 		{
 			room = this._accessRoomByNumber(parseInt(roomId));
 			// player = room?.accessPlayerByName(playerId);
-			player = room?.accessPlayerById(playerId);
+			// player = room?.accessPlayerById(playerId);
+			player = room?.accessPlayerByUserId(playerId);
 		}
 		else
 		{
 			room = this._accessRoomById(roomId);
-			player = room?.accessPlayerById(playerId);
+			// player = room?.accessPlayerById(playerId);
+			player = room?.accessPlayerByUserId(playerId);
 		}
 		if (room === undefined)
 		{
@@ -119,12 +126,14 @@ export	class RoomManager implements RoomManagerInterface
 		{
 			room = this._accessRoomByNumber(parseInt(roomId));
 			// player = room?.accessPlayerByName(playerId);
-			player = room?.accessPlayerById(playerId);
+			// player = room?.accessPlayerById(playerId);
+			player = room?.accessPlayerByUserId(playerId);
 		}
 		else
 		{
 			room = this._accessRoomById(roomId);
-			player = room?.accessPlayerById(playerId);
+			// player = room?.accessPlayerById(playerId);
+			player = room?.accessPlayerByUserId(playerId);
 		}
 		if (room === undefined)
 		{
@@ -157,8 +166,8 @@ export	class RoomManager implements RoomManagerInterface
 		else
 		{
 			room = this._accessRoomById(roomId);
-			playerFrom = room?.accessPlayerById(playerIdFrom);
-			playerTo = room?.accessPlayerById(playerIdTo);
+			playerFrom = room?.accessPlayerByUserId(playerIdFrom);
+			playerTo = room?.accessPlayerByUserId(playerIdTo);
 		}
 		if (room === undefined)
 		{
@@ -190,12 +199,14 @@ export	class RoomManager implements RoomManagerInterface
 		{
 			room = this._accessRoomByNumber(parseInt(roomId));
 			// player = room?.accessPlayerByName(playerId);
-			player = room?.accessPlayerById(playerId);
+			// player = room?.accessPlayerById(playerId);
+			player = room?.accessPlayerByUserId(playerId);
 		}
 		else
 		{
 			room = this._accessRoomById(roomId);
-			player = room?.accessPlayerById(playerId);
+			// player = room?.accessPlayerById(playerId);
+			player = room?.accessPlayerByUserId(playerId);
 		}
 		if (room === undefined)
 		{
@@ -222,12 +233,14 @@ export	class RoomManager implements RoomManagerInterface
 		{
 			room = this._accessRoomByNumber(parseInt(roomId));
 			// player = room?.accessPlayerByName(playerId);
-			player = room?.accessPlayerById(playerId);
+			// player = room?.accessPlayerById(playerId);
+			player = room?.accessPlayerByUserId(playerId);
 		}
 		else
 		{
 			room = this._accessRoomById(roomId);
-			player = room?.accessPlayerById(playerId);
+			// player = room?.accessPlayerById(playerId);
+			player = room?.accessPlayerByUserId(playerId);
 		}
 		if (room === undefined)
 		{
@@ -270,11 +283,13 @@ export	class RoomManager implements RoomManagerInterface
 		return (room.getState());
 	}
 
-
-	public getPlayersIdFromRoomId(roomId: string): readonly string[] {
+	public getUsersIdFromRoomId(roomId: string): readonly string[] {
 		let res : string[] = [];
 		let players : Player[] | undefined = this._accessRoomById(roomId)?.getPlayers();
-		players?.forEach((player) => {res.push(player.getId())});
+		// if (players === undefined)
+		// 	return res;
+		// players = players.filter((player) => !player.getIsLLM());
+		players?.forEach((player) => {res.push(player.getUserId()!)});
 		return res;
 	}
 

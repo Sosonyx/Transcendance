@@ -18,6 +18,6 @@ export interface RoomManagerInterface {
 	onDisconnectEvent(playerId : string, roomId : RoomId | null, isTTY? : boolean) : void;
 	onReplayEvent(playerId : string, roomId : RoomId, isTTY? : boolean) : void;
 	onSkipEvent(roomId: RoomId, isTTY : boolean) : void;
-    getPlayersIdFromRoomId(roomId : RoomId) : readonly  string[]; // return playersId
+    getUsersIdFromRoomId(roomId : RoomId) : readonly  string[]; // return player UserId
 	getRoomState(roomId : RoomId) : string | null;
 };

@@ -21,14 +21,14 @@
 		</div>
         
 		<!-- All of the above -->
-        <button id="send-btn">Send</button>
+       <button id="send-btn">Send</button>
 
         <!-- State: Vote -->
         <div id="vote-container"></div>
 
         <!-- State: Result -->
-        <button id="replay-btn" type="button">Replay</button>
-        <button id="new-game-btn" type="button">New game</button>
+        <button id="replay-btn">Replay</button>
+        <button id="new-game-btn">New game</button>
     </form>
     <script>
         const socket = io('http://localhost:3000')
@@ -62,7 +62,8 @@
 					show(vbox, promptLabel, promptInput, sendBtn);
 					break;
 				case 'action_2':
-					promptLabel.textContent = data;
+					// Si data est null ou undefined, on met un texte par défaut au lieu d'afficher "undefined"
+					promptLabel.textContent = data || "Waiting for prompt..."; 
 					promptInput.placeholder = 'Your response...';
 					show(vbox, promptLabel, promptInput, sendBtn);
 					break;
