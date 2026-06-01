@@ -122,6 +122,8 @@
 			if (promptInput.value) {
 				socket.emit('input', promptInput.value);
 				promptInput.value = '';
+				promptLabel.textContent = 'Waiting for other players';
+				hide(promptInput);
 			}
 			// chat
             else if (input.value ){

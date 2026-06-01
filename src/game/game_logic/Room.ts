@@ -3,7 +3,7 @@ import { v4 as uuid } from 'uuid';
 import { EventEmitter } from "node:events";
 import { LlmController } from "../../backend/llm/llmController.js";
 import type { Message } from "../../backend/llm/types/messages.js";
-import { prisma } from "../lib/prisma.js" 
+// import { prisma } from "../lib/prisma.js" 
 
 const action_1_Time : number = 30 * 1000; // 30 seconds
 const action_2_Time : number = 30 * 1000; // 30 seconds
@@ -31,7 +31,7 @@ type playerInput =  { name : string, input : string};
 export class Room extends EventEmitter
 {
 	private	readonly _id : string;
-	private	_gameId? : string | null;
+	// private	_gameId? : string | null;
 	private _number : number;
 	private _state : roomStates;
 	private	_players : Player[];
@@ -44,41 +44,41 @@ export class Room extends EventEmitter
 
 	// DATABASE
 
-	private	async _createRoomInDB() {
-		console.log('saving room in DB');
-		let image = await prisma.room.create({
-			data: {
-				id : this._id
-			}
-		});
-		console.log(image);
-	};
+	// private	async _createRoomInDB() {
+	// 	console.log('saving room in DB');
+	// 	let image = await prisma.room.create({
+	// 		data: {
+	// 			id : this._id
+	// 		}
+	// 	});
+	// 	console.log(image);
+	// };
 
-	private	async _createGameInDB() {
-		this._gameId = uuid();
-		console.log(`${this._gameId}`);
-		console.log('saving game in DB');
-		let image = await prisma.game.create({
-			data: {
-				id : this._gameId,
-				roomId : this._id,
-				startTime : new Date(),
+	// private	async _createGameInDB() {
+	// 	this._gameId = uuid();
+	// 	console.log(`${this._gameId}`);
+	// 	console.log('saving game in DB');
+	// 	let image = await prisma.game.create({
+	// 		data: {
+	// 			id : this._gameId,
+	// 			roomId : this._id,
+	// 			startTime : new Date(),
 
-				players : {
-					create: this._players.map((player) => ({
-						id : player.getId(),
-						userId : player.getUserId(),
-						name : player.getName(),
-						status : (player.getIsLLM() ? 'llm' : 'user')
-					}))
-				}
-			},
-			include : {players:true}
-		});
-		console.log(image);
-		if (image.players)
-		console.log(image.players);
-	};
+	// 			players : {
+	// 				create: this._players.map((player) => ({
+	// 					id : player.getId(),
+	// 					userId : player.getUserId(),
+	// 					name : player.getName(),
+	// 					status : (player.getIsLLM() ? 'llm' : 'user')
+	// 				}))
+	// 			}
+	// 		},
+	// 		include : {players:true}
+	// 	});
+	// 	console.log(image);
+	// 	if (image.players)
+	// 	console.log(image.players);
+	// };
 
 	// SETGET
 
@@ -131,7 +131,7 @@ export class Room extends EventEmitter
 
 			case (roomStates.ACTION_1) :
 				this._addLLMPLayer();
-				this._createGameInDB();
+				// this._createGameInDB();
 				this._allPlayersShouldAct();
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.ACTION_2) }, action_1_Time);
 				break ;
@@ -174,15 +174,15 @@ export class Room extends EventEmitter
 		//TODO : TEMP 
 		// FIX
 
-		let image = await prisma.user.create({
-			data : {
-				id : player.getUserId() as string,
-				email : uuid(),
-				username : uuid()
-			}
-		}
-		)
-		console.log('temp : ', image.id)
+		// let image = await prisma.user.create({
+		// 	data : {
+		// 		id : player.getUserId() as string,
+		// 		email : uuid(),
+		// 		username : uuid()
+		// 	}
+		// }
+		// )
+		// console.log('temp : ', image.id)
 
 
 		if (this._state != roomStates.LOBBY)
@@ -442,7 +442,7 @@ export class Room extends EventEmitter
 		super();
 		console.log("Constructor called for class Room");
 		this._id = uuid();
-		this._gameId = null;
+		// this._gameId = null;
 		this._number = nb;
 		this._state = roomStates.INIT;
 		this._players = [];
@@ -453,6 +453,6 @@ export class Room extends EventEmitter
 
 		this._llmController = new LlmController(this._id, this as EventEmitter, {}, [], `LlmPlayer${nb}`);
 		this._llmController.startListening();
-		this._createRoomInDB();
+		// this._createRoomInDB();
 	}
 }
