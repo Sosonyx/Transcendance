@@ -4,7 +4,7 @@ SRC_DIR := src/
 BACKEND_DIR := src/backend
 GAME_DIR := src/game
 
-.PHONY: help deps db-push db-studio deps-root build run run-llm run-backend run-game clean
+.PHONY: help deps db-push db-studio deps-root build run run-backend run-game clean
 
 help:
 	@printf '%s\n' \
@@ -33,11 +33,8 @@ build: deps-root
 	ln -sfn $(PWD)/src/node_modules $(PWD)/build/node_modules
 
 run:
-	# Exécute le server.js compilé qui se trouve à la racine du dossier build/
 	node build/server.js
 
-run-llm:
-	npm run chat --prefix $(LLM_DIR)
 
 run-backend:
 	node build/backend/server.js
