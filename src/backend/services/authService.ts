@@ -28,17 +28,6 @@ export async function registerUser(newUser: userInterface) : Promise<Partial<use
       username: newUser.username, 
       hashedPassword: hash, 
       avatar : newUser.avatar ? newUser.avatar : null,
-    Stats: {
-      create: {
-          numberOfGames: 0,
-          gamesWin: 0,
-          gamesLose: 0,
-          winrate: 0.0,
-        }
-      }
-    },
-    include: {
-      Stats: true
     }})
 
   return (user);

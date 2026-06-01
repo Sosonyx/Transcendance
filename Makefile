@@ -1,49 +1,51 @@
 SHELL := /bin/sh
 LLM_DIR := src/backend/llm
+SRC_DIR := src/
 BACKEND_DIR := src/backend
 GAME_DIR := src/game
 
-.PHONY: help deps deps-backend deps-game build build-backend build-game run run-backend run-game clean
+.PHONY: help deps db-push db-studio deps-root build run run-llm run-backend run-game clean
 
 help:
 	@printf '%s\n' \
 		"Targets:" \
-		"  make deps           Install dependencies for backend and game" \
-		"  make build          Compile backend and game" \
-		"  make run            Launch the backend server with tsx" \
+		"  make deps-root      Install dependencies and generate Prisma client" \
+		"  make build          Compile the whole project (including src/server.ts)" \
+		"  make run            Launch the main root server" \
+		"  make run-backend    Launch the backend server" \
 		"  make run-game       Launch the game server" \
 		"  make clean          Remove generated build output"
 
-deps: deps-backend deps-game
+db-push:
+	npx prisma db push --schema=src/prisma/schema.prisma --dotenv=.env
 
-deps-backend:
-	npm install --prefix $(BACKEND_DIR)
+db-studio:
+	npx prisma studio --schema=src/prisma/schema.prisma --url=$(DATABASE_URL)
 
-deps-game:
-	npm install --prefix $(GAME_DIR)
+deps-root:
+	ln -sfn $(PWD)/.env $(PWD)/src/.env
+	npm install --prefix $(SRC_DIR)
+	npx --prefix src/ prisma generate --schema=src/prisma/schema.prisma --config=src/prisma.config.ts
+	
+build: deps-root
+	mkdir -p build
+	npx --prefix $(SRC_DIR) tsc -b $(SRC_DIR)tsconfig.json
+	ln -sfn $(PWD)/src/node_modules $(PWD)/build/node_modules
 
-build: build-backend build-game
-
-build-backend: deps-backend
-	npm --prefix $(BACKEND_DIR) run build
-	mkdir -p build/backend
-	ln -sfn ../../src/backend/node_modules build/backend/node_modules
-
-build-game: deps-game
-	npm --prefix $(GAME_DIR) run build
-	mkdir -p build/game
-	ln -sfn ../../src/game/node_modules build/game/node_modules
-
-run: run-backend
+run:
+	# Exécute le server.js compilé qui se trouve à la racine du dossier build/
+	node build/server.js
 
 run-llm:
 	npm run chat --prefix $(LLM_DIR)
 
-run-backend: deps-backend
-	node build/backend/backend/server.js
+run-backend:
+	node build/backend/server.js
 
-run-game: deps-game
-	node build/game/game/server.js
+run-game:
+	node build/game/server.js
 
 clean:
+	rm -rf src/.env
 	rm -rf build
+	rm -rf src/node_modules

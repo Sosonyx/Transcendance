@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "../build"
+  },
+  "files": [
+    "./server.ts",
+    "./main.ts"
+  ],
+  "references": [
+    { "path": "./backend" },
+    { "path": "./game" },
+    { "path": "./llm" }
+  ]
+}
