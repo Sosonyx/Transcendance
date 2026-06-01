@@ -6,7 +6,8 @@ import { type Message , type RoomId } from '../types/index.js';
 
 import { CLI } from '../game_logic/CommandLine.js';
 
-export function registerSocketHandlers(io: Server) {
+export function registerSocketHandlers(io: Server) 
+{
 	const roomManager = new RoomManager();
 
 	/* ===============Connexion client================= */
@@ -14,6 +15,8 @@ export function registerSocketHandlers(io: Server) {
 		// console.log(`Joueur connecté : ${socket.id}`);
 
 		// Recupere la room
+		// TODO : remplacer socket.id par userID ?
+
 		let [roomId, roomEmitter, playerEmitter] : [RoomId, EventEmitter, EventEmitter] = roomManager.connectPlayer(socket.id);
 
 		// Rejoins sa room
@@ -44,7 +47,7 @@ export function registerSocketHandlers(io: Server) {
 					break;
 				}
 		        case roomStates.VOTE: {
-		            io.to(roomId).emit('startVote', roomManager.getPlayersIdFromRoomId(roomId));
+		            io.to(roomId).emit('startVote', roomManager.getUsersIdFromRoomId(roomId));
 		            // console.log(`${roomId}: starting vote phase`);
 		            break;
 		        }
@@ -64,6 +67,7 @@ export function registerSocketHandlers(io: Server) {
 		roomEmitter.on('stateChanged', onStateChanged);
 
 		// Relay messages emitted on the roomEmitter to socket.io clients
+		// TODO: redo
 		if (roomEmitter.listenerCount('message') === 0) {
 			roomEmitter.on('message', (message: Message) => {
 				if (roomId === null) return;
@@ -166,6 +170,7 @@ export function registerSocketHandlers(io: Server) {
 			// console.log(`Joueur déconnecté : ${socket.id}`);
 		});
 	});
+
 	const CommandLineInterpreter = new CLI(roomManager);
     CommandLineInterpreter.run();
 }

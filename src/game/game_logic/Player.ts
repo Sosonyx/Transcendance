@@ -1,8 +1,10 @@
 import EventEmitter from "node:events";
+import { v4 as uuid} from "uuid";
 
 export class Player extends EventEmitter
 {
 	private	_id : string;
+	private _userId : string | null;
 	private _name : string;
 	private	_isLLM : boolean;
 	private _isReady : boolean;
@@ -13,6 +15,10 @@ export class Player extends EventEmitter
 
 	public getId() : string {
 		return this._id;
+	}
+
+	public getUserId() : string | null {
+		return this._userId;
 	}
 
 	public getName() : string {
@@ -48,6 +54,7 @@ export class Player extends EventEmitter
 	}
 
 	public reset() {
+		this._id = uuid();
 		this._isReady = false;
 		this._acted = false;
 		this._wantReplay = false;
@@ -68,10 +75,11 @@ export class Player extends EventEmitter
 		this._voteAgainst = target;
 	}
 
-	public constructor(id : string, isLLM : boolean = false) {
+	public constructor(userId : string | null, isLLM : boolean = false) {
 		super();
 		console.log("Constructor called for class Player");
-		this._id = id;
+		this._id = uuid();
+		this._userId = userId;
 		this._name = 'no-name';
 		this._isLLM = isLLM;
 		this._isReady = false;

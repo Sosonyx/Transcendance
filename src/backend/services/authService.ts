@@ -28,9 +28,7 @@ export async function registerUser(newUser: UserInterface) : Promise<Partial<Use
       username: newUser.username, 
       hashedPassword: hash, 
       avatar : newUser.avatar ? newUser.avatar : null,
-      }
-    },
-  )
+    }})
 
   return (user);
 }

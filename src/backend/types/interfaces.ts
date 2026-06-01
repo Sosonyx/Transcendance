@@ -1,6 +1,6 @@
 export interface Player {
     id: string;
-    roomId: string;
+    gameId: string;
     userId: string | null;
     name: string;
     status: string;
