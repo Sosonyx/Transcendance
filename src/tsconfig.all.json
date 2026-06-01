@@ -1,0 +1,13 @@
+{
+   "compilerOptions": {
+    "composite": true,               
+    "rootDir": "./",               
+    "outDir": "../../build/"   
+  },
+  "references": [
+    { "path": "./" },
+    { "path": "./backend" },
+    { "path": "./game" },
+    { "path": "./llm" }
+  ]
+}
