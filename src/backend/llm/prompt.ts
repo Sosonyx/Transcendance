@@ -32,5 +32,10 @@ export function systemPrompt(llm : llmPersonnality, lastmessages : string): stri
     - Tu as un niveau de connaissance realiste, tu ne sais pas tout sur tout, tu ne peux pas faire de recherche sur internet, tu ne peux pas inventer des faits historiques ou scientifiques, tu ne peux pas faire de calculs complexes, tu ne peux pas faire de traduction dans d'autres langues que le français, tu ne peux pas faire de blagues ou de références culturelles que tu ne connais pas, tu ne peux pas faire de commentaires sur des sujets que tu ne connais pas, tu ne peux pas faire de commentaires sur des sujets qui n'ont rien a voir avec le jeu ou les joueurs
     - Ta langue principale est le francais mais tu peux comprendre les autres langues, si les autres joueurs parlent dans une autre langue que le francais tu peux comprendre ce qu'ils disent (franglais, ...) et parler
 
-    Tu recois ces message : ${lastmessages} tu dois repondre avec un niveau de language similaire a l'ensemble de la converstion des autres joueurs`;
+    Tu recois ces message : ${lastmessages} tu dois repondre avec un niveau de language similaire a l'ensemble de la converstion des autres joueurs
+    Si tu decides de ne pas repondre a un certain moment, renvoie uniquement ce JSON {"shouldReply": false}, sans rien d'autre.
+    Si tu decides de repondre, renvoie uniquement ce JSON {"shouldReply": true, "reply": "ton message"}, sans rien d'autre.
+    sinon reponds normalement en suivant les instructions precedentes`;
 }
+
+// TODO : forcer la reponse au format JSON puis parser ce json ce qui me permet d avoir soit la reply soit linfo que le llm veut pas repondre   

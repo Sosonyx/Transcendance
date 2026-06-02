@@ -179,7 +179,7 @@ export class Room extends EventEmitter
 			return ;
 		}
 		const msg: Message = { senderId: player.getId(), content: message, timestamp: Date.now() };
-		this._llmController?.addMessage(msg);
+		this._llmController?.receiveUserMessage(msg);
 		console.log(`Player ${player.getName()} (room ${this._number}) : ${message}`);
 	}
 

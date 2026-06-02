@@ -1,29 +1,33 @@
 import type { EventEmitter } from "node:events";
 import { pipeline } from "./pipeline.js";
-import { llmHistory as llmHistory } from "./llmHistory.js";
+import type { LlmDecision } from "./pipeline.js";
+import { LlmContextBuilder } from "./services/llmContextBuilder.js";
+import { LlmDecisionEngine } from "./services/llmDecisionEngine.js";
+import { llmHistory as llmHistory } from "./services/llmHistory.js";
 import { llmPersonnality } from "./personnality.js";
-import { LlmScheduler } from "./llmScheduler.js";
+import { LlmResponseEmitter } from "./services/llmResponseEmitter.js";
+import { LlmScheduler } from "./services/llmScheduler.js";
 import type { Message } from "./types/messages.js";
 
 export class Llm {
-	private readonly	_roomEmitter: EventEmitter;
-
-	private readonly	_nbPlayers: number;
 	private				_lastMessages: Message[] = [];
 	private 			_llmHistory: llmHistory;
-	private             _currentQuestion: string | undefined;
 
 	private				_llmPersonnality: llmPersonnality;
 	private readonly	_scheduler: LlmScheduler;
+	private readonly	_contextBuilder: LlmContextBuilder;
+	private readonly	_decisionEngine: LlmDecisionEngine;
+	private readonly	_responseEmitter: LlmResponseEmitter;
 
 	public constructor(roomEmitter: EventEmitter,
 	playerNames: string[] = [], llmName: string) 
 	{
-		this._roomEmitter = roomEmitter;
-		this._nbPlayers = playerNames.length;
 		this._llmHistory = new llmHistory();
 		this._llmPersonnality = new llmPersonnality(playerNames, llmName);
 		this._scheduler = new LlmScheduler();
+		this._contextBuilder = new LlmContextBuilder();
+		this._decisionEngine = new LlmDecisionEngine(playerNames.length);
+		this._responseEmitter = new LlmResponseEmitter(roomEmitter, this._llmPersonnality);
 	}
 	// To set when the room is in a state where the LLM should answer
 	public startPlaying(): void {
@@ -34,89 +38,73 @@ export class Llm {
 		this._scheduler.stop();
 	}
 
-	private getCutoffTime(): number {
-		return Date.now() - 1500;
+	// To be able to know what is the current question in the room, so the LLM can decide to answer spontaneously about it.
+	public setGlobalQuestion(question: string): void {
+		this._decisionEngine.setGlobalQuestion(question);
+	}
+	
+	public async answerGlobalQuestion(responsesFromUsers: Message[]): Promise<string> {
+		const decision: LlmDecision = await pipeline(this._llmHistory, 
+			this._contextBuilder.buildContext(responsesFromUsers), this._llmPersonnality);
+		
+		if (decision.shouldReply && decision.reply)
+			return decision.reply;
+		return "";
 	}
 
-	private collectMessagesToAnswer(cutoff: number): Message[] {
-		return this._lastMessages.filter(m => m.timestamp <= cutoff);
-	}
-
-	private clearProcessedMessages(cutoff: number): void {
-		// Remove messages that were used, keeping only those that are newer than the cutoff (1.5s)
-		this._lastMessages = this._lastMessages.filter(m => m.timestamp > cutoff);
-	}
-
-	private shouldSpontaneouslyAnswer(): boolean {
-		const prob = Math.min(0.4, 1 / this._nbPlayers);
-
-		return Math.random() < prob;
-	}
-
-	private	consumeGlobalQuestion(): string | undefined {
-		// Consume the current question and reset it to undefined to avoid using the same question 
-		// multiple times if the LLM takes a long time to answer.
-		const currentQuestion = this._currentQuestion;
-		this._currentQuestion = undefined;
-
-		return currentQuestion;
-	}
-
-	private delayResponse(reply: string): void {
-		let delay = 800 + reply.length * 10;
-		delay = Math.min(delay, 2000);
-
-		if (!this._scheduler.canEmit())
-			return;
-		setTimeout(() => {
-			if (!this._scheduler.canEmit())
-				return;
-
-			const msg: Message = { senderId: this._llmPersonnality.getName() ?? 'Llm', content: reply, timestamp: Date.now() };
-			this._roomEmitter.emit("message", msg);
-		}, delay);
-	}
-
-	public	addMessage(message: Message): void {
+	public	receiveUserMessage(message: Message): void {
 		this._lastMessages.push(message);
 
-		if (this._scheduler.canEmit())
-			this._scheduler.scheduleNextTick(() => { void this.llmAnswer(); });
+		this._scheduler.scheduleNextTick(() => { void this.llmAnswer(); });
+	}
+
+	private handleNoRecentMessages(messagesRecentEnough: Message[]): Message[] | undefined {
+		// No recent user messages, decide whether the LLM should speak spontaneously.
+		if (!this._decisionEngine.shouldSpontaneouslyAnswer()) {
+			console.log("LLM decides not to answer spontaneously.");
+			return undefined;
+		}
+
+		// We need to create a "fake" message to trigger the pipeline.
+		const currQuestion = this._decisionEngine.consumeGlobalQuestion();
+		if (!currQuestion)
+			return undefined;
+
+		messagesRecentEnough.push({ senderId: "system", content: currQuestion, timestamp: Date.now() });
+		return messagesRecentEnough;
+	}
+
+	private async handleAnswer(messagesRecentEnough: Message[], cutoff: number): Promise<void> {
+		this._lastMessages = this._contextBuilder.clearProcessedMessages(this._lastMessages, cutoff);
+
+		const decision: LlmDecision = await pipeline(this._llmHistory, this._contextBuilder.buildContext(messagesRecentEnough), this._llmPersonnality);
+		console.log("LLM decision:", decision);
+		console.log("LLM reply:", decision.reply);
+			if (decision.shouldReply && decision.reply)
+			this._responseEmitter.emit(decision.reply, () => this._scheduler.canEmit());	
 	}
 
 	private async llmAnswer(): Promise<void> {
-		if (!this._scheduler.tryBeginAnswering()) {
-			if (this._scheduler.canEmit())
-				this._scheduler.scheduleNextTick(() => { void this.llmAnswer(); });
+		if (!this._scheduler.tryBeginAnswering()) 
+		{
+			this._scheduler.scheduleNextTick(() => { void this.llmAnswer(); });
 			return;
 		}
 
-		// "Seuil" minimum
-		const cutoff = this.getCutoffTime();
+		const cutoff = this._contextBuilder.getCutoffTime();
 
 		try {
-			const messagesUsedToAnswer = this.collectMessagesToAnswer(cutoff);
+			const messagesRecentEnough = this._contextBuilder.collectMessagesToAnswer(this._lastMessages, cutoff);
 
-			if (!messagesUsedToAnswer.length) {
-				// No recent user messages, decide whether the LLM should speak spontaneously
-				if (!this.shouldSpontaneouslyAnswer()) {
-					console.log("LLM decides not to answer spontaneously.");
+			if (!messagesRecentEnough.length) {
+				const spontaneousMessages = this.handleNoRecentMessages(messagesRecentEnough);
+				if (!spontaneousMessages)
 					return;
-				}
-				// We need to create a "fake" message to trigger the pipeline
-				const currQuestion = this.consumeGlobalQuestion();
-				if (!currQuestion) {
-					return;
-				}
-				messagesUsedToAnswer.push({ senderId: "system", content: currQuestion, timestamp: Date.now() });
+
+				await this.handleAnswer(spontaneousMessages, cutoff);
+				return;
 			}
-			// Clear the messages that are used to answer from the "object's buffer", keeping only the newer ones to be processed next tick
-			this.clearProcessedMessages(cutoff);
-
-			const reply = await pipeline(this._llmHistory, parseMessages(messagesUsedToAnswer), this._llmPersonnality);
-			if (reply && this._scheduler.canEmit()) {
-				this.delayResponse(reply);
-			}				
+			await this.handleAnswer(messagesRecentEnough, cutoff);
 		}
 		catch (error) {
 			console.error("Error in LLM pipeline:", error);
@@ -127,12 +115,4 @@ export class Llm {
 			});
 		}
 	}
-
-	public setCurrentQuestion(question: string): void {
-		this._currentQuestion = question;
-	}
-}
-
-function parseMessages(messages: Message[]): string {
-	return messages.map(m => `${m.senderId}: ${m.content}`).join("\n");
 }
