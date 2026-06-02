@@ -6,8 +6,9 @@
     "outDir": "../../build/game"   
   },
   
-  "include": ["**/*"],
+"include": ["**/*", "../lib/prisma.ts"],     
   "references": [
-    { "path": "../llm" }   
+    { "path": "../llm" },
+    { "path": "../prisma" }
   ]
 }

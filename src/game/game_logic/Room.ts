@@ -4,7 +4,7 @@ import { EventEmitter } from "node:events";
 import { LlmController } from "../../llm/llmController.js";
 import type { Message } from "../../llm/types/messages.js";
 import { shuffle } from "../utils/index.js";
-import { prisma } from "../lib/prisma.js" 
+import { prisma } from "../../prisma/prisma.js" 
 import type { VoteInfo } from "../utils/index.js";
 
 const action_1_Time : number = 30 * 1000; // 30 seconds

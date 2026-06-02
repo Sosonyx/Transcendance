@@ -6,7 +6,6 @@
   },
   "files": [
     "./server.ts",
-    "./main.ts"
   ],
   "references": [
     { "path": "./backend" },
