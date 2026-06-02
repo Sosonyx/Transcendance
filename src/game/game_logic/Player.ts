@@ -60,6 +60,11 @@ export class Player extends EventEmitter
 		this._wantReplay = false;
 		this._voteAgainst = null;
 		this._score = 0;
+		this._name = '';
+	}
+
+	public setName(name : string) {
+		this._name = name;
 	}
 
 	public setActed(status : boolean) {

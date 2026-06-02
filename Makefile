@@ -25,7 +25,7 @@ db-studio:
 deps-root:
 	ln -sfn $(PWD)/.env $(PWD)/src/.env
 	npm install --prefix $(SRC_DIR)
-	npx --prefix src/ prisma generate --schema=src/prisma/schema.prisma --config=src/prisma.config.ts
+# 	npx --prefix src/ prisma generate --schema=src/prisma/schema.prisma --config=src/prisma.config.ts
 	
 build: deps-root
 	mkdir -p build
