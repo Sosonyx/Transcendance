@@ -1,4 +1,4 @@
-import { prisma } from "../lib/prisma.js"
+import { prisma } from "../../prisma/prisma.js"
 import type { FastifyInstance } from "fastify";
 import type { oAuthProfile } from "../types/interfaces.js";
 
