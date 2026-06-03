@@ -1,5 +1,5 @@
 import type { FastifyRequest, FastifyReply } from 'fastify';
-import { prisma } from '../../prisma/prisma.js';
+import { prisma } from "../prisma/prisma.js";
 
 const userProfileSelect = {
     id: true,

@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify';
-import { prisma } from '../../prisma/prisma.js';
+import { prisma } from '../prisma/prisma.js';
 
 export async function healthRoutes(app: FastifyInstance) 
 {

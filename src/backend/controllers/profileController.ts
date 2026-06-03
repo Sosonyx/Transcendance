@@ -1,6 +1,6 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import type { DBUserResponse, Player, UserMap, UserSafeInterface, UserInterface } from "../types/interfaces.js";
-import { prisma } from "../../prisma/prisma.js";
+import { prisma } from "../prisma/prisma.js";
 
 export async function getProfileController(req: FastifyRequest, reply: FastifyReply){
 	try 

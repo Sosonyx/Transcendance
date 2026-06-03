@@ -7,6 +7,6 @@
   },
   "include": ["**/*"],
   "references": [
-	{"path": "../prisma"}
+	{"path": "./prisma"}
   ]
 }

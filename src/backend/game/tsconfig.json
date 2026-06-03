@@ -1,9 +1,9 @@
 {
-  "extends": "../tsconfig.base.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "composite": true,               
     "rootDir": "./",               
-    "outDir": "../../build/game"   
+    "outDir": "../../../build/backend/game"   
   },
   
 "include": ["**/*", "../lib/prisma.ts"],     

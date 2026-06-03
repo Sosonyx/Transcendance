@@ -4,7 +4,6 @@
   "compilerOptions": {
     // File Layout
     "rootDir": "./",
-    "outDir": "./build",
     
     // Environment Settings
     // See also https://aka.ms/tsconfig/module

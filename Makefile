@@ -5,31 +5,33 @@ SRC_DIR := src/
 
 deps:
 	docker compose up -d
-	ln -sfn $(PWD)/.env $(PWD)/src/.env
 	npm install --prefix $(SRC_DIR)
-	npx --prefix src/ prisma generate --schema=src/backend/prisma/schema.prisma --config=src/prisma.config.ts
-	
+	cd src && npx prisma generate --schema=backend/prisma/schema.prisma --config=prisma.config.ts
+	cd src/backend && npx prisma db push --schema=prisma/schema.prisma
+
 build: deps
 	mkdir -p build
-	cd src/ && npx prisma db push && cd ..
-	npx --prefix $(SRC_DIR) tsc -b $(SRC_DIR)tsconfig.json
+	npx --prefix src/ tsc -b $(PWD)/src/tsconfig.json
 	ln -sfn $(PWD)/src/node_modules $(PWD)/build/node_modules
 
+
 run:
-	node build/server.js
+	cd src && node ../build/server.js
 
 
 run-backend:
-	node build/backend/server.js
+	cd src && node ../build/backend/server.js
 
 run-game:
-	node build/game/server.js
+	cd src && node ../build/backend/game/server.js
 
 clean:
 	rm -rf build
 	rm -rf src/node_modules
 
-fclean:
-	clean 
+fclean: clean
+	docker compose down postgres
 	rm -rf src/.env
+	rm -rf src/build
+
 

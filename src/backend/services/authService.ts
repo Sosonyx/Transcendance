@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { prisma } from "../../prisma/prisma.js";
+import { prisma } from "../prisma/prisma.js";
 import type { UserInterface } from "../types/interfaces.js"
 import type { FastifyRequest } from "fastify/types/request.js";
 import type { FastifyReply } from "fastify/types/reply.js";

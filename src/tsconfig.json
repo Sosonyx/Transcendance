@@ -9,7 +9,7 @@
   ],
   "references": [
     { "path": "./backend" },
-    { "path": "./game" },
-    { "path": "./llm" }
+    { "path": "./backend/game" },
+    { "path": "./backend/llm" }
   ]
 }
