@@ -58,8 +58,6 @@ export async function askClaude(promptContext: string, conversationHistory: Mess
     {
         throw new Error("Unexpected response type");
     }
-
-    llmResponse.
     return block.text;
 }
 

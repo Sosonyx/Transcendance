@@ -31,7 +31,6 @@ export enum roomStates {
 
 type playerInput =  { name : string, input : string};
 
-
 export class Room extends EventEmitter
 {
 	private	readonly _id : string;
@@ -486,6 +485,7 @@ export class Room extends EventEmitter
 		this._input = null;
 		this._maxPlayerCount = maxPlayerCount;
 		this._isAccessible = true;
+		this._llm = null;
 
 		this._createRoomInDB();
 	}
