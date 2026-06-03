@@ -53,12 +53,13 @@ export async function askClaude(promptContext: string, conversationHistory: Mess
         system: [getSystemPrompt(promptContext)], 
         messages: conversationHistory
     });
-
     const block = llmResponse.content.find( (b: Anthropic.Messages.ContentBlock) => b.type === "text")
     if(block === undefined || block.type !== "text")
     {
         throw new Error("Unexpected response type");
     }
+
+    llmResponse.
     return block.text;
 }
 

@@ -97,6 +97,7 @@ export class Room extends EventEmitter
 				this._allPlayersShouldAct();
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.CHAT) }, action_2_Time);
 				data = this._pickAnInput();
+				// TODO: ici appeler le llm pour rep a sa question et stocker sa reponse pour la donner dans le chat?
 				break ;
 
 			case (roomStates.CHAT) :
@@ -376,7 +377,7 @@ export class Room extends EventEmitter
 		console.log(`Chosen input is : ${input}`);
 		if (input === undefined)
 			return null;
-		this._llmController?.setCurrentQuestion(input);
+		this._llmController?.setGlobalQuestion(input);
 		return input as string;
 	}
 

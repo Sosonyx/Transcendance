@@ -1,9 +1,14 @@
+enum LlmSchedulerState {
+	Stopped = "stopped",
+	Idle = "idle",
+	Answering = "answering"
+}
+
 export class LlmScheduler {
 	private readonly	_intervalMs: number;
 	private readonly	_jitterMs: number;
 
-	private			_isPlaying = false;
-	private			_isAnswering = false;
+	private			_state: LlmSchedulerState = LlmSchedulerState.Stopped;
 	private			_timer: NodeJS.Timeout | null = null;
 
 	public constructor(intervalMs = 5000, jitterMs = 2000) {
@@ -12,42 +17,43 @@ export class LlmScheduler {
 	}
 
 	public start(onTick: () => void): void {
-		if (this._isPlaying)
+		if (this._state !== LlmSchedulerState.Stopped)
 			return;
 
-		this._isPlaying = true;
+		this._state = LlmSchedulerState.Idle;
 		this.scheduleNextTick(onTick);
 	}
 
 	public stop(): void {
-		if (!this._isPlaying)
+		if (this._state === LlmSchedulerState.Stopped)
 			return;
 
-		this._isPlaying = false;
+		this._state = LlmSchedulerState.Stopped;
 		this.clearTimer();
 	}
 
 	public tryBeginAnswering(): boolean {
-		if (!this._isPlaying || this._isAnswering)
+		if (this._state !== LlmSchedulerState.Idle)
 			return false;
 
-		this._isAnswering = true;
+		this._state = LlmSchedulerState.Answering;
 		return true;
 	}
 
 	public finishAnswering(onCanSchedule: () => void): void {
-		this._isAnswering = false;
+		if (this._state === LlmSchedulerState.Stopped)
+			return;
 
-		if (this._isPlaying)
-			onCanSchedule();
+		this._state = LlmSchedulerState.Idle;
+		onCanSchedule();
 	}
 
 	public canEmit(): boolean {
-		return this._isPlaying;
+		return this._state !== LlmSchedulerState.Stopped;
 	}
 
 	public scheduleNextTick(onTick: () => void): void {
-		if (!this._isPlaying || this._timer)
+		if (this._state === LlmSchedulerState.Stopped || this._timer)
 			return;
 
 		this._timer = setTimeout(() => {
