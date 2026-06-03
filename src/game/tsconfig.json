@@ -1,8 +1,14 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "../../build/game"
+    "composite": true,               
+    "rootDir": "./",               
+    "outDir": "../../build/game"   
   },
-  "include": ["**/*.ts"],
-  "exclude": ["node_modules", "build", "dist"]
+  
+"include": ["**/*", "../lib/prisma.ts"],     
+  "references": [
+    { "path": "../llm" },
+    { "path": "../prisma" }
+  ]
 }

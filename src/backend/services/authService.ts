@@ -1,11 +1,11 @@
 import bcrypt from "bcrypt";
-import { prisma } from "../lib/prisma.js";
-import type { userInterface } from "../types/interfaces.js"
+import { prisma } from "../../prisma/prisma.js";
+import type { UserInterface } from "../types/interfaces.js"
 import type { FastifyRequest } from "fastify/types/request.js";
 import type { FastifyReply } from "fastify/types/reply.js";
 
 
-export async function loginUser(currUser : Partial <userInterface>) 
+export async function loginUser(currUser : Partial <UserInterface>) 
 {
   const user = await prisma.user.findUnique({
     where : {
@@ -19,26 +19,15 @@ export async function loginUser(currUser : Partial <userInterface>)
   return user;
 }
 
-export async function registerUser(newUser: userInterface) : Promise<Partial<userInterface>>
+export async function registerUser(newUser: UserInterface) : Promise<Partial<UserInterface>>
 {
-  const hash = await bcrypt.hash(newUser.password, 10);
+  const hash = await bcrypt.hash(newUser.password!, 10);
   const user = await prisma.user.create({
     data :{
       email: newUser.email,
       username: newUser.username, 
       hashedPassword: hash, 
       avatar : newUser.avatar ? newUser.avatar : null,
-    Stats: {
-      create: {
-          numberOfGames: 0,
-          gamesWin: 0,
-          gamesLose: 0,
-          winrate: 0.0,
-        }
-      }
-    },
-    include: {
-      Stats: true
     }})
 
   return (user);

@@ -2,11 +2,12 @@ import { Server } from 'socket.io';
 import { EventEmitter } from "node:events";
 import { RoomManager } from '../game_logic/RoomManager.js';
 import { roomStates } from '../game_logic/Room.js';
-import { type Message , type RoomId } from '../types/index.js';
+import { type Message , type RoomId } from '../utils/index.js';
 
 import { CLI } from '../game_logic/CommandLine.js';
 
-export function registerSocketHandlers(io: Server) {
+export function registerSocketHandlers(io: Server) 
+{
 	const roomManager = new RoomManager();
 
 	/* ===============Connexion client================= */
@@ -14,6 +15,8 @@ export function registerSocketHandlers(io: Server) {
 		// console.log(`Joueur connecté : ${socket.id}`);
 
 		// Recupere la room
+		// TODO : remplacer socket.id par userID ?
+
 		let [roomId, roomEmitter, playerEmitter] : [RoomId, EventEmitter, EventEmitter] = roomManager.connectPlayer(socket.id);
 
 		// Rejoins sa room
@@ -39,12 +42,12 @@ export function registerSocketHandlers(io: Server) {
 				}
 
 				case roomStates.CHAT: {
-					io.to(roomId).emit('startChat');
+					io.to(roomId).emit('startChat', data);
 					// console.log(`${roomId}: starting action phase`);
 					break;
 				}
 		        case roomStates.VOTE: {
-		            io.to(roomId).emit('startVote', roomManager.getPlayersIdFromRoomId(roomId));
+		            socket.emit('startVote', roomManager.getVotePoolFromUser(roomId, socket.id));
 		            // console.log(`${roomId}: starting vote phase`);
 		            break;
 		        }
@@ -64,6 +67,7 @@ export function registerSocketHandlers(io: Server) {
 		roomEmitter.on('stateChanged', onStateChanged);
 
 		// Relay messages emitted on the roomEmitter to socket.io clients
+		// TODO: redo
 		if (roomEmitter.listenerCount('message') === 0) {
 			roomEmitter.on('message', (message: Message) => {
 				if (roomId === null) return;
@@ -83,7 +87,6 @@ export function registerSocketHandlers(io: Server) {
 		/* ==========ACTION_1==========*/
 		// Joueur interragit action_1
 		socket.on('input', (content: string) => {
-
 			// console.log(`socket backend received an input info !`);
 			if (roomId === null) return;
 			if (roomManager.getRoomState(roomId) !== roomStates.ACTION_1 && roomManager.getRoomState(roomId) !== roomStates.ACTION_2 ) return;
@@ -166,6 +169,7 @@ export function registerSocketHandlers(io: Server) {
 			// console.log(`Joueur déconnecté : ${socket.id}`);
 		});
 	});
+
 	const CommandLineInterpreter = new CLI(roomManager);
     CommandLineInterpreter.run();
 }

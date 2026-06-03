@@ -23,7 +23,7 @@ model User {
   friendOf Friendship[] @relation("FriendOf")
   OAuthAccount OAuthAccount[]
 
-  playedAs  Player[]
+  playedAs  Player[] // to find his stats
 }
 
 model OAuthAccount {
@@ -55,49 +55,57 @@ model Friendship {
   user   User @relation("UserFriends", fields: [userId], references: [id], onDelete: Cascade)
   friend User @relation("FriendOf", fields: [friendId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, friendId])
+  @@unique([userId, friendId]) // pas deux fois la même paire
 }
 
 model Player {
   id        String @id @default(cuid())
-  roomId    String 
+  gameId    String
   userId    String?
   name      String
-  status    String
+  status    String // ('llm' | 'user')
   score     Int @default(0)
+  won		Boolean @default(false)
 
   logsFrom  Log[] @relation("LogsFrom")
   logsTo    Log[] @relation("LogsTo")
 
-  room  Room  @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  game  Game  @relation(fields: [gameId], references: [id], onDelete: Cascade)
   user  User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([userId])
-  @@index([roomId])
+  @@index([gameId])
 } 
 
 model Log {
   id            String @id @default(cuid())
-  roomId        String
+  gameId        String
   event         String
   content       String?
   playerFromId  String?
   playerToId    String?
   timestamp     DateTime @default(now())
 
-  room        Room    @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  game        Game    @relation(fields: [gameId], references: [id], onDelete: Cascade)
   playerFrom  Player?  @relation("LogsFrom", fields: [playerFromId], references: [id], onDelete: SetNull)
   playerTo    Player?  @relation("LogsTo", fields: [playerToId], references: [id], onDelete: SetNull)
 
-  @@index([roomId, timestamp])
+  @@index([gameId, timestamp])
+}
+
+model Game {
+	id			String @id @default(cuid())
+	roomId		String
+	startTime	DateTime?
+  	winner		String?
+	players		Player[]
+	logs    	Log[]
+
+	room		Room    @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  	@@index([roomId])
 }
 
 model Room {
   id        String @id @default(cuid())
-  startTime DateTime?
-  endTime   DateTime?
-  winner    String?
-
-  players Player[]
-  logs    Log[]
+  games		Game[]
 }

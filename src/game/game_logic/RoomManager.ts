@@ -1,7 +1,7 @@
 import { Room } from "./Room.js";
 import { Player } from "./Player.js";
 import { EventEmitter } from "node:events";
-import { type RoomManagerInterface, type RoomId } from "../types/index.js";
+import { type RoomManagerInterface, type RoomId, type VoteInfo } from "../utils/index.js";
 
 export	class RoomManager implements RoomManagerInterface
 {
@@ -16,7 +16,8 @@ export	class RoomManager implements RoomManagerInterface
 		return room
 	}
 
-	public connectPlayer(playerId : string , isTTY : boolean = false) : [roomId : RoomId, room : EventEmitter, player : EventEmitter] {
+	public connectPlayer(playerId : string , isTTY : boolean = false) : [roomId : RoomId, room : EventEmitter, player : EventEmitter]
+	{
 		let player : Player | undefined;
 		let room : Room | undefined;
 
@@ -25,14 +26,16 @@ export	class RoomManager implements RoomManagerInterface
 		{
 			room = this._rooms.find(room => room.accessPlayerByName(playerId));
 			// player = room?.accessPlayerByName(playerId);
-			player = room?.accessPlayerById(playerId);
+			// player = room?.accessPlayerById(playerId);
+			player = room?.accessPlayerByUserId(playerId);
 			if (room)
 				console.log(`Found existing room ${room.getNumber()}`);
 		}
 		else
 		{
 			room = this._rooms.find(room => room.accessPlayerById(playerId));
-			player = room?.accessPlayerById(playerId);
+			// player = room?.accessPlayerById(playerId);
+			player = room?.accessPlayerByUserId(playerId);
 		}
 		if (room === undefined)
 		{
@@ -55,12 +58,14 @@ export	class RoomManager implements RoomManagerInterface
 		{
 			room = this._accessRoomByNumber(parseInt(roomId));
 			// player = room?.accessPlayerByName(playerId);
-			player = room?.accessPlayerById(playerId);
+			// player = room?.accessPlayerById(playerId);
+			player = room?.accessPlayerByUserId(playerId);
 		}
 		else
 		{
 			room = this._accessRoomById(roomId);
-			player = room?.accessPlayerById(playerId);
+			// player = room?.accessPlayerById(playerId);
+			player = room?.accessPlayerByUserId(playerId);
 		}
 		if (room === undefined)
 		{
@@ -87,12 +92,14 @@ export	class RoomManager implements RoomManagerInterface
 		{
 			room = this._accessRoomByNumber(parseInt(roomId));
 			// player = room?.accessPlayerByName(playerId);
-			player = room?.accessPlayerById(playerId);
+			// player = room?.accessPlayerById(playerId);
+			player = room?.accessPlayerByUserId(playerId);
 		}
 		else
 		{
 			room = this._accessRoomById(roomId);
-			player = room?.accessPlayerById(playerId);
+			// player = room?.accessPlayerById(playerId);
+			player = room?.accessPlayerByUserId(playerId);
 		}
 		if (room === undefined)
 		{
@@ -119,12 +126,14 @@ export	class RoomManager implements RoomManagerInterface
 		{
 			room = this._accessRoomByNumber(parseInt(roomId));
 			// player = room?.accessPlayerByName(playerId);
-			player = room?.accessPlayerById(playerId);
+			// player = room?.accessPlayerById(playerId);
+			player = room?.accessPlayerByUserId(playerId);
 		}
 		else
 		{
 			room = this._accessRoomById(roomId);
-			player = room?.accessPlayerById(playerId);
+			// player = room?.accessPlayerById(playerId);
+			player = room?.accessPlayerByUserId(playerId);
 		}
 		if (room === undefined)
 		{
@@ -157,7 +166,7 @@ export	class RoomManager implements RoomManagerInterface
 		else
 		{
 			room = this._accessRoomById(roomId);
-			playerFrom = room?.accessPlayerById(playerIdFrom);
+			playerFrom = room?.accessPlayerByUserId(playerIdFrom);
 			playerTo = room?.accessPlayerById(playerIdTo);
 		}
 		if (room === undefined)
@@ -190,12 +199,14 @@ export	class RoomManager implements RoomManagerInterface
 		{
 			room = this._accessRoomByNumber(parseInt(roomId));
 			// player = room?.accessPlayerByName(playerId);
-			player = room?.accessPlayerById(playerId);
+			// player = room?.accessPlayerById(playerId);
+			player = room?.accessPlayerByUserId(playerId);
 		}
 		else
 		{
 			room = this._accessRoomById(roomId);
-			player = room?.accessPlayerById(playerId);
+			// player = room?.accessPlayerById(playerId);
+			player = room?.accessPlayerByUserId(playerId);
 		}
 		if (room === undefined)
 		{
@@ -222,12 +233,14 @@ export	class RoomManager implements RoomManagerInterface
 		{
 			room = this._accessRoomByNumber(parseInt(roomId));
 			// player = room?.accessPlayerByName(playerId);
-			player = room?.accessPlayerById(playerId);
+			// player = room?.accessPlayerById(playerId);
+			player = room?.accessPlayerByUserId(playerId);
 		}
 		else
 		{
 			room = this._accessRoomById(roomId);
-			player = room?.accessPlayerById(playerId);
+			// player = room?.accessPlayerById(playerId);
+			player = room?.accessPlayerByUserId(playerId);
 		}
 		if (room === undefined)
 		{
@@ -270,12 +283,39 @@ export	class RoomManager implements RoomManagerInterface
 		return (room.getState());
 	}
 
+	// public getUsersIdFromRoomId(roomId: string): readonly string[] {
+	// 	let res : string[] = [];
+	// 	let players : Player[] | undefined = this._accessRoomById(roomId)?.getPlayers();
+	// 	// if (players === undefined)
+	// 	// 	return res;
+	// 	// players = players.filter((player) => !player.getIsLLM());
+	// 	players?.forEach((player) => {res.push(player.getUserId()!)});
+	// 	return res;
+	// }
 
-	public getPlayersIdFromRoomId(roomId: string): readonly string[] {
-		let res : string[] = [];
-		let players : Player[] | undefined = this._accessRoomById(roomId)?.getPlayers();
-		players?.forEach((player) => {res.push(player.getId())});
-		return res;
+	public getVotePoolFromUser(roomId : RoomId, userId : string) : VoteInfo[] | null
+	{
+		
+		if (roomId === null)
+			return null;
+
+		let room : Room | undefined;
+		let player : Player | undefined;
+
+		room = this._accessRoomById(roomId);
+		player = room?.accessPlayerByUserId(userId);
+		if (room === undefined)
+		{
+			console.error(`\n\x1b[41mNo room found with ID ${roomId}\x1b[0m\n`);
+			return null;
+		}
+		if (player === undefined)
+		{
+			console.error(`\n\x1b[41mNo player with ID ${userId} in room ${roomId}\x1b[0m\n`);
+			return null;
+		}
+
+		return room.getVotePoolFromPlayer(player.getId());
 	}
 
 	private _accessFreeRoom() : Room {

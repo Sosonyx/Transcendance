@@ -16,11 +16,11 @@ import { registerSocketHandlers } from './socket/index.js';
 export const fastify = Fastify();
 
 fastify.register(fastifyStatic, {
-    root: join(process.cwd(), 'public')
+    root: join(process.cwd(), './public')
 });
 
 fastify.get('/', (request, reply) => {
-    request;
+	request;
     return reply.sendFile('index.html');
 });
 
@@ -32,6 +32,6 @@ const io = new Server(fastify.server, {
 
 registerSocketHandlers(io);
 
-fastify.listen({ port: 3000, host: '0.0.0.0' }, () => {
+fastify.listen({ port: 3000}, () => {
     console.log('Serveur lancé sur le port 3000');
 });

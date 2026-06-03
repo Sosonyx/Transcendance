@@ -1,8 +1,12 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
+	"composite":true,
+    "rootDir": "./",
     "outDir": "../../build/backend"
   },
-  "include": ["**/*.ts"],
-  "exclude": ["node_modules", "build", "dist"]
+  "include": ["**/*"],
+  "references": [
+	{"path": "../prisma"}
+  ]
 }

@@ -1,8 +1,11 @@
 import { Player } from "./Player.js";
-import {v4 as uuid} from 'uuid';
+import { v4 as uuid } from 'uuid';
 import { EventEmitter } from "node:events";
-import { Llm } from "../../backend/llm/llm.js";
-import type { Message } from "../../backend/llm/types/messages.js";
+import { Llm } from "../../llm/llm.js";
+import type { Message } from "../../llm/types/messages.js";
+import { shuffle } from "../utils/index.js";
+import { prisma } from "../../prisma/prisma.js" 
+import type { VoteInfo } from "../utils/index.js";
 
 const action_1_Time : number = 30 * 1000; // 30 seconds
 const action_2_Time : number = 30 * 1000; // 30 seconds
@@ -12,6 +15,8 @@ const replayTime : number = 30 * 1000; // 30 seconds
 const maxPlayerCount : number = 7;
 const scoreCorrectVote : number = 3;
 const scoreGetVoted : number = 1;
+
+const possibleNames : string[] = ['YELLOW', 'RED', 'BLUE', 'ORANGE', 'GREEN', 'PINK', 'WHITE', 'BLACK'];
 
 export enum roomStates {
 	INIT = "INIT",
@@ -26,18 +31,59 @@ export enum roomStates {
 
 type playerInput =  { name : string, input : string};
 
+
 export class Room extends EventEmitter
 {
-	private _llmController?: Llm | null;
-	private	_id : string;
+	private	readonly _id : string;
+	private	_gameId? : string | null;
 	private _number : number;
 	private _state : roomStates;
 	private	_players : Player[];
 	private _inputs : playerInput[];
+	private _input : playerInput | null;
 	private _playerCount : number;
 	private _maxPlayerCount : number;
 	private _isAccessible : boolean;
 	private _timerId : NodeJS.Timeout | undefined;
+	private _llm: Llm | null;
+
+	// DATABASE
+
+	private	async _createRoomInDB() {
+		console.log('saving room in DB');
+		let image = await prisma.room.create({
+			data: {
+				id : this._id
+			}
+		});
+		console.log(image);
+	};
+
+	private	async _createGameInDB() {
+		this._gameId = uuid();
+		console.log(`${this._gameId}`);
+		console.log('saving game in DB');
+		let image = await prisma.game.create({
+			data: {
+				id : this._gameId,
+				roomId : this._id,
+				startTime : new Date(),
+
+				players : {
+					create: this._players.map((player) => ({
+						id : player.getId(),
+						userId : player.getUserId(),
+						name : player.getName(),
+						status : (player.getIsLLM() ? 'llm' : 'user')
+					}))
+				}
+			},
+			include : {players:true}
+		});
+		console.log(image);
+		if (image.players)
+		console.log(image.players);
+	};
 
 	// SETGET
 
@@ -69,6 +115,14 @@ export class Room extends EventEmitter
 		return this._isAccessible;
 	}
 
+	public getVotePoolFromPlayer(playerId : string) : VoteInfo[] {
+		let votes : VoteInfo[] = [];
+		let votable = this._players.filter(player => player.getId() !== playerId);
+		votable.forEach(player => votes.push([player.getId(), player.getName()]));
+
+		return votes;
+	}
+
 	private _allPlayersShouldAct() {
 		this._players.forEach((player : Player) => player.setActed(false));
 	}
@@ -85,28 +139,39 @@ export class Room extends EventEmitter
 
 		switch (newState) {
 
-			case (roomStates.LOBBY) : break ;
+			case (roomStates.LOBBY) : 
+				break ;
 
 			case (roomStates.ACTION_1) :
-				this._allPlayersShouldAct();
 				this._addLLMPLayer();
+				this._givePlayersName();
+				console.log(this._players);
+				this._players = shuffle(this._players);
+				console.log(this._players);
+				this._createGameInDB();
+				this._allPlayersShouldAct();
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.ACTION_2) }, action_1_Time);
 				break ;
 
 			case (roomStates.ACTION_2) :
 				this._allPlayersShouldAct();
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.CHAT) }, action_2_Time);
-				data = this._pickAnInput();
-				// TODO: ici appeler le llm pour rep a sa question et stocker sa reponse pour la donner dans le chat?
+				this._input = this._pickAnInput();
+				if (this._input === null)
+				{
+					this.stateSwitch(roomStates.CHAT)
+					return ;
+				}
+				data = this._input.input;
 				break ;
 
 			case (roomStates.CHAT) :
-				this._llmController?.startPlaying();
+				this._llm?.startPlaying();
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.VOTE) }, chatTime);
 				break ;
 
 			case (roomStates.VOTE) :
-				this._llmController?.stopPlaying();
+				this._llm?.stopPlaying();
 				this._allPlayersShouldAct();
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.RESULT) }, voteTime);
 				break ;
@@ -130,7 +195,21 @@ export class Room extends EventEmitter
 
 	// EVENTS
 
-	public onJoin(player : Player) {
+	public async onJoin(player : Player) {
+		// TODO : TEMP 
+		// FIX
+
+		let image = await prisma.user.create({
+			data : {
+				id : player.getUserId() as string,
+				email : uuid(),
+				username : uuid()
+			}
+		}
+		)
+		console.log('temp : ', image.id)
+
+
 		if (this._state != roomStates.LOBBY)
 		{
 			this.stateSwitch(roomStates.ERROR);
@@ -180,7 +259,7 @@ export class Room extends EventEmitter
 			return ;
 		}
 		const msg: Message = { senderId: player.getId(), content: message, timestamp: Date.now() };
-		this._llmController?.receiveUserMessage(msg);
+		this._llm?.receiveUserMessage(msg);
 		console.log(`Player ${player.getName()} (room ${this._number}) : ${message}`);
 	}
 
@@ -253,8 +332,8 @@ export class Room extends EventEmitter
 	}
 
 	private	_addLLMPLayer() {
-		let LLMPlayer = new Player(uuid(), true);
-		this._llmController = new Llm(this as EventEmitter, this._players.map(player => player.getName()), LLMPlayer.getName());
+		let LLMPlayer = new Player(null, true);
+		this._llm = new Llm(this as EventEmitter, this._players.map(player => player.getName()), LLMPlayer.getName());
 		this._players.push(LLMPlayer);
 	}
 
@@ -265,10 +344,11 @@ export class Room extends EventEmitter
 	private _restartRoom() {
 		this._removeLLMPlayers();
 		this._inputs = [];
+		this._input = null;
 		this._players.forEach(player => {player.reset()});
 		this.stateSwitch(roomStates.LOBBY);
 		this._checkLobbyStatus();
-		this._llmController = null;
+		this._llm = null;
 	}
 
 	private _computeResult() : void
@@ -342,12 +422,22 @@ export class Room extends EventEmitter
 		}
 	}
 
+	private _givePlayersName() {
+		let namePool = shuffle(possibleNames);
+		this._players.forEach( player => {player.setName(namePool.pop() as string)} );
+
+	}
+
 	public accessPlayerByName(name : string) : Player | undefined {
 		return this._players.find(player => player.getName() == name);
 	}
 
 	public accessPlayerById(id : string) : Player | undefined {
 		return this._players.find(player => player.getId() == id);
+	}
+
+	public accessPlayerByUserId(id : string) : Player | undefined {
+		return this._players.find(player => player.getUserId() == id);
 	}
 
 	private _isLobbyReady() : boolean {
@@ -372,13 +462,13 @@ export class Room extends EventEmitter
 		return (true);
 	}
 
-	private _pickAnInput() : string | null {
-		let input = this._inputs[Math.floor(Math.random() * this._inputs.length)]?.input;
+	private _pickAnInput() : playerInput | null {
+		let input = this._inputs[Math.floor(Math.random() * this._inputs.length)];
 		console.log(`Chosen input is : ${input}`);
 		if (input === undefined)
 			return null;
-		this._llmController?.setGlobalQuestion(input);
-		return input as string;
+		// this._llm?.setGlobalQuestion(input);
+		return input;
 	}
 
 	// CONSTRUCTOR
@@ -387,12 +477,16 @@ export class Room extends EventEmitter
 		super();
 		console.log("Constructor called for class Room");
 		this._id = uuid();
+		this._gameId = null;
 		this._number = nb;
 		this._state = roomStates.INIT;
 		this._players = [];
 		this._playerCount = 0;
 		this._inputs = [];
+		this._input = null;
 		this._maxPlayerCount = maxPlayerCount;
 		this._isAccessible = true;
+
+		this._createRoomInDB();
 	}
 }

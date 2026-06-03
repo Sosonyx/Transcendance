@@ -1,10 +1,10 @@
 import Fastify from 'fastify';
+import 'dotenv/config';
 import fastifyStatic from '@fastify/static';
 
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { initRoutes } from './routes/initRoutes.js'
-
 
 export const app = Fastify({ logger: true });
 

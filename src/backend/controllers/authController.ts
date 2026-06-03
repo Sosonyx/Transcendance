@@ -1,11 +1,11 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import { registerUser, loginUser } from "../services/authService.js";
-import { prisma } from "../lib/prisma.js"
-import type { userInterface } from "../types/interfaces.js"
+import { prisma } from "../../prisma/prisma.js"
+import type { UserInterface } from "../types/interfaces.js"
 
 export async function registerController(req: FastifyRequest, reply: FastifyReply)
 {
-  let newUser: userInterface = req.body as userInterface;
+  let newUser: UserInterface = req.body as UserInterface;
   
   const validEmail = await prisma.user.findUnique({where :{email:newUser.email}})
   if (validEmail)
@@ -15,15 +15,26 @@ export async function registerController(req: FastifyRequest, reply: FastifyRepl
   if (validUsername)
 		throw new Error("Invalid username");
 
-  const user = await registerUser({email: newUser.email, username: newUser.username, password: newUser.password, avatar: newUser.avatar, id : null});
-  var token: string = req.server.jwt.sign({ userId: user.id, username: user.username }, { expiresIn: '1h' });
+  const user: Partial<UserInterface>= await registerUser({
+            email: newUser.email,
+            username: newUser.username,
+            password: newUser.password,
+            avatar: newUser.avatar,
+            id: newUser.id
+          });
+
+  var token: string = req.server.jwt.sign({
+            userId: user.id,
+            username: user.username
+          },
+          { expiresIn: '1h' });
   reply.setCookie('token', token, { httpOnly: false, secure: false /* true en prod (HTTPS seulement)*/, sameSite: 'strict', maxAge: 86400, path: '/'});
   return reply.status(201).send({token, user});
 }
 
 export async function loginController(req : FastifyRequest, reply : FastifyReply)
 {
-  const body = req.body as Partial <userInterface>;
+  const body = req.body as Partial <UserInterface>;
   const user = await loginUser(body);
   var token: string = req.server.jwt.sign({ userId: user.id, username: user.username }, { expiresIn: '1h' });
   reply.setCookie('token', token, { httpOnly: false, secure: false /* true en prod (HTTPS seulement)*/, sameSite: 'strict', maxAge: 86400, path: '/'});

@@ -43,6 +43,26 @@
         .status-dot.connected { background-color: #00adb5; }
         .status-text { font-size: 14px; color: #aaa; }
         .status-text span { color: #00adb5; font-weight: 600; }
+        
+        .status-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .btn-nav {
+            background-color: #3f3f4e;
+            border: 1px solid #555;
+            color: #fff;
+            border-radius: 6px;
+            padding: 6px 14px;
+            font-size: 13px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .btn-nav:hover {
+            background-color: #4f4f62;
+            border-color: #00adb5;
+        }
         .btn-logout {
             background: transparent;
             border: 1px solid #c62828;
@@ -202,10 +222,12 @@
             <div class="status-dot" id="statusDot"></div>
             <div class="status-text" id="statusText">Non connecté</div>
         </div>
-        <button class="btn-logout" id="logoutBtn" style="display:none" onclick="handleLogout()">Déconnexion</button>
+        <div class="status-actions">
+            <a href="index.html" class="btn-nav" id="chatBtn" style="display:none">Chat</a>
+            <button class="btn-logout" id="logoutBtn" style="display:none" onclick="handleLogout()">Déconnexion</button>
+        </div>
     </div>
 
-    <!-- DIV CONTENANT LES BOUTONS OAUTH (Masquée via JS si connecté) -->
     <div class="oauth-container" id="oauthLinks">
         <a href="/api/auth/42">
             <button class="btn-oauth">Connexion 42</button>
@@ -215,7 +237,6 @@
         </a>
     </div>
 
-    <!-- FORMULAIRES D'INSCRIPTION ET DE CONNEXION CLASSIQUES -->
     <div class="container" id="authFormsContainer">
         <div class="form-section">
             <h2>Créer un compte</h2>
@@ -254,7 +275,6 @@
         </div>
     </div>
 
-    <!-- ESPACE JOUEUR PRIVE -->
     <div class="container" id="statsContainer" style="display: none;">
         <h2>Espace Joueur</h2>
         <div class="action-group">
@@ -281,6 +301,13 @@
     const PROFILE_URL     = '/api/profile';
     const LEADERBOARD_URL = '/api/leaderboard';
 
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+    }
+
     function displayMessage(id, text, ok) {
         const el = document.getElementById(id);
         el.innerText = text;
@@ -289,36 +316,37 @@
     }
 
     function updateStatusBar() {
-        const token    = localStorage.getItem('token');
+        const token    = getCookie('jwt') || localStorage.getItem('token');
         const username = localStorage.getItem('username');
+        
         const dot  = document.getElementById('statusDot');
         const text = document.getElementById('statusText');
         const btn  = document.getElementById('logoutBtn');
+        const chatBtn = document.getElementById('chatBtn'); // Récupération du bouton Chat
         const statsSection = document.getElementById('statsContainer');
         const statsDisplay = document.getElementById('statsDisplay');
         
-        // Ciblage des nouveaux éléments à masquer/afficher
         const oauthLinks   = document.getElementById('oauthLinks');
         const authFormsContainer = document.getElementById('authFormsContainer');
 
-        if (token && username) {
+        if (token) {
             dot.classList.add('connected');
-            text.innerHTML = 'Connecté en tant que <span>' + username + '</span>';
+            text.innerHTML = username ? 'Connecté en tant que <span>' + username + '</span>' : 'Connecté';
             btn.style.display = 'block';
+            chatBtn.style.display = 'block'; // Affiche le bouton Chat
             statsSection.style.display = 'block'; 
             
-            // ON CACHE les éléments de connexion si le joueur est connecté
             oauthLinks.style.display = 'none';
             authFormsContainer.style.display = 'none';
         } else {
             dot.classList.remove('connected');
             text.innerHTML = 'Non connecté';
             btn.style.display = 'none';
+            chatBtn.style.display = 'none'; // Masque le bouton Chat
             statsSection.style.display = 'none'; 
             statsDisplay.style.display = 'none';
             statsDisplay.innerHTML = '';
             
-            // ON RE-AFFICHE les options de connexion si déconnecté
             oauthLinks.style.display = 'flex';
             authFormsContainer.style.display = 'block';
         }
@@ -524,7 +552,7 @@
             localStorage.setItem('username', username);
             window.history.replaceState({}, document.title, window.location.pathname);
             displayMessage('loginMessage', 'Connexion OAuth réussie !', true);
-            updateStatusBar(); // Mis à jour pour rafraîchir l'interface immédiatement après l'OAuth
+            updateStatusBar();
         }
     }
 
