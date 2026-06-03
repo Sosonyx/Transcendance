@@ -1,0 +1,91 @@
+@import '../node_modules/mini.css/dist/mini-default.min.css';
+
+.centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+	height: 5.725rem;
+}
+
+#messages {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+	padding-bottom: 5.725rem;
+	overflow-y: auto;
+}
+
+#messages > li {
+	padding: 0.5rem 1rem;
+}
+
+#messages > li:nth-child(odd) {
+	background: #efefef;
+}
+
+#chatform {
+    display: flex;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    margin: 0;
+}
+
+#input {
+    flex: 1;
+}
+
+.vote-grid {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	justify-content: center;
+	padding: 1rem;
+}
+
+.player-card {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 1rem;
+	border-radius: 8px;
+	background: #333;
+	cursor: pointer;
+	transition: background 0.2s;
+	width: 120px;
+    overflow: hidden;
+}
+
+.player-card h3 {
+    word-break: break-word;
+}
+
+.player-card:hover:not(.disabled):not(.voted) {
+	background: #c0392b;
+}
+
+.player-card.voted {
+	background: #c0392b;
+	cursor: default;
+}
+
+.player-card.disabled {
+	background: #999;
+	cursor: not-allowed;
+	opacity: 0.6;
+}
+
+.player-avatar {
+	width: 64px;
+	height: 64px;
+	border-radius: 50%;
+	margin-bottom: 0.5rem;
+}

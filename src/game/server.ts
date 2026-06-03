@@ -16,15 +16,21 @@ import { registerSocketHandlers } from './socket/index.js';
 export const fastify = Fastify();
 
 fastify.register(fastifyStatic, {
-    root: join(process.cwd(), './public')
+    root: join(__dirname, '../../src/frontend/dist'),
+    prefix: '/'
 });
 
-fastify.get('/', (request, reply) => {
-	request;
-    return reply.sendFile('index.html');
+fastify.setNotFoundHandler((req, reply) => {
+    req;
+    reply.sendFile('index.html');
 });
 
-console.log('Fastify is now ready ;)');
+// fastify.get('/', (request, reply) => {
+// 	request;
+//     return reply.sendFile('index.html');
+// });
+
+// console.log('Fastify is now ready ;)');
 
 const io = new Server(fastify.server, {
     connectionStateRecovery: {}
