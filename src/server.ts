@@ -2,7 +2,7 @@ import Fastify from 'fastify';
 import 'dotenv/config';
 import fastifyStatic from '@fastify/static';
 import { Server } from 'socket.io';
-import { registerSocketHandlers } from './game/socket/index.js';
+import { registerSocketHandlers } from './backend/game/socket/index.js';
 
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';

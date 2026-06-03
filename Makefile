@@ -7,7 +7,7 @@ deps:
 	docker compose up -d
 	ln -sfn $(PWD)/.env $(PWD)/src/.env
 	npm install --prefix $(SRC_DIR)
-	npx --prefix src/ prisma generate --schema=src/prisma/schema.prisma --config=src/prisma.config.ts
+	npx --prefix src/ prisma generate --schema=src/backend/prisma/schema.prisma --config=src/prisma.config.ts
 	
 build: deps
 	mkdir -p build
@@ -26,6 +26,10 @@ run-game:
 	node build/game/server.js
 
 clean:
-	rm -rf src/.env
 	rm -rf build
 	rm -rf src/node_modules
+
+fclean:
+	clean 
+	rm -rf src/.env
+
