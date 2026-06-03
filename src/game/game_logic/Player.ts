@@ -45,6 +45,10 @@ export class Player extends EventEmitter
 		return (this._voteAgainst)
 	}
 
+	public getScore() : number {
+		return (this._score)
+	}
+
 	public incrementScore(value : number) {
 		this._score += value;
 	}
@@ -53,13 +57,18 @@ export class Player extends EventEmitter
 		this._isReady = !this._isReady;
 	}
 
-	public reset() {
-		this._id = uuid();
+	public reset(full : boolean = true) {
+		console.log('player reset as');
+		console.log(full);
+		if (full)
+		{
+			this._id = uuid();
+			this._score = 0;
+			this._wantReplay = false;
+		}
 		this._isReady = false;
 		this._acted = false;
-		this._wantReplay = false;
 		this._voteAgainst = null;
-		this._score = 0;
 		this._name = '';
 	}
 
