@@ -15,6 +15,7 @@ const replayTime : number = 30 * 1000; // 30 seconds
 const maxPlayerCount : number = 7;
 const scoreCorrectVote : number = 3;
 const scoreGetVoted : number = 1;
+const scoreObjective : number = 10;
 
 const possibleNames : string[] = ['YELLOW', 'RED', 'BLUE', 'ORANGE', 'GREEN', 'PINK', 'WHITE', 'BLACK'];
 
@@ -29,12 +30,18 @@ export enum roomStates {
 	ERROR = "ERROR"
 }
 
-type playerInput =  { name : string, input : string};
+enum gameMode {
+	SCORE,
+	ELIMINATION
+}
 
+type playerInput =  { name : string, input : string};
+type winCondition = (mode : gameMode) => boolean;
 
 export class Room extends EventEmitter
 {
 	private	readonly _id : string;
+	private	_gamemode : gameMode;
 	private	_gameId? : string | null;
 	private _number : number;
 	private _state : roomStates;
@@ -45,25 +52,24 @@ export class Room extends EventEmitter
 	private _maxPlayerCount : number;
 	private _isAccessible : boolean;
 	private _timerId : NodeJS.Timeout | undefined;
-	private _llmController: LlmController | null;
+	private _llmController : LlmController | null;
+	private _winCondition : winCondition | null;
 
 	// DATABASE
 
 	private	async _createRoomInDB() {
 		console.log('saving room in DB');
-		let image = await prisma.room.create({
+		await prisma.room.create({
 			data: {
 				id : this._id
 			}
 		});
-		console.log(image);
 	};
 
 	private	async _createGameInDB() {
 		this._gameId = uuid();
-		console.log(`${this._gameId}`);
 		console.log('saving game in DB');
-		let image = await prisma.game.create({
+		await prisma.game.create({
 			data: {
 				id : this._gameId,
 				roomId : this._id,
@@ -80,9 +86,6 @@ export class Room extends EventEmitter
 			},
 			include : {players:true}
 		});
-		console.log(image);
-		if (image.players)
-		console.log(image.players);
 	};
 
 	// SETGET
@@ -143,12 +146,8 @@ export class Room extends EventEmitter
 				break ;
 
 			case (roomStates.ACTION_1) :
-				this._addLLMPLayer();
 				this._givePlayersName();
-				console.log(this._players);
 				this._players = shuffle(this._players);
-				console.log(this._players);
-				this._createGameInDB();
 				this._allPlayersShouldAct();
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.ACTION_2) }, action_1_Time);
 				break ;
@@ -175,7 +174,6 @@ export class Room extends EventEmitter
 				break ;
 
 			case (roomStates.RESULT) :
-				this._computeResult();
 				this._timerId = setTimeout(() => { this._onReplayTimerEnded() }, replayTime);
 				break ;
 
@@ -276,8 +274,7 @@ export class Room extends EventEmitter
 		playerFrom.setVoteAgainst(playerTo);
 		playerFrom.setActed(true);
 		console.log(`Room ${this._number} : Player ${playerFrom.getName()} is voting against player ${playerTo.getName()}`);
-		if (this._haveAllPlayersActed())
-			this.stateSwitch(roomStates.RESULT)
+		this._checkVoteStatus();
 	}
 
 	public onReplay(player : Player)
@@ -338,17 +335,24 @@ export class Room extends EventEmitter
 		this._players = this._players.filter(player => !player.getIsLLM());
 	}
 
-	private _restartRoom() {
-		this._removeLLMPlayers();
+	private _restartRoom(full : boolean = true) {
 		this._inputs = [];
 		this._input = null;
-		this._players.forEach(player => {player.reset()});
-		this.stateSwitch(roomStates.LOBBY);
-		this._checkLobbyStatus();
+		if (full)
+			this._removeLLMPlayers();
+		this._players.forEach(player => {player.reset(full)});
+		if (full)
+		{
+			this.stateSwitch(roomStates.LOBBY);
+			this._checkLobbyStatus();
+		}
+		else
+			this.stateSwitch(roomStates.ACTION_1)
 	}
 
 	private _computeResult() : void
 	{
+		console.log('_computeResult');
 		this._players.forEach(player => {
 			if (!player.getIsLLM() && player.getVoteAgainst() !== null)
 			{
@@ -368,6 +372,23 @@ export class Room extends EventEmitter
 		timedOut.forEach(player => {
 			player.emit('timedOut')
 		});
+	}
+
+	private _checkVoteStatus() {
+		console.log(this._checkVoteStatus)
+		if (!this._haveAllPlayersActed())
+			return ;
+		this._computeResult();
+		if (this._winCondition!(this._gamemode))
+		{
+			console.log('WIN CON !!!')
+			this.stateSwitch(roomStates.RESULT)
+		}
+		else
+		{
+			console.log('WIN CON IS NOT MET')
+			this._restartRoom(false);
+		}
 	}
 
 	private _checkActionStatus() {
@@ -414,14 +435,16 @@ export class Room extends EventEmitter
 		if (this._isLobbyReady())
 		{
 			this._isAccessible = false;
+			this._addLLMPLayer();
+			this._createGameInDB();
 			this.stateSwitch(roomStates.ACTION_1);
 		}
 	}
 
 	private _givePlayersName() {
-		let namePool = shuffle(possibleNames);
+		let namePool = [...possibleNames];
+		shuffle(namePool);
 		this._players.forEach( player => {player.setName(namePool.pop() as string)} );
-
 	}
 
 	public accessPlayerByName(name : string) : Player | undefined {
@@ -466,12 +489,18 @@ export class Room extends EventEmitter
 		return input;
 	}
 
+	private __winConditionScore() : boolean {
+		let winners : Player[] = this._players.filter(player => player.getScore() > scoreObjective);
+		return (winners.length > 0)
+	}
+
 	// CONSTRUCTOR
 
 	public constructor(nb : number) {
 		super();
 		console.log("Constructor called for class Room");
 		this._id = uuid();
+		this._gamemode = gameMode.SCORE;
 		this._gameId = null;
 		this._number = nb;
 		this._state = roomStates.INIT;
@@ -481,6 +510,7 @@ export class Room extends EventEmitter
 		this._input = null;
 		this._maxPlayerCount = maxPlayerCount;
 		this._isAccessible = true;
+		this._winCondition = this.__winConditionScore;
 
 		this._llmController = new LlmController(this._id, this as EventEmitter, {}, [], `LlmPlayer${nb}`);
 		this._llmController.startListening();
