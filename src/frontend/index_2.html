@@ -461,8 +461,8 @@
             const res = await fetch(SETUP_2FA_URL, { method: 'POST', credentials: 'include' });
             const data = await res.json();
             
-            if (res.ok && data.qrCodeDataUrl) {
-                qrImg.src = data.qrCodeDataUrl; // Injecte le QR Code Base64 dans l'image
+            if (res.ok && data.qrCode) {
+                qrImg.src = data.qrCode; // Injecte le QR Code Base64 dans l'image
                 setupSection.style.display = 'block';
                 document.getElementById('setup2FAMessage').style.display = 'none';
             } else {

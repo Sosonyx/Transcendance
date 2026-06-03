@@ -2,7 +2,7 @@ import { TOTP } from "otpauth";
 import QRCode from 'qrcode';
 import type { TwoFactorSecret, JwtPayload } from "../types/interfaces.js";
 import type { FastifyReply, FastifyRequest } from "fastify";
-import {prisma} from '../lib/prisma.js'
+import {prisma} from '../../prisma/prisma.js'
 
 export async function generateTwoFactorSecret(userEmail: string): Promise<TwoFactorSecret> {
   const totp = new TOTP({ // Time Based One time Password
@@ -17,9 +17,9 @@ export async function generateTwoFactorSecret(userEmail: string): Promise<TwoFac
   const qrCode = await QRCode.toDataURL(otpauthUrl); // Transform otpauthUrl to qr code data
 
   const twoFactorInfos: TwoFactorSecret  = {
-	secret: secret,
-	otpauthUrl: otpauthUrl,
-	qrCode: qrCode
+    secret: secret,
+    otpauthUrl: otpauthUrl,
+    qrCode: qrCode
   }
   return (twoFactorInfos)
 }
