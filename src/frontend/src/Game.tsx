@@ -2,13 +2,13 @@ import './Game.css'
 import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { LobbyPanel, Action1Panel, Action2Panel, ChatPanel, VotePanel, ResultPanel } from './panels'
-import { roomStates } from './types';
+import { roomStates, type VoteInfo } from './types';
 
 function Game() {
     const [state, setState] = useState<roomStates>(roomStates.LOBBY);
     const [socket, setSocket] = useState<Socket | null>(null);
     const [prompt, setPrompt] = useState<string | null>(null);
-    const [players, setPlayers] = useState<string[]>([]);
+    const [players, setPlayers] = useState<VoteInfo[]>([]);
     
     useEffect(() => {
         const s = io('http://localhost:3000');

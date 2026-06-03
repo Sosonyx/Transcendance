@@ -14,3 +14,5 @@ export interface Message {
     content: string,
     timestamp: number
 }
+
+export type VoteInfo = [id : string, name : string]

@@ -1,18 +1,19 @@
 import { useState } from "react";
 import { Socket } from "socket.io-client";
+import type { VoteInfo } from "../types";
 
 interface VotePanelProps {
 	socket: Socket | null;
-	players: string[];
+	players: VoteInfo[];
 }
 
 function VotePanel({ socket, players }: VotePanelProps) {
 	const [votedFor, setVotedFor] = useState<string | null>(null);
 
-	const handleVote = (player: string) => {
+	const handleVote = (player: VoteInfo) => {
 		if (votedFor) return;
-		socket?.emit('vote', player);
-		setVotedFor(player);
+		socket?.emit('vote', player[0]);
+		setVotedFor(player[1]);
 	};
 	
 	const getCardClass = (player: string): string => {
@@ -26,12 +27,12 @@ function VotePanel({ socket, players }: VotePanelProps) {
 			<div className="vote-grid">
 				{players.map((player) => (
 					<div
-						key={player}
-						className={getCardClass(player)}
+						key={player[1]}
+						className={getCardClass(player[1])}
 						onClick={() => handleVote(player)}
 					>
-						<img src="/avatars/avatar.png" alt={player} className="player-avatar" />
-						<h3>{player}</h3>
+						<img src="/avatars/avatar.png" alt={player[1]} className="player-avatar" />
+						<h3>{player[1]}</h3>
 					</div>
 				))}
 			</div>
