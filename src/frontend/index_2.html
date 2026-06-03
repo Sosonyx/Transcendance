@@ -75,7 +75,6 @@
         }
         .btn-logout:hover { background-color: #c62828; color: #fff; }
         
-        /* Style ajouté pour harmoniser tes boutons OAuth avec ta charte */
         .oauth-container {
             width: 100%;
             max-width: 420px;
@@ -160,10 +159,22 @@
         }
         button[type=submit]:hover, .btn-action:hover { background-color: #007a80; }
         
+        .btn-danger {
+            background-color: #c62828 !important;
+        }
+        .btn-danger:hover {
+            background-color: #b71c1c !important;
+        }
+
         .action-group {
             display: flex;
             gap: 10px;
             margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .action-group button {
+            flex: 1;
+            min-width: 100px;
         }
         .search-section {
             margin-top: 15px;
@@ -191,6 +202,21 @@
         }
         .display-box p { margin-bottom: 8px; color: #ccc; }
         .display-box p span { color: #fff; font-weight: 600; }
+        
+        .qr-section {
+            text-align: center;
+            margin: 15px 0;
+            padding: 10px;
+            background: #fff;
+            border-radius: 8px;
+            display: inline-block;
+            width: 100%;
+        }
+        .qr-section img {
+            max-width: 180px;
+            height: auto;
+        }
+
         .leaderboard-table {
             width: 100%;
             border-collapse: collapse;
@@ -220,7 +246,7 @@
     <div class="status-bar">
         <div class="status-left">
             <div class="status-dot" id="statusDot"></div>
-            <div class="status-text" id="statusText">Non connecté</div>
+            <div class="status-text" id="statusText">Vérification...</div>
         </div>
         <div class="status-actions">
             <a href="index.html" class="btn-nav" id="chatBtn" style="display:none">Chat</a>
@@ -275,11 +301,41 @@
         </div>
     </div>
 
+    <div class="container" id="twoFactorContainer" style="display: none;">
+        <h2>Validation Double Authentification</h2>
+        <form id="twoFactorForm">
+            <div class="form-group">
+                <label>Code de sécurité (6 chiffres)</label>
+                <input type="text" id="2fa-code" placeholder="000000" maxlength="6" pattern="[0-9]{6}" required>
+            </div>
+            <button type="submit">Valider</button>
+        </form>
+        <div id="twoFactorMessage" class="message"></div>
+    </div>
+
     <div class="container" id="statsContainer" style="display: none;">
         <h2>Espace Joueur</h2>
         <div class="action-group">
             <button class="btn-action" onclick="fetchProfile()">Mon Profil</button>
             <button class="btn-action" onclick="fetchLeaderboard()">Classement</button>
+            <button class="btn-action" id="btnEnable2FA" onclick="start2FASetup()">Activer 2FA</button>
+            <button class="btn-action btn-danger" id="btnDisable2FA" style="display:none;" onclick="disable2FA()">Désactiver 2FA</button>
+        </div>
+
+        <div id="setup2FASection" class="display-box" style="display: none;">
+            <h3>Configuration de la Double Authentification</h3>
+            <p style="margin-top:10px;">Scannez ce QR Code avec Google Authenticator ou une application similaire :</p>
+            <div class="qr-section">
+                <img id="qrCodeImg" src="" alt="QR Code 2FA">
+            </div>
+            <form id="verify2FAForm">
+                <div class="form-group">
+                    <label>Entrez le code à 6 chiffres pour confirmer :</label>
+                    <input type="text" id="verify-2fa-code" placeholder="000000" maxlength="6" pattern="[0-9]{6}" required>
+                </div>
+                <button type="submit" class="btn-action">Confirmer et Activer</button>
+            </form>
+            <div id="setup2FAMessage" class="message"></div>
         </div>
 
         <div class="search-section">
@@ -295,18 +351,17 @@
     </div>
 
 <script>
-    const REGISTER_URL    = '/api/register';
-    const LOGIN_URL       = '/api/login';
-    const LOGOUT_URL      = '/api/logout';
-    const PROFILE_URL     = '/api/profile';
-    const LEADERBOARD_URL = '/api/leaderboard';
+    const REGISTER_URL     = '/api/register';
+    const LOGIN_URL        = '/api/login';
+    const LOGOUT_URL       = '/api/logout';
+    const PROFILE_URL      = '/api/profile';
+    const LEADERBOARD_URL  = '/api/leaderboard';
+    const VALIDATE_2FA_URL = '/api/2fa/validate'; // Pour le login
+    const SETUP_2FA_URL    = '/api/2fa/setup';    // Demande de QR code
+    const VERIFY_2FA_URL   = '/api/2fa/verify';   // Confirmation d'activation
+    const DISABLE_2FA_URL  = '/api/2fa/disable';  // Désactivation (À ajouter sur ton back)
 
-    function getCookie(name) {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop().split(';').shift();
-        return null;
-    }
+    let currentUserData = null;
 
     function displayMessage(id, text, ok) {
         const el = document.getElementById(id);
@@ -315,208 +370,162 @@
         el.className = 'message ' + (ok ? 'success' : 'error');
     }
 
-    function updateStatusBar() {
-        const token    = getCookie('jwt') || localStorage.getItem('token');
-        const username = localStorage.getItem('username');
-        
-        const dot  = document.getElementById('statusDot');
-        const text = document.getElementById('statusText');
-        const btn  = document.getElementById('logoutBtn');
-        const chatBtn = document.getElementById('chatBtn'); // Récupération du bouton Chat
-        const statsSection = document.getElementById('statsContainer');
-        const statsDisplay = document.getElementById('statsDisplay');
-        
-        const oauthLinks   = document.getElementById('oauthLinks');
-        const authFormsContainer = document.getElementById('authFormsContainer');
-
-        if (token) {
-            dot.classList.add('connected');
-            text.innerHTML = username ? 'Connecté en tant que <span>' + username + '</span>' : 'Connecté';
-            btn.style.display = 'block';
-            chatBtn.style.display = 'block'; // Affiche le bouton Chat
-            statsSection.style.display = 'block'; 
-            
-            oauthLinks.style.display = 'none';
-            authFormsContainer.style.display = 'none';
-        } else {
-            dot.classList.remove('connected');
-            text.innerHTML = 'Non connecté';
-            btn.style.display = 'none';
-            chatBtn.style.display = 'none'; // Masque le bouton Chat
-            statsSection.style.display = 'none'; 
-            statsDisplay.style.display = 'none';
-            statsDisplay.innerHTML = '';
-            
-            oauthLinks.style.display = 'flex';
-            authFormsContainer.style.display = 'block';
-        }
-    }
-
-    async function handleLogout() {
+    async function checkAuthSession() {
         try {
-            const res = await fetch(LOGOUT_URL, {
-                method: 'POST',
-                credentials: 'include' 
-            });
-
+            const res = await fetch(PROFILE_URL, { method: 'GET', credentials: 'include' });
+            
             if (res.ok) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('username');
-                updateStatusBar();
+                const data = await res.json();
+                currentUserData = data; // Sauvegarde des données utilisateur locales
+                updateUI('CONNECTED', data.username);
+                toggle2FAButtons(data.twoFactorEnabled);
+            } else if (res.status === 403) {
+                updateUI('NEED_2FA');
             } else {
-                console.error("Échec de la déconnexion côté serveur.");
+                updateUI('DISCONNECTED');
             }
         } catch (e) {
             console.error("Erreur réseau :", e);
+            updateUI('DISCONNECTED');
         }
     }
 
-    async function fetchProfile() {
-        const display = document.getElementById('statsDisplay');
-        try {
-            const res = await fetch(PROFILE_URL, {
-                method: 'GET',
-                credentials: 'include' 
-            });
-            const data = await res.json();
-
-            if (res.ok) {
-                display.style.display = 'block';
-                const stats = data.Stats || { numberOfGames: 0, gamesWin: 0, gamesLose: 0, winrate: 0 };
-                
-                display.innerHTML = `
-                    <h3>Profil de ${data.username}</h3><br>
-                    <p>Email: <span>${data.email}</span></p>
-                    <p>ID Joueur: <span>${data.id}</span></p><br>
-                    <h4>Statistiques de Jeu :</h4>
-                    <p>Parties jouées: <span>${stats.numberOfGames}</span></p>
-                    <p>Victoires: <span>${stats.gamesWin}</span></p>
-                    <p>Défaites: <span>${stats.gamesLose}</span></p>
-                    <p>Taux de victoire: <span>${stats.winrate}%</span></p>
-                `;
-            } else {
-                display.style.display = 'block';
-                display.innerHTML = `<p style="color:#ef9a9a">Erreur: ${data.error || 'Impossible de charger le profil'}</p>`;
-            }
-        } catch (e) {
-            console.error(e);
-            display.style.display = 'block';
-            display.innerHTML = `<p style="color:#ef9a9a">Erreur réseau lors de la récupération du profil.</p>`;
+    // Alterne l'affichage des boutons 2FA dans l'Espace Joueur
+    function toggle2FAButtons(isEnabled) {
+        const btnEnable = document.getElementById('btnEnable2FA');
+        const btnDisable = document.getElementById('btnDisable2FA');
+        
+        if (isEnabled) {
+            btnEnable.style.display = 'none';
+            btnDisable.style.display = 'block';
+        } else {
+            btnEnable.style.display = 'block';
+            btnDisable.style.display = 'none';
         }
     }
 
-    document.getElementById('searchProfileForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const targetUsername = document.getElementById('search-username').value.trim();
-        const display = document.getElementById('statsDisplay');
+    function updateUI(state, username = '') {
+        const dot  = document.getElementById('statusDot');
+        const text = document.getElementById('statusText');
+        const logoutBtn  = document.getElementById('logoutBtn');
+        const chatBtn = document.getElementById('chatBtn');
+        
+        const oauthLinks   = document.getElementById('oauthLinks');
+        const authFormsContainer = document.getElementById('authFormsContainer');
+        const twoFactorContainer = document.getElementById('twoFactorContainer');
+        const statsSection = document.getElementById('statsContainer');
+        const setup2FASection = document.getElementById('setup2FASection');
+
+        if (state === 'CONNECTED') {
+            dot.className = 'status-dot connected';
+            text.innerHTML = 'Connecté : <span>' + username + '</span>';
+            logoutBtn.style.display = 'block';
+            chatBtn.style.display = 'block';
+            statsSection.style.display = 'block';
+            
+            oauthLinks.style.display = 'none';
+            authFormsContainer.style.display = 'none';
+            twoFactorContainer.style.display = 'none';
+        } 
+        else if (state === 'NEED_2FA') {
+            dot.className = 'status-dot';
+            text.innerHTML = 'Vérification 2FA requise';
+            logoutBtn.style.display = 'block';
+            chatBtn.style.display = 'none';
+            statsSection.style.display = 'none';
+            
+            oauthLinks.style.display = 'none';
+            authFormsContainer.style.display = 'none';
+            twoFactorContainer.style.display = 'block';
+        } 
+        else { // DISCONNECTED
+            dot.className = 'status-dot';
+            text.innerHTML = 'Non connecté';
+            logoutBtn.style.display = 'none';
+            chatBtn.style.display = 'none';
+            statsSection.style.display = 'none';
+            setup2FASection.style.display = 'none';
+            
+            oauthLinks.style.display = 'flex';
+            authFormsContainer.style.display = 'block';
+            twoFactorContainer.style.display = 'none';
+        }
+    }
+
+    // --- PHASE 1 : DEMANDE D'ACTIVATION (RECUPERATION DU QR CODE) ---
+    async function start2FASetup() {
+        const setupSection = document.getElementById('setup2FASection');
+        const qrImg = document.getElementById('qrCodeImg');
         
         try {
-            const res = await fetch(`${PROFILE_URL}/${encodeURIComponent(targetUsername)}`, {
-                method: 'POST',
-                credentials: 'include'
-            });
+            const res = await fetch(SETUP_2FA_URL, { method: 'POST', credentials: 'include' });
             const data = await res.json();
-
-            if (res.ok) {
-                display.style.display = 'block';
-                const stats = data.Stats || { numberOfGames: 0, gamesWin: 0, gamesLose: 0, winrate: 0 };
-                
-                display.innerHTML = `
-                    <h3>Profil public de ${data.username}</h3><br>
-                    <p>ID Joueur: <span>${data.id}</span></p><br>
-                    <h4>Statistiques de Jeu :</h4>
-                    <p>Parties jouées: <span>${stats.numberOfGames}</span></p>
-                    <p>Victoires: <span>${stats.gamesWin}</span></p>
-                    <p>Défaites: <span>${stats.gamesLose}</span></p>
-                    <p>Taux de victoire: <span>${stats.winrate}%</span></p>
-                `;
-                document.getElementById('searchProfileForm').reset();
+            
+            if (res.ok && data.qrCodeDataUrl) {
+                qrImg.src = data.qrCodeDataUrl; // Injecte le QR Code Base64 dans l'image
+                setupSection.style.display = 'block';
+                document.getElementById('setup2FAMessage').style.display = 'none';
             } else {
-                display.style.display = 'block';
-                display.innerHTML = `<p style="color:#ef9a9a">Erreur: ${data.error || 'Joueur introuvable'}</p>`;
+                alert(data.message || "Impossible de charger le protocole 2FA.");
             }
         } catch (e) {
             console.error(e);
-            display.style.display = 'block';
-            display.innerHTML = `<p style="color:#ef9a9a">Erreur réseau lors de la recherche.</p>`;
-        }
-    });
-
-    async function fetchLeaderboard() {
-        const display = document.getElementById('statsDisplay');
-        try {
-            const res = await fetch(LEADERBOARD_URL, {
-                method: 'GET',
-                credentials: 'include'
-            });
-            const data = await res.json();
-
-            if (res.ok) {
-                display.style.display = 'block';
-                if (data.length === 0) {
-                    display.innerHTML = `<h3>Classement Général</h3><p>Aucune statistique enregistrée pour le moment.</p>`;
-                    return;
-                }
-
-                let tableRows = data.map((row, index) => `
-                    <tr>
-                        <td><span>#${index + 1}</span></td>
-                        <td>${row.user?.username || 'Joueur Inconnu'}</td>
-                        <td>${row.numberOfGames}</td>
-                        <td>${row.winrate}%</td>
-                    </tr>
-                `).join('');
-
-                display.innerHTML = `
-                    <h3>Classement (Top 10)</h3>
-                    <table class="leaderboard-table">
-                        <thead>
-                            <tr>
-                                <th>Rang</th>
-                                <th>Joueur</th>
-                                <th>Parties</th>
-                                <th>Winrate</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${tableRows}
-                        </tbody>
-                    </table>
-                `;
-            } else {
-                display.style.display = 'block';
-                display.innerHTML = `<p style="color:#ef9a9a">Erreur: ${data.error || 'Impossible de charger le classement'}</p>`;
-            }
-        } catch (e) {
-            console.error(e);
-            display.style.display = 'block';
-            display.innerHTML = `<p style="color:#ef9a9a">Erreur réseau lors de la récupération du classement.</p>`;
         }
     }
 
-    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    // --- PHASE 2 : VERIFICATION ET VERROUILLAGE DU 2FA ---
+    document.getElementById('verify2FAForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const email    = document.getElementById('reg-email').value;
-        const username = document.getElementById('reg-username').value;
-        const password = document.getElementById('reg-password').value;
+        const code = document.getElementById('verify-2fa-code').value;
+        
         try {
-            const res  = await fetch(REGISTER_URL, {
+            const res = await fetch(VERIFY_2FA_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, username, password })
+                body: JSON.stringify({ token: code })
             });
             const data = await res.json();
+
             if (res.ok) {
-                displayMessage('registerMessage', 'Compte créé avec succès !', true);
-                document.getElementById('registerForm').reset();
+                displayMessage('setup2FAMessage', 'Double authentification activée avec succès !', true);
+                document.getElementById('verify2FAForm').reset();
+                setTimeout(() => {
+                    document.getElementById('setup2FASection').style.display = 'none';
+                    checkAuthSession(); // Recharge le profil pour appliquer les changements
+                }, 1500);
             } else {
-                displayMessage('registerMessage', data.error || "Erreur lors de l'inscription", false);
+                displayMessage('setup2FAMessage', data.message || 'Code incorrect', false);
             }
         } catch {
-            displayMessage('registerMessage', 'Erreur réseau', false);
+            displayMessage('setup2FAMessage', 'Erreur réseau', false);
         }
     });
 
+    // --- PHASE 3 : DESACTIVATION DU 2FA ---
+    async function disable2FA() {
+        if (!confirm("Êtes-vous sûr de vouloir désactiver la Double Authentification ? Votre compte sera moins sécurisé.")) {
+            return;
+        }
+
+        try {
+            const res = await fetch(DISABLE_2FA_URL, {
+                method: 'POST',
+                credentials: 'include'
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                alert("La double authentification a été désactivée.");
+                checkAuthSession(); // Met à jour l'UI
+            } else {
+                alert(data.message || "Erreur lors de la désactivation.");
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    // --- SOUCHETS CLASSIQUES (LOGIN, LOGOUT, ETC.) ---
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const username = document.getElementById('login-username').value;
@@ -527,37 +536,84 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
             });
-            const data = await res.json();
             if (res.ok) {
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('username', data.user?.username || username);
-                displayMessage('loginMessage', 'Connexion réussie !', true);
                 document.getElementById('loginForm').reset();
-                updateStatusBar();
+                checkAuthSession();
             } else {
+                const data = await res.json();
                 displayMessage('loginMessage', data.error || 'Identifiants invalides', false);
             }
-        } catch {
-            displayMessage('loginMessage', 'Erreur réseau', false);
-        }
+        } catch { displayMessage('loginMessage', 'Erreur réseau', false); }
     });
 
-    function checkOAuthCallback() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
-        const username = urlParams.get('username');
+    document.getElementById('twoFactorForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const code = document.getElementById('2fa-code').value;
+        try {
+            const res = await fetch(VALIDATE_2FA_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: code })
+            });
+            if (res.ok) {
+                document.getElementById('twoFactorForm').reset();
+                checkAuthSession();
+            } else {
+                const data = await res.json();
+                displayMessage('twoFactorMessage', data.message || 'Code invalide', false);
+            }
+        } catch { displayMessage('twoFactorMessage', 'Erreur réseau', false); }
+    });
 
-        if (token && username) {
-            localStorage.setItem('token', token);
-            localStorage.setItem('username', username);
-            window.history.replaceState({}, document.title, window.location.pathname);
-            displayMessage('loginMessage', 'Connexion OAuth réussie !', true);
-            updateStatusBar();
-        }
+    async function handleLogout() {
+        try {
+            const res = await fetch(LOGOUT_URL, { method: 'POST', credentials: 'include' });
+            if (res.ok) checkAuthSession();
+        } catch (e) { console.error(e); }
     }
 
-    checkOAuthCallback();
-    updateStatusBar();
+    async function fetchProfile() {
+        const display = document.getElementById('statsDisplay');
+        try {
+            const res = await fetch(PROFILE_URL, { method: 'GET', credentials: 'include' });
+            const data = await res.json();
+            if (res.ok) {
+                display.style.display = 'block';
+                const stats = data.Stats || { numberOfGames: 0, gamesWin: 0, gamesLose: 0, winrate: 0 };
+                display.innerHTML = `<h3>Profil de ${data.username}</h3><br><p>2FA Actif: <span>${data.twoFactorEnabled ? 'Oui' : 'Non'}</span></p><p>Email: <span>${data.email}</span></p><br><h4>Statistiques :</h4><p>Parties: <span>${stats.numberOfGames}</span></p><p>Winrate: <span>${stats.winrate}%</span></p>`;
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    async function fetchLeaderboard() {
+        const display = document.getElementById('statsDisplay');
+        try {
+            const res = await fetch(LEADERBOARD_URL, { method: 'GET', credentials: 'include' });
+            const data = await res.json();
+            if (res.ok) {
+                display.style.display = 'block';
+                let tableRows = data.map((row, index) => `<tr><td><span>#${index + 1}</span></td><td>${row.user?.username || 'Inconnu'}</td><td>${row.numberOfGames}</td><td>${row.winrate}%</td></tr>`).join('');
+                display.innerHTML = `<h3>Top 10</h3><table class="leaderboard-table"><thead><tr><th>Rang</th><th>Joueur</th><th>Parties</th><th>Winrate</th></tr></thead><tbody>${tableRows}</tbody></table>`;
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('reg-email').value;
+        const username = document.getElementById('reg-username').value;
+        const password = document.getElementById('reg-password').value;
+        try {
+            const res  = await fetch(REGISTER_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, username, password })
+            });
+            if (res.ok) { displayMessage('registerMessage', 'Compte créé !', true); document.getElementById('registerForm').reset(); }
+        } catch { displayMessage('registerMessage', 'Erreur réseau', false); }
+    });
+
+    checkAuthSession();
 </script>
 </body>
 </html>
