@@ -8,12 +8,12 @@ import { LlmScheduler } from "./services/llmScheduler.js";
 import type { Message } from "./types/messages.js";
 
 // Duplicate type definition, should be moved to a common file
-type playerInput =  { name : string, input : string};
+export type playerInput =  { name : string, input : string};
 
 export class Llm {
 	private				_lastMessages: Message[] = [];
 	private 			_llmHistory: llmHistory;
-	private				_globalQuestion: string | undefined;
+	// private				_globalQuestion: string | undefined;
 
 	private				_llmPersonnality: llmPersonnality;
 	private readonly	_scheduler: LlmScheduler;
@@ -46,8 +46,8 @@ export class Llm {
 			return {name : this._llmPersonnality.getName() ?? "", input : ""};			
 	}
 
-	public async answerGlobalQuestion(responsesFromUsers: Message[]): Promise<void> {
-		this._lastMessages.push({ senderId: "system", content: `Global question: ${this._globalQuestion}`, timestamp: Date.now() });
+	public async answerGlobalQuestion(globalQuestion: string, responsesFromUsers: Message[]): Promise<void> {
+		this._lastMessages.push({ senderId: "system", content: `Global question: ${globalQuestion}`, timestamp: Date.now() });
 		
 		const action = await pipeline(this._llmHistory, this._contextBuilder.buildContext(responsesFromUsers), this._llmPersonnality);
 		if (action.type === "answer_global_question")
@@ -99,7 +99,7 @@ export class Llm {
 		this._llmPersonnality.setName(name);
 	}
 
-	public setGlobalQuestion(question: string): void {
-		this._globalQuestion = question;
-	}
+	// public setGlobalQuestion(question: string): void {
+		// this._globalQuestion = question;
+	// }
 }
