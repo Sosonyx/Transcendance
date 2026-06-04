@@ -6,6 +6,14 @@
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
+
+	<!-- Chat context -->
+	<!-- IA GENERATED CODE -->
+	<div id="chat-context" style="display:none">
+    	<p id="chat-question" class="label"></p>
+    	<ul id="chat-answers"></ul>
+	</div>
+
     <ul id="messages"></ul>
     <form id="form">
 
@@ -14,6 +22,7 @@
 
 		<!-- State: Chat -->
         <input id="input" type="text" placeholder="Message..." autocomplete="off" />
+
 		<!-- State: Action_1 / Action_2-->
 		<div class="vbox">
 			<p id="prompt-label" class="label"> Ask a question ! </p>
@@ -42,9 +51,10 @@
         const voteContainer = document.getElementById('vote-container');
         const replayBtn = document.getElementById('replay-btn');
         const newGameBtn = document.getElementById('new-game-btn');
+		const chatContext = document.getElementById('chat-context');
 
         // -- Helpers --
-        const ALL = [vbox, promptLabel, promptInput, input, sendBtn, readyBtn, voteContainer, replayBtn, newGameBtn];
+        const ALL = [vbox, promptLabel, promptInput, input, sendBtn, readyBtn, voteContainer, replayBtn, newGameBtn, chatContext];
         const hide = (...els) => els.forEach(el => el.style.display = 'none');
         const show = (...els) => els.forEach(el => el.style.display = '');
 
@@ -68,6 +78,22 @@
 					show(vbox, promptLabel, promptInput, sendBtn);
 					break;
                 case 'chat':
+
+					// AI GENERATED CODE
+					if (data)
+					{
+    			    	document.getElementById('chat-question').textContent = data.question;	
+    			    	const answerList = document.getElementById('chat-answers');
+    			    	answerList.innerHTML = '';
+    			    	data.answers.forEach(([playerName, answer]) => {
+							console.log('HERE 2');
+    			    	    const li = document.createElement('li');
+    			    	    li.textContent = `${playerName} : ${answer}`;
+    			    	    answerList.appendChild(li);
+    			   		});
+    			    	document.getElementById('chat-context').style.display = '';
+    				}
+
                     show(input, sendBtn);
                     break;
                 case 'vote':
@@ -104,7 +130,7 @@
         socket.on('startLobby', ()        	=> setState('lobby'));
 		socket.on('startAction1', ()		=> setState('action_1'));
 		socket.on('startAction2', (prompt)	=> setState('action_2', prompt));
-        socket.on('startChat', ()			=> setState('chat'));
+        socket.on('startChat', (context)	=> setState('chat', context));
         socket.on('startVote', (players) 	=> setState('vote', players));
         socket.on('startResult', ()        	=> setState('result'));
 

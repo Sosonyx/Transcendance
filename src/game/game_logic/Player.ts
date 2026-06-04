@@ -7,7 +7,6 @@ export class Player extends EventEmitter
 	private _userId : string | null;
 	private _name : string;
 	private	_isLLM : boolean;
-	private _isReady : boolean;
 	private _acted : boolean;
 	private _wantReplay : boolean;
 	private	_voteAgainst : Player | null;
@@ -28,10 +27,6 @@ export class Player extends EventEmitter
 
 	public getIsLLM() : boolean {
 		return this._isLLM;
-	}
-
-	public isReady() : boolean {
-		return this._isReady;
 	}
 
 	public hasActed() : boolean {
@@ -58,10 +53,6 @@ export class Player extends EventEmitter
 		this._score += value;
 	}
 
-	public switchReady() {
-		this._isReady = !this._isReady;
-	}
-
 	public reset(full : boolean = true) {
 		console.log('player reset as');
 		console.log(full);
@@ -72,7 +63,6 @@ export class Player extends EventEmitter
 			this._wantReplay = false;
 			this._eliminated = false;
 		}
-		this._isReady = false;
 		this._acted = false;
 		this._voteAgainst = null;
 	}
@@ -107,7 +97,6 @@ export class Player extends EventEmitter
 		this._userId = userId;
 		this._name = 'no-name';
 		this._isLLM = isLLM;
-		this._isReady = false;
 		this._acted = false;
 		this._wantReplay = false;
 		this._voteAgainst = null;
