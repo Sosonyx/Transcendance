@@ -29,7 +29,7 @@ export enum roomStates {
 	ERROR = "ERROR"
 }
 
-type playerInput =  { name : string, input : string};
+export type playerInput =  { name : string, input : string};
 
 export class Room extends EventEmitter
 {
@@ -157,13 +157,12 @@ export class Room extends EventEmitter
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.CHAT) }, action_2_Time);
 				this._input = this._pickAnInput();
 				if (this._input === null)
-				{
-					this.stateSwitch(roomStates.CHAT)
-					return ;
-				}
+					{
+						this.stateSwitch(roomStates.CHAT)
+						return ;
+					}
 				data = this._input.input;
-				break ;
-
+				break;
 			case (roomStates.CHAT) :
 				this._llm?.startPlaying();
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.VOTE) }, chatTime);
@@ -182,7 +181,6 @@ export class Room extends EventEmitter
 
 			default : break ;
 		}
-
 		console.log(`\x1b[33m-> Room ${this._number} : switching from ${this._state} to ${newState}\x1b[0m`)
 		this._state = newState;
 		this.emit('stateChanged', this._state, data)
@@ -332,7 +330,7 @@ export class Room extends EventEmitter
 
 	private	_addLLMPLayer() {
 		let LLMPlayer = new Player(null, true);
-		this._llm = new Llm(this as EventEmitter, this._players.map(player => player.getName()), LLMPlayer.getName());
+		this._llm = new Llm(this as EventEmitter, this._players.map(player => player.getName()));
 		this._players.push(LLMPlayer);
 	}
 

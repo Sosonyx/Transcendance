@@ -3,44 +3,33 @@ import { askClaude } from "./claude.js";
 import type { llmHistory } from "./services/llmHistory.js";
 import type { llmPersonnality } from "./personnality.js";
 import type { MessageParam } from "@anthropic-ai/sdk/resources";
+import type { GameAction } from "./claude.js"
 
-export interface LlmDecision {
-    shouldReply: boolean;
-    reply?: string | undefined;
-}
-
-function parseLlmDecision(rawDecision: string): LlmDecision { 
-    const trimmedDecision = rawDecision.trim();
-
-    try {
-        const parsedDecision = JSON.parse(trimmedDecision) as Partial<LlmDecision>;
-
-        if (typeof parsedDecision.shouldReply === "boolean") {
-            return {
-                shouldReply: parsedDecision.shouldReply,
-                reply: (typeof parsedDecision.reply === "string") ? parsedDecision.reply : undefined
-            };
-        }
-    }
-    catch {
-        throw new Error("Invalid LLM response format. Expected a JSON with 'shouldReply' boolean and optional 'reply' string.");
-    }
-    return {
-        shouldReply: true,
-        reply: trimmedDecision
-    };
-}
-
-export async function pipeline(history: llmHistory, lastMessages: string,  personnality : llmPersonnality): Promise<LlmDecision> 
+export async function pipeline(history: llmHistory, lastMessages: string,  personnality : llmPersonnality): Promise<GameAction> 
 {
     const promptContext: string = systemPrompt(personnality, lastMessages);
     const usersMessages: MessageParam[] = [...history.getMessagesHistory(), { role: 'user', content: lastMessages }];
 
-    const llmReply: string = await askClaude(promptContext, usersMessages);
-    const decision = parseLlmDecision(llmReply);
+    const action: GameAction = await askClaude(promptContext, usersMessages);
 
     history.addMessageAsUser(lastMessages);
-    history.addMessageAsAssistant(llmReply);
 
-    return decision;
+    switch (action.type) {
+        case "answer_global_question":
+            history.addMessageAsAssistant(action.response);
+            break;
+        case "message":
+            history.addMessageAsAssistant(action.text);
+            break;
+        case "silent":
+            console.log(`[SILENT] ${action.reason}`);  
+            history.addMessageAsAssistant(`[SILENT] ${action.reason}`);  
+            break;
+        case "vote":
+            console.log(`[VOTE] ${personnality.getName()} votes against ${action.target}`);
+            break;
+        default:
+            throw new Error("Action inconnue");
+    }
+    return action;
 }

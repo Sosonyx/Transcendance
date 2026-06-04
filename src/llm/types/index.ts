@@ -3,8 +3,10 @@ import type { Message } from "./messages.js";
 export interface LlmInterface {
     startPlaying(): void;
     stopPlaying(): void;
+
+    setName(name: string): void;
     receiveUserMessage(message: Message): void;
-    // To set the global question of the room
     setGlobalQuestion(question: string): void;
     answerGlobalQuestion(responsesFromUsers: Message[]): Promise<string | undefined>;
+    vote(): Promise<string | undefined>;
 }

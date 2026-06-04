@@ -13,14 +13,10 @@ export class LlmContextBuilder {
 		return messages.filter(message => message.timestamp > cutoff);
 	}
 
-	public buildContext(messages: Message[], currentQuestion?: string): string {
-		let messagesToSend;
+	public buildContext(messages: Message[]): string {
+		if (messages.length === 0)
+			return {senderid: "system", content: "No messages yet, sometimes you might have to spontanously respond", timestamp: Date.now()}.content;
 
-        if (!currentQuestion)
-            messagesToSend = messages;
-        else
-            messagesToSend = [...messages, { senderId: "system", content: currentQuestion, timestamp: Date.now() }];
-
-		return messagesToSend.map(message => `${message.senderId}: ${message.content}`).join("\n");
+		return messages.map(message => `${message.senderId}: ${message.content}`).join("\n");
 	}
 }

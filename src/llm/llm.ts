@@ -1,8 +1,6 @@
 import type { EventEmitter } from "node:events";
 import { pipeline } from "./pipeline.js";
-import type { LlmDecision } from "./pipeline.js";
 import { LlmContextBuilder } from "./services/llmContextBuilder.js";
-import { LlmDecisionEngine } from "./services/llmDecisionEngine.js";
 import { llmHistory as llmHistory } from "./services/llmHistory.js";
 import { llmPersonnality } from "./personnality.js";
 import { LlmResponseEmitter } from "./services/llmResponseEmitter.js";
@@ -12,107 +10,90 @@ import type { Message } from "./types/messages.js";
 export class Llm {
 	private				_lastMessages: Message[] = [];
 	private 			_llmHistory: llmHistory;
+	private				_globalQuestion: string | undefined;
 
 	private				_llmPersonnality: llmPersonnality;
 	private readonly	_scheduler: LlmScheduler;
 	private readonly	_contextBuilder: LlmContextBuilder;
-	private readonly	_decisionEngine: LlmDecisionEngine;
 	private readonly	_responseEmitter: LlmResponseEmitter;
 
 	public constructor(roomEmitter: EventEmitter,
-	playerNames: string[] = [], llmName: string) 
+	playerNames: string[] = []) 
 	{
 		this._llmHistory = new llmHistory();
-		this._llmPersonnality = new llmPersonnality(playerNames, llmName);
+		this._llmPersonnality = new llmPersonnality(playerNames);
 		this._scheduler = new LlmScheduler();
 		this._contextBuilder = new LlmContextBuilder();
-		this._decisionEngine = new LlmDecisionEngine(playerNames.length);
 		this._responseEmitter = new LlmResponseEmitter(roomEmitter, this._llmPersonnality);
 	}
 	// To set when the room is in a state where the LLM should answer
 	public startPlaying(): void {
-		this._scheduler.start(() => { void this.llmAnswer(); });
+		this._scheduler.start(() => { void this.llmChat(); });
 	}
 
 	public stopPlaying(): void {
 		this._scheduler.stop();
 	}
 
-	// To be able to know what is the current question in the room, so the LLM can decide to answer spontaneously about it.
-	public setGlobalQuestion(question: string): void {
-		this._decisionEngine.setGlobalQuestion(question);
-	}
-	
 	public async answerGlobalQuestion(responsesFromUsers: Message[]): Promise<string> {
-		const decision: LlmDecision = await pipeline(this._llmHistory, 
-			this._contextBuilder.buildContext(responsesFromUsers), this._llmPersonnality);
+		this._lastMessages.push({ senderId: "system", content: `Global question: ${this._globalQuestion}`, timestamp: Date.now() });
 		
-		if (decision.shouldReply && decision.reply)
-			return decision.reply;
-		return "";
+		const action = await pipeline(this._llmHistory, this._contextBuilder.buildContext(responsesFromUsers), this._llmPersonnality);
+		if (action.type === "answer_global_question")
+			return action.response;
+		else 
+			return "";
+	}
+
+	public async vote(): Promise<string> {
+		// TODO: I will need to pass a proper context
+		const action = await pipeline(this._llmHistory, this._contextBuilder.buildContext([]), this._llmPersonnality);
+		if (action.type === "vote")
+			return action.target;
+		else 
+			return "";
 	}
 
 	public	receiveUserMessage(message: Message): void {
 		this._lastMessages.push(message);
 
-		this._scheduler.scheduleNextTick(() => { void this.llmAnswer(); });
+		this._scheduler.scheduleNextTick(() => { void this.llmChat(); });
 	}
 
-	private handleNoRecentMessages(messagesRecentEnough: Message[]): Message[] | undefined {
-		// No recent user messages, decide whether the LLM should speak spontaneously.
-		if (!this._decisionEngine.shouldSpontaneouslyAnswer()) {
-			console.log("LLM decides not to answer spontaneously.");
-			return undefined;
-		}
-
-		// We need to create a "fake" message to trigger the pipeline.
-		const currQuestion = this._decisionEngine.consumeGlobalQuestion();
-		if (!currQuestion)
-			return undefined;
-
-		messagesRecentEnough.push({ senderId: "system", content: currQuestion, timestamp: Date.now() });
-		return messagesRecentEnough;
-	}
-
-	private async handleAnswer(messagesRecentEnough: Message[], cutoff: number): Promise<void> {
-		this._lastMessages = this._contextBuilder.clearProcessedMessages(this._lastMessages, cutoff);
-
-		const decision: LlmDecision = await pipeline(this._llmHistory, this._contextBuilder.buildContext(messagesRecentEnough), this._llmPersonnality);
-		console.log("LLM decision:", decision);
-		console.log("LLM reply:", decision.reply);
-			if (decision.shouldReply && decision.reply)
-			this._responseEmitter.emit(decision.reply, () => this._scheduler.canEmit());	
-	}
-
-	private async llmAnswer(): Promise<void> {
+	private async llmChat(): Promise<void> {
 		if (!this._scheduler.tryBeginAnswering()) 
 		{
-			this._scheduler.scheduleNextTick(() => { void this.llmAnswer(); });
+			this._scheduler.scheduleNextTick(() => { void this.llmChat(); });
 			return;
 		}
 
-		const cutoff = this._contextBuilder.getCutoffTime();
-
 		try {
-			const messagesRecentEnough = this._contextBuilder.collectMessagesToAnswer(this._lastMessages, cutoff);
+			const cutoff = this._contextBuilder.getCutoffTime();
+			const messages = this._contextBuilder.collectMessagesToAnswer(this._lastMessages, cutoff);
 
-			if (!messagesRecentEnough.length) {
-				const spontaneousMessages = this.handleNoRecentMessages(messagesRecentEnough);
-				if (!spontaneousMessages)
-					return;
+			this._lastMessages = this._contextBuilder.clearProcessedMessages(this._lastMessages, cutoff);
 
-				await this.handleAnswer(spontaneousMessages, cutoff);
-				return;
-			}
-			await this.handleAnswer(messagesRecentEnough, cutoff);
-		}
+			const action = await pipeline(this._llmHistory, this._contextBuilder.buildContext(messages), this._llmPersonnality);
+
+			console.log("LLM action:", action);
+			if (action.type === "message")
+				this._responseEmitter.emit(action.text, () => this._scheduler.canEmit());
+		} 
 		catch (error) {
 			console.error("Error in LLM pipeline:", error);
-		}
+		} 
 		finally {
 			this._scheduler.finishAnswering(() => {
-				this._scheduler.scheduleNextTick(() => { void this.llmAnswer(); });
+			this._scheduler.scheduleNextTick(() => { void this.llmChat(); });
 			});
 		}
+	}
+
+	public setName(name: string): void {
+		this._llmPersonnality.setName(name);
+	}
+
+	public setGlobalQuestion(question: string): void {
+		this._globalQuestion = question;
 	}
 }

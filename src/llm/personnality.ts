@@ -9,8 +9,7 @@ const WAY_OF_SPEAKING_OPTIONS = [
     "familier et concis",
     "ludique et taquin",
     "calme et pose",
-    "intelligent et analytique",
-    "rapide et direct"
+    "intelligent et analytique"
 ];
 
 const IA_STRATEGIE_OPTIONS = [
@@ -27,13 +26,17 @@ export class llmPersonnality {
     private _wayOfSpeaking: string;
     private _iaStrategie: string;
 
-    public constructor(players: string[], llmName: string) {
+    public constructor(players: string[]) {
         this._players = players;
-        this._name = llmName;
         this._temper = giveTemper();
         this._wayOfSpeaking = giveWayOfSpeaking();
         this._iaStrategie = giveIaStrategie();
     }
+
+    public setName(name: string): void {
+        this._name = name;
+    }
+
     public getName(): string | undefined {
         return (this._name);
     }
