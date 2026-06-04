@@ -1,7 +1,7 @@
 import { Player } from "./Player.js";
 import { v4 as uuid } from 'uuid';
 import { EventEmitter } from "node:events";
-import { LlmController } from "../../llm/llmController.js";
+import { Llm } from "../../llm/llm.js";
 import type { Message } from "../../llm/types/messages.js";
 import { shuffle } from "../utils/index.js";
 import { prisma } from "../../prisma/prisma.js" 
@@ -17,6 +17,8 @@ export enum roomStates {
 	RESULT = "RESULT",
 	ERROR = "ERROR"
 }
+
+type playerInput =  { name : string, input : string};
 
 enum gameMode {
 	SCORE,
@@ -37,7 +39,6 @@ const eliminationTreshold : number = 1;
 // const possibleGameModes : gameMode[] = [gameMode.SCORE, gameMode.ELIMINATION];
 const possibleNames : string[] = ['YELLOW', 'RED', 'BLUE', 'ORANGE', 'GREEN', 'PINK', 'WHITE', 'BLACK'];
 
-type playerInput =  { name : string, input : string};
 type winCondition = () => boolean;
 
 export class Room extends EventEmitter
@@ -54,7 +55,7 @@ export class Room extends EventEmitter
 	private _maxPlayerCount : number;
 	private _isAccessible : boolean;
 	private _timerId : NodeJS.Timeout | undefined;
-	private _llmController : LlmController | null;
+	private _llm: Llm | null;
 	private _winCondition : winCondition | null;
 
 	// DATABASE
@@ -164,18 +165,19 @@ export class Room extends EventEmitter
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.CHAT) }, action_2_Time);
 				this._input = this._pickAnInput();
 				if (this._input === null)
-				{
-					this.stateSwitch(roomStates.CHAT)
-					return ;
-				}
+					{
+						this.stateSwitch(roomStates.CHAT)
+						return ;
+					}
 				data = this._input.input;
-				break ;
-
+				break;
 			case (roomStates.CHAT) :
+				this._llm?.startPlaying();
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.VOTE) }, chatTime);
 				break ;
 
 			case (roomStates.VOTE) :
+				this._llm?.stopPlaying();
 				this._allPlayersShouldAct();
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.RESULT) }, voteTime);
 				break ;
@@ -186,7 +188,6 @@ export class Room extends EventEmitter
 
 			default : break ;
 		}
-
 		console.log(`\x1b[33m-> Room ${this._number} : switching from ${this._state} to ${newState}\x1b[0m`)
 		this._state = newState;
 		this.emit('stateChanged', this._state, data)
@@ -263,7 +264,7 @@ export class Room extends EventEmitter
 		}
 		const msg: Message = { senderId: player.getName(), content: message, timestamp: Date.now() };
 		this.emit("message", msg);
-		this._llmController?.notifyLlm(msg);
+		this._llm?.receiveUserMessage(msg);
 		console.log(`Player ${player.getName()} (room ${this._number}) : ${message}`);
 	}
 
@@ -335,11 +336,14 @@ export class Room extends EventEmitter
 	}
 
 	private	_addLLMPLayer() {
-		this._players.push(new Player(null, true));
+		let LLMPlayer = new Player(null, true);
+		this._llm = new Llm(this as EventEmitter, this._players.map(player => player.getName()));
+		this._players.push(LLMPlayer);
 	}
 
 	private	_removeLLMPlayers() {
 		this._players = this._players.filter(player => !player.getIsLLM());
+		this._llm = null;
 	}
 
 	private _restartRoom(full : boolean = true) {
@@ -515,6 +519,7 @@ export class Room extends EventEmitter
 		console.log(`Chosen input is : ${input}`);
 		if (input === undefined)
 			return null;
+		// this._llm?.setGlobalQuestion(input);
 		return input;
 	}
 
@@ -554,11 +559,10 @@ export class Room extends EventEmitter
 		this._input = null;
 		this._maxPlayerCount = maxPlayerCount;
 		this._isAccessible = true;
+		this._llm = null;
 		// this._winCondition = this.__winConditionScore;
 		this._winCondition = this.__winConditionElimination;
 
-		this._llmController = new LlmController(this._id, this as EventEmitter, {}, [], `LlmPlayer${nb}`);
-		this._llmController.startListening();
 		this._createRoomInDB();
 	}
 }

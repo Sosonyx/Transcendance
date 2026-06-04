@@ -1,19 +1,42 @@
-export class llmPersonnality
-{
+const TEMPER_OPTIONS = [
+    "calme et patient",
+    "curieux et attentif",
+    "plutot reserve",
+    "sociable et joueur"
+];
+
+const WAY_OF_SPEAKING_OPTIONS = [
+    "familier et concis",
+    "ludique et taquin",
+    "calme et pose",
+    "intelligent et analytique"
+];
+
+const IA_STRATEGIE_OPTIONS = [
+    "Tu es accusateur, tu prends une cible parmis les joueurs (au bon moment) et tu la accuses (directement, ou en demandant l'avis des autres)",
+    "Tu es peut etre une ia qui sait ? Tu peux te faire passer pour l'IA en plaisantant",
+    "Tu essaies de prendre le lead du chat (sauf si beaucoup de gens parlent) en posant des questions (relatifs a la question principale)",
+    "Tu ne fais que repondre aux questions en restant un peu distant, observateur, avec peu de mots/ reponses courtes si possible"
+];
+
+export class llmPersonnality {
     private _name?: string;
     private _players?: string[];
     private _temper: string;
     private _wayOfSpeaking: string;
     private _iaStrategie: string;
 
-    public constructor(players: string[], llmName: string)
-    {
+    public constructor(players: string[]) {
         this._players = players;
-        this._name = llmName;
         this._temper = giveTemper();
         this._wayOfSpeaking = giveWayOfSpeaking();
         this._iaStrategie = giveIaStrategie();
     }
+
+    public setName(name: string): void {
+        this._name = name;
+    }
+
     public getName(): string | undefined {
         return (this._name);
     }
@@ -29,56 +52,23 @@ export class llmPersonnality
     public getIaStrategie(): string {
         return (this._iaStrategie);
     }
-    
+
     public getTemper(): string {
         return (this._temper);
     }
 };
 
 export function giveTemper(): string {
-    var str: string = "";
-    const random = (Math.random() * 4);
-    switch (random) {
-        case 1:
-            str = "tu t'enerves tres vite.";
-        case 2:
-            str = "tres calme";
-        case 3:
-            str = "hyper sympa";
-        case 4:
-            str = "completent decaler tu dis vraiment n'importe quoi ";
-    }
-    return (str);
+    const random = Math.floor(Math.random() * TEMPER_OPTIONS.length);
+    return (TEMPER_OPTIONS[random]!);
 }
 
-export function giveWayOfSpeaking(): string {
-    var str: string = "";
-    const random = (Math.random() * 4);
-    switch (random) {
-        case 1:
-            str = "Tu t'exprimes avec politesse et retenue. Jamais d'argot.";
-        case 2:
-            str = "Tu parles cash, sans fioritures. Langage direct et populaire.";
-        case 3:
-            str = "Tu es brusque, tu coupes la parole, tu intimides.";
-        case 4:
-            str = "Tu parles par énigmes, tu ne donnes jamais de réponse directe.";
-    }
-    return (str);
+export function giveWayOfSpeaking(): string  {
+    const random = Math.floor(Math.random() * WAY_OF_SPEAKING_OPTIONS.length);
+    return (WAY_OF_SPEAKING_OPTIONS[random]!);
 }
 
 export function giveIaStrategie(): string {
-    var str: string = "";
-    const random = (Math.random() * 4);
-    switch (random) {
-        case 1:
-            str = "Tu n'es pas une ia tu le prend mal qu'on te le dise ";
-        case 2:
-            str = "Tu es peut etre une ia qui sait ?";
-        case 3:
-            str = "Tu es un humain qui se fait passer pour une ia";
-        case 4:
-            str = "tu ne sais pas trop";
-    }
-    return (str);
+    const random = Math.floor(Math.random() * IA_STRATEGIE_OPTIONS.length);
+    return (IA_STRATEGIE_OPTIONS[random]!);
 }
