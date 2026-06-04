@@ -53,12 +53,12 @@ const tools: Anthropic.Tool[] = [
         input_schema: {
             type: "object",
             properties: {
-                text: {
+                content: {
                     type: "string",
                     description: "La réponse a la question globale posée par un des joueurs lors de la phase de reponse a la question globale.",
                 },
             },
-            required: ["text"],
+            required: ["content"],
         },
     },
     {
@@ -67,12 +67,12 @@ const tools: Anthropic.Tool[] = [
         input_schema: {
             type: "object",
             properties: {
-            text: {
-                type: "string",
-                description: "Le message à poster dans le chat",
+                content: {
+                    type: "string",
+                    description: "Le message à poster dans le chat",
+                },
             },
-            },
-            required: ["text"],
+            required: ["content"],
         },
     },
     {
@@ -81,12 +81,12 @@ const tools: Anthropic.Tool[] = [
         input_schema: {
             type: "object",
             properties: {
-                reason: {
-                type: "string",
-                description: "Pourquoi tu choisis de te taire (jamais visible par les joueurs)",
+                content: {
+                    type: "string",
+                    description: "Pourquoi tu choisis de te taire (jamais visible par les joueurs)",
                 },
             },
-            required: ["reason"],
+            required: ["content"],
         },
     },
     {
@@ -95,12 +95,12 @@ const tools: Anthropic.Tool[] = [
         input_schema: {
             type: "object",
             properties: {
-                target: {
-                type: "string",
-                description: "Le nom du joueur contre qui tu votes",
+                content: {
+                    type: "string",
+                    description: "Le nom du joueur contre qui tu votes",
                 },
             },
-            required: ["target"],
+            required: ["content"],
         },
     },
 ];
@@ -117,16 +117,16 @@ function extractAction(res: Anthropic.Message): GameAction {
         throw new Error("Aucun outil appelé");
 
     // We determine the action type based on the tool name, and extract the relevant information from the tool's input.
-    let input = block.input as Record<string, string>;
+    let input = block.input as { content: string };
     switch (block.name) {
         case "answer_global_question":
-            return { type: "answer_global_question", response: input.text as string };
+            return { type: "answer_global_question", response: input.content };
         case "send_message":
-            return { type: "message", text: input.text as string };
+            return { type: "message", text: input.content };
         case "stay_silent":
-            return { type: "silent", reason: input.reason as string };
+            return { type: "silent", reason: input.content };
         case "cast_vote":
-            return { type: "vote", target: input.target as string };
+            return { type: "vote", target: input.content };
         default:
             throw new Error(`Outil inconnu: ${block.name}`);
     }
