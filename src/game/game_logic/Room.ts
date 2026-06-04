@@ -7,18 +7,6 @@ import { shuffle } from "../utils/index.js";
 import { prisma } from "../../prisma/prisma.js" 
 import type { VoteInfo } from "../utils/index.js";
 
-const action_1_Time : number = 30 * 1000; // 30 seconds
-const action_2_Time : number = 30 * 1000; // 30 seconds
-const chatTime : number = 60 * 1000; // 30 seconds
-const voteTime : number = 30 * 1000; // 30 seconds
-const replayTime : number = 30 * 1000; // 30 seconds
-const maxPlayerCount : number = 7;
-const scoreCorrectVote : number = 3;
-const scoreGetVoted : number = 1;
-const scoreObjective : number = 10;
-
-const possibleNames : string[] = ['YELLOW', 'RED', 'BLUE', 'ORANGE', 'GREEN', 'PINK', 'WHITE', 'BLACK'];
-
 export enum roomStates {
 	INIT = "INIT",
 	LOBBY = "LOBBY",
@@ -34,6 +22,20 @@ enum gameMode {
 	SCORE,
 	ELIMINATION
 }
+
+const action_1_Time : number = 30 * 1000; // 30 seconds
+const action_2_Time : number = 30 * 1000; // 30 seconds
+const chatTime : number = 60 * 1000; // 30 seconds
+const voteTime : number = 30 * 1000; // 30 seconds
+const replayTime : number = 30 * 1000; // 30 seconds
+const maxPlayerCount : number = 7;
+const scoreCorrectVote : number = 3;
+const scoreGetVoted : number = 1;
+// const scoreObjective : number = 10;
+const eliminationTreshold : number = 1;
+
+// const possibleGameModes : gameMode[] = [gameMode.SCORE, gameMode.ELIMINATION];
+const possibleNames : string[] = ['YELLOW', 'RED', 'BLUE', 'ORANGE', 'GREEN', 'PINK', 'WHITE', 'BLACK'];
 
 type playerInput =  { name : string, input : string};
 type winCondition = (mode : gameMode) => boolean;
@@ -120,7 +122,12 @@ export class Room extends EventEmitter
 
 	public getVotePoolFromPlayer(playerId : string) : VoteInfo[] {
 		let votes : VoteInfo[] = [];
-		let votable = this._players.filter(player => player.getId() !== playerId);
+		let player : Player = this._players.find(player => player.getId() === playerId)!;
+
+		if (player.getEliminated())
+			return votes;
+
+		let votable = this._players.filter(player => player.getId() !== playerId && player.getEliminated() === false);
 		votable.forEach(player => votes.push([player.getId(), player.getName()]));
 
 		return votes;
@@ -254,8 +261,8 @@ export class Room extends EventEmitter
 			this.stateSwitch(roomStates.ERROR);
 			return ;
 		}
-		const msg: Message = { senderId: player.getId(), content: message, timestamp: Date.now() };
-		// this.emit("message", msg);
+		const msg: Message = { senderId: player.getName(), content: message, timestamp: Date.now() };
+		this.emit("message", msg);
 		this._llmController?.notifyLlm(msg);
 		console.log(`Player ${player.getName()} (room ${this._number}) : ${message}`);
 	}
@@ -353,16 +360,38 @@ export class Room extends EventEmitter
 	private _computeResult() : void
 	{
 		console.log('_computeResult');
-		this._players.forEach(player => {
-			if (!player.getIsLLM() && player.getVoteAgainst() !== null)
-			{
-				let target : Player = player.getVoteAgainst() as Player;
-				if (target.getIsLLM())
-					player.incrementScore(scoreCorrectVote);
-				else 
-					target.incrementScore(scoreGetVoted);
-			}
-		});
+
+		// SCORE MODE
+		if (this._gamemode === gameMode.SCORE)
+		{
+			this._players.forEach(player => {
+				if (!player.getIsLLM() && player.getVoteAgainst() !== null)
+				{
+					let target : Player = player.getVoteAgainst()!;
+					if (target.getIsLLM())
+						player.incrementScore(scoreCorrectVote);
+					else 
+						target.incrementScore(scoreGetVoted);
+				}
+			});
+		}
+
+		// ELIMINATION MODE
+		if (this._gamemode === gameMode.ELIMINATION)
+		{
+			this._players.forEach(player => {
+				if (!player.getEliminated() && player.getVoteAgainst() != null)
+				{
+					let target : Player = player.getVoteAgainst()!;
+					target.incrementScore(1);
+				}}
+			)
+			const highScore = Math.max(...this._players.map(p => p.getScore()));
+			const voted = this._players.filter(p => p.getScore() === highScore);
+
+			voted.forEach(
+				player => player.setEliminated(true));
+		}
 	}
 
 	private _onReplayTimerEnded()
@@ -381,12 +410,12 @@ export class Room extends EventEmitter
 		this._computeResult();
 		if (this._winCondition!(this._gamemode))
 		{
-			console.log('WIN CON !!!')
+			console.log('GAME IS OVER !!!')
 			this.stateSwitch(roomStates.RESULT)
 		}
 		else
 		{
-			console.log('WIN CON IS NOT MET')
+			console.log('GAME CONTINUE !!!')
 			this._restartRoom(false);
 		}
 	}
@@ -470,7 +499,7 @@ export class Room extends EventEmitter
 	}
 
 	private _haveAllPlayersActed() : boolean {
-		if (this._players.find(player  => !player.hasActed() && !player.getIsLLM()))
+		if (this._players.find(player  => !player.hasActed() && !player.getIsLLM() && !player.getEliminated()))
 			return (false);
 		return (true);
 	}
@@ -489,9 +518,24 @@ export class Room extends EventEmitter
 		return input;
 	}
 
-	private __winConditionScore() : boolean {
-		let winners : Player[] = this._players.filter(player => player.getScore() > scoreObjective);
-		return (winners.length > 0)
+	// private __winConditionScore() : boolean {
+	// 	let winners : Player[] = this._players.filter(player => player.getScore() > scoreObjective);
+	// 	return (winners.length > 0)
+	// }
+
+	private __winConditionElimination() : boolean {
+		let humans : Player[] = this._players.filter(player => !player.getIsLLM() && !player.getEliminated());
+		if (humans.length <= eliminationTreshold)
+		{
+			console.log('LLM won!');
+			return (true);
+		}
+		if (!this._players.find(player => player.getIsLLM()))
+		{
+			console.log('Humans won!');
+			return (true);
+		}
+		return (false);
 	}
 
 	// CONSTRUCTOR
@@ -500,7 +544,7 @@ export class Room extends EventEmitter
 		super();
 		console.log("Constructor called for class Room");
 		this._id = uuid();
-		this._gamemode = gameMode.SCORE;
+		this._gamemode = gameMode.ELIMINATION;
 		this._gameId = null;
 		this._number = nb;
 		this._state = roomStates.INIT;
@@ -510,7 +554,8 @@ export class Room extends EventEmitter
 		this._input = null;
 		this._maxPlayerCount = maxPlayerCount;
 		this._isAccessible = true;
-		this._winCondition = this.__winConditionScore;
+		// this._winCondition = this.__winConditionScore;
+		this._winCondition = this.__winConditionElimination;
 
 		this._llmController = new LlmController(this._id, this as EventEmitter, {}, [], `LlmPlayer${nb}`);
 		this._llmController.startListening();
