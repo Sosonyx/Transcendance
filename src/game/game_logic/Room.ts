@@ -145,7 +145,7 @@ export class Room extends EventEmitter
 
 	public stateSwitch(newState : roomStates) : void 
 	{
-		let data : string | null = null;
+		let data : any | null = null;
 
 		if (!(newState in roomStates))
 			newState = roomStates.ERROR;
@@ -175,6 +175,10 @@ export class Room extends EventEmitter
 				data = this._input.input;
 				break;
 			case (roomStates.CHAT) :
+				data = {
+					question: this._input?.input,
+					answers : this._inputs.map(p => [p.name, p.input])
+				}
 				this._llm?.startPlaying();
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.VOTE) }, chatTime);
 				break ;
@@ -253,6 +257,8 @@ export class Room extends EventEmitter
 		}
 		if (this._state == roomStates.ACTION_2)
 		{
+			let name : string = player.getName();
+			this._inputs.push({name, input});
 			console.log(`Player ${player.getName()} (room ${this._number}) : ${input}`);
 			player.setActed(true);
 		}
@@ -373,6 +379,23 @@ export class Room extends EventEmitter
 		});
 	}
 
+	private _checkLobbyStatus() {
+		if (this._state != roomStates.LOBBY)
+		{
+			this.stateSwitch(roomStates.ERROR);
+				return ;
+		}
+		this._playerCount = this._players.length;
+		this._isAccessible = (this._playerCount !== this._maxPlayerCount);
+		if (this._isLobbyReady())
+		{
+			this._isAccessible = false;
+			this._addLLMPLayer();
+			this._createGameInDB();
+			this.stateSwitch(roomStates.ACTION_1);
+		}
+	}
+
 	private _checkVoteStatus() {
 		console.log(this._checkVoteStatus)
 		if (!this._haveAllPlayersActed())
@@ -423,23 +446,6 @@ export class Room extends EventEmitter
 			this._checkRestart();
 	}
 
-	private _checkLobbyStatus() {
-		if (this._state != roomStates.LOBBY)
-		{
-			this.stateSwitch(roomStates.ERROR);
-				return ;
-		}
-		this._playerCount = this._players.length;
-		this._isAccessible = (this._playerCount !== this._maxPlayerCount);
-		if (this._isLobbyReady())
-		{
-			this._isAccessible = false;
-			this._addLLMPLayer();
-			this._createGameInDB();
-			this.stateSwitch(roomStates.ACTION_1);
-		}
-	}
-
 	private _givePlayersName() {
 		let namePool = [...possibleNames];
 		shuffle(namePool);
@@ -476,12 +482,15 @@ export class Room extends EventEmitter
 
 	private _pickAnInput() : playerInput | null {
 		let input = this._inputs[Math.floor(Math.random() * this._inputs.length)];
+		this._inputs = [];
 		console.log(`Chosen input is : ${input}`);
 		if (input === undefined)
 			return null;
 		// this._llm?.setGlobalQuestion(input);
 		return input;
 	}
+
+	// GAMEMODE
 
 	private _pickGameMode() : void
 	{
