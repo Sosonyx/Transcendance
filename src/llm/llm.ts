@@ -8,7 +8,7 @@ import { LlmScheduler } from "./services/llmScheduler.js";
 import type { Message } from "./types/messages.js";
 
 // Duplicate type definition, should be moved to a common file
-type playerInput =  { name : string, input : string};
+export type playerInput =  { name : string, input : string};
 
 export class Llm {
 	private				_lastMessages: Message[] = [];

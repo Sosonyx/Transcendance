@@ -425,21 +425,18 @@ export class Room extends EventEmitter
 			case roomStates.ACTION_1 :
 			{
 				//todo : better context building + safety for stateSwitch
-				// let llmInput = await this._llm?.askGlobalQuestion(this._inputs.map(p => ({senderId: p.name, content: p.input, timestamp: Date.now()})));
-				// if (llmInput)
-				// {
-				// 	console.log(`LLM input is : ${llmInput.input}`);
-				// 	this._inputs.push(llmInput);
-				// }
+				let llmInput = await this._llm?.askGlobalQuestion(this._inputs.map(p => ({senderId: p.name, content: p.input, timestamp: Date.now()})));
+				if (llmInput)
+					this._inputs.push(llmInput);
 				this.stateSwitch(roomStates.ACTION_2) ;
 				return ;
 			}
 			case roomStates.ACTION_2 :
 			{
 				//todo : better context building + safety for stateSwitch
-				// let llmInput = await this._llm?.answerGlobalQuestion(this._input?.input ?? "", this._inputs.map(p => ({senderId: p.name, content: p.input, timestamp: Date.now()})));
-				// if (llmInput)
-				// 	this._inputs.push(llmInput);
+				let llmInput = await this._llm?.answerGlobalQuestion(this._input?.input ?? "", this._inputs.map(p => ({senderId: p.name, content: p.input, timestamp: Date.now()})));
+				if (llmInput)
+					this._inputs.push(llmInput);
 				this.stateSwitch(roomStates.CHAT) ;
 				return ;
 			}
