@@ -106,6 +106,12 @@ export function registerSocketHandlers(io: Server)
 			socket.emit('message', message);
 		});
 
+		// Relay messages emitted on the roomEmitter to socket.io clients
+		roomEmitter.on('message', (message: Message) => {
+				if (roomId === null) return;
+				socket.emit('message', message);
+			});
+
 		/* ==========VOTE==========*/
 		// Joueur vote
 		socket.on('vote', (playerId: string) => {

@@ -43,22 +43,20 @@ function ChatPanel({ socket }: ChatPanelProps) {
 		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
 	}, [messages]);
 
-	// AI replica of twitch: Assign a color to each user based on their ID
-	//! to erase
-	const COLORS = ['#ff6905','#9147ff','#1e9eff','#e91916','#ff69b4','#00c8af'];
+	// Assign a color to each user based on their ID
+	//! to change
+	const colors = ['#ffff00','#ff0000','#0000ff','#ff8800','#00ff00','#ff0088','#ffffff','#000000'];
+	const possibleNames : string[] = ['YELLOW', 'RED', 'BLUE', 'ORANGE', 'GREEN', 'PINK', 'WHITE', 'BLACK'];
 
 	const getColor = (id: string) => {
-		const hash = id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-		return COLORS[hash % COLORS.length];
-};
+		return colors[possibleNames.indexOf(id)] ?? '#efeff1';
+	};
 
 	return (
 	<div>
 		<ul id="messages">
 			{messages.map((msg, i) => (
 				<li key={i}>
-					// AI replica of Twitch: Display the sender's ID in a color based on their ID
-					//! to change
 					<span style={{ color: getColor(msg.senderId), fontWeight: 700 }}>{msg.senderId}</span>
 					{': '}{msg.content}
 				</li>

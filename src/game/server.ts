@@ -20,17 +20,15 @@ fastify.register(fastifyStatic, {
     prefix: '/'
 });
 
+// Pour tester avec l'ancien html statique
+// fastify.register(fastifyStatic, {
+//     root: join(process.cwd(), './public')
+// });
+
 fastify.setNotFoundHandler((req, reply) => {
     req;
     reply.sendFile('index.html');
 });
-
-// fastify.get('/', (request, reply) => {
-// 	request;
-//     return reply.sendFile('index.html');
-// });
-
-// console.log('Fastify is now ready ;)');
 
 const io = new Server(fastify.server, {
     connectionStateRecovery: {}
