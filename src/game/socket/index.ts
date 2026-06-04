@@ -102,9 +102,9 @@ export function registerSocketHandlers(io: Server)
 
 		// Relay messages emitted on the roomEmitter to socket.io clients
 		roomEmitter.on('message', (message: Message) => {
-				if (roomId === null) return;
-				socket.emit('message', message);
-			});
+			if (roomId === null) return;
+			socket.emit('message', message);
+		});
 
 		/* ==========VOTE==========*/
 		// Joueur vote
