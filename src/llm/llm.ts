@@ -41,17 +41,19 @@ export class Llm {
 	public async askGlobalQuestion(questionsFromUsers: Message[]): Promise<playerInput> {
 		const action = await pipeline(this._llmHistory, this._contextBuilder.buildContext(questionsFromUsers), this._llmPersonnality);
 		if (action.type === "answer_global_question")
-			return {name : this._llmPersonnality.getName() ?? "", input : action.response};
+			return {name : this._llmPersonnality.getName() ?? "PINK", input : action.response};
 		else
-			return {name : this._llmPersonnality.getName() ?? "", input : ""};			
+			return {name : this._llmPersonnality.getName() ?? "PINK", input : ""};			
 	}
 
-	public async answerGlobalQuestion(globalQuestion: string, responsesFromUsers: Message[]): Promise<void> {
+	public async answerGlobalQuestion(globalQuestion: string, responsesFromUsers: Message[]): Promise<playerInput> {
 		this._lastMessages.push({ senderId: "system", content: `Global question: ${globalQuestion}`, timestamp: Date.now() });
 		
 		const action = await pipeline(this._llmHistory, this._contextBuilder.buildContext(responsesFromUsers), this._llmPersonnality);
 		if (action.type === "answer_global_question")
-			this._responseEmitter.emit(action.response, () => this._scheduler.canEmit());
+			return {name : this._llmPersonnality.getName() ?? "PINK", input : action.response};
+		else
+			return {name : this._llmPersonnality.getName() ?? "PINK", input : ""};
 	}
 
 	public async vote(): Promise<void> {

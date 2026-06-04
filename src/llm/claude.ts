@@ -49,7 +49,8 @@ const tools: Anthropic.Tool[] = [
     {
         name: "answer_global_question",
         description: "Répond à la question globale posée par le jeu. \
-        Utilise cet outil pour répondre à une question posée à tous les joueurs, avant la phase de discussion, tu ne dois utiliser cet outil qu'une seule fois, la toute premiere fois.",
+        Utilise cet outil pour répondre à une question posée à tous les joueurs, avant la phase de discussion, tu ne dois utiliser cet outil qu'une seule fois, la toute premiere fois. Tu vas \
+        recevoir les questions posées par les joueurs pour pouvoir adapter ton language, mais tu ne dois pas les utiliser pour formuler ta question.",
         input_schema: {
             type: "object",
             properties: {

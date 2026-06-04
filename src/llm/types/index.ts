@@ -9,7 +9,7 @@ export interface LlmInterface {
     receiveUserMessage(message: Message): void;
 
     askGlobalQuestion(questionsFromUsers: Message[]): Promise<playerInput>;
-    answerGlobalQuestion(globalQuestion: string, responsesFromUsers: Message[]): Promise<void>;
+    answerGlobalQuestion(globalQuestion: string, responsesFromUsers: Message[]): Promise<playerInput>;
     // setGlobalQuestion(question: string): void;
     vote(): Promise<void>;
 }
