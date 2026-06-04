@@ -38,7 +38,7 @@ const eliminationTreshold : number = 1;
 const possibleNames : string[] = ['YELLOW', 'RED', 'BLUE', 'ORANGE', 'GREEN', 'PINK', 'WHITE', 'BLACK'];
 
 type playerInput =  { name : string, input : string};
-type winCondition = (mode : gameMode) => boolean;
+type winCondition = () => boolean;
 
 export class Room extends EventEmitter
 {
@@ -408,7 +408,7 @@ export class Room extends EventEmitter
 		if (!this._haveAllPlayersActed())
 			return ;
 		this._computeResult();
-		if (this._winCondition!(this._gamemode))
+		if (this._winCondition!())
 		{
 			console.log('GAME IS OVER !!!')
 			this.stateSwitch(roomStates.RESULT)
@@ -530,7 +530,7 @@ export class Room extends EventEmitter
 			console.log('LLM won!');
 			return (true);
 		}
-		if (!this._players.find(player => player.getIsLLM()))
+		if (!this._players.find(player => player.getIsLLM() && !player.getEliminated()))
 		{
 			console.log('Humans won!');
 			return (true);
