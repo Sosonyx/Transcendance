@@ -1,0 +1,21 @@
+FROM node:20-alpine
+
+WORKDIR /app 
+#if no folder conflict with package.json inside docker# 
+
+COPY package*.json ./
+COPY prisma.config.ts ./
+COPY tsconfig*.json ./
+RUN npm install
+
+COPY . .
+
+RUN npx prisma generate --schema=backend/prisma/schema.prisma --config=prisma.config.ts
+
+RUN npx tsc -b tsconfig.json
+
+# RUN mkdir -p public
+
+EXPOSE 3000
+
+CMD ["sh", "-c", "npx prisma db push --schema=backend/prisma/schema.prisma && node build/server.js", "node", "build/server.js"]

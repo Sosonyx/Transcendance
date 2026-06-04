@@ -4,18 +4,14 @@ SRC_DIR := src/
 .PHONY: deps build run run-backend run-game clean
 
 deps:
-	docker compose up -d
+	docker compose build 
+	sleep 3
 	npm install --prefix $(SRC_DIR)
-	cd src && npx prisma generate --schema=backend/prisma/schema.prisma --config=prisma.config.ts
-	cd src/backend && npx prisma db push --schema=prisma/schema.prisma
+	ln -sfn $(PWD)/.env $(PWD)/src/backend/.env
+	
 
-build: deps
-	mkdir -p build
-	npx --prefix src/ tsc -b $(PWD)/src/tsconfig.json
-	ln -sfn $(PWD)/src/node_modules $(PWD)/build/node_modules
-
-
-run:
+run: deps
+	docker compose up
 	cd src && node ../build/server.js
 
 
@@ -31,7 +27,9 @@ clean:
 
 fclean: clean
 	docker compose down postgres
+	podman system prune -a
 	rm -rf src/.env
+	rm -rf build/backend/.env
 	rm -rf src/build
 
 

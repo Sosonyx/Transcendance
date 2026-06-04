@@ -14,7 +14,7 @@ export const app = Fastify({ logger: true });
         const __dirname = path.dirname(__filename);
         // console.error(__dirname)
         await app.register(fastifyStatic, {
-            root: path.resolve(__dirname, '../../public'),
+            root: path.resolve(__dirname, '/home/tlecuyer/trensendence/src/frontend/'),
 
         });
     }
