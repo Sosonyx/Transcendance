@@ -13,7 +13,7 @@ export class LlmResponseEmitter {
 
 	// We need "canEmit()" because we have to check again before emitting
 	public emit(reply: string, canEmit: () => boolean): void {
-		let delay = 800 + reply.length * 10;
+		let delay = 1000 + reply.length * 100;
 		delay = Math.min(delay, 2000);
 
 		if (!canEmit())

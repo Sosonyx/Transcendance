@@ -35,23 +35,19 @@ export class Llm {
 		this._scheduler.stop();
 	}
 
-	public async answerGlobalQuestion(responsesFromUsers: Message[]): Promise<string> {
+	public async answerGlobalQuestion(responsesFromUsers: Message[]): Promise<void> {
 		this._lastMessages.push({ senderId: "system", content: `Global question: ${this._globalQuestion}`, timestamp: Date.now() });
 		
 		const action = await pipeline(this._llmHistory, this._contextBuilder.buildContext(responsesFromUsers), this._llmPersonnality);
 		if (action.type === "answer_global_question")
-			return action.response;
-		else 
-			return "";
+			this._responseEmitter.emit(action.response, () => this._scheduler.canEmit());
 	}
 
-	public async vote(): Promise<string> {
+	public async vote(): Promise<void> {
 		// TODO: I will need to pass a proper context
 		const action = await pipeline(this._llmHistory, this._contextBuilder.buildContext([]), this._llmPersonnality);
 		if (action.type === "vote")
-			return action.target;
-		else 
-			return "";
+			this._responseEmitter.emit(action.target, () => this._scheduler.canEmit());
 	}
 
 	public	receiveUserMessage(message: Message): void {
@@ -70,7 +66,6 @@ export class Llm {
 		try {
 			const cutoff = this._contextBuilder.getCutoffTime();
 			const messages = this._contextBuilder.collectMessagesToAnswer(this._lastMessages, cutoff);
-
 			this._lastMessages = this._contextBuilder.clearProcessedMessages(this._lastMessages, cutoff);
 
 			const action = await pipeline(this._llmHistory, this._contextBuilder.buildContext(messages), this._llmPersonnality);
