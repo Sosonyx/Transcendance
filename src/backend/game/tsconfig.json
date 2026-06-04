@@ -3,7 +3,7 @@
   "compilerOptions": {
     "composite": true,               
     "rootDir": "./",               
-    "outDir": "../../../build/backend/game"   
+    "outDir": "../../../app/build/backend/game"   
   },
   
 "include": ["**/*", "../lib/prisma.ts"],     

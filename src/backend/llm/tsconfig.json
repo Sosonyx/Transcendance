@@ -3,7 +3,7 @@
   "compilerOptions": {
     "composite": true,               
     "rootDir": "./",               
-    "outDir": "../../../build/backend/llm"   
+    "outDir": "../../../app/build/backend/llm"   
   },
   "include": ["**/*"]            
 }
