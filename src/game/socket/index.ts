@@ -66,12 +66,6 @@ export function registerSocketHandlers(io: Server)
 		// Changement d'etat de la room
 		roomEmitter.on('stateChanged', onStateChanged);
 
-		// Relay messages emitted on the roomEmitter to socket.io clients
-		roomEmitter.on('message', (message: Message) => {
-			if (roomId === null) return;
-			socket.emit('message', message);
-		});
-
 		/* ==========LOBBY==========*/
 		// Joueur pret
 		socket.on('ready', () => {
@@ -104,14 +98,13 @@ export function registerSocketHandlers(io: Server)
 			if (content.length > 500) return;
 			
 			roomManager.onChatEvent(socket.id, roomId, content);
-
-			const message: Message = {
-				senderId: socket.id,
-				content,
-				timestamp: Date.now()
-			};
-			io.to(roomId).emit('message', message);
 		});
+
+		// Relay messages emitted on the roomEmitter to socket.io clients
+		roomEmitter.on('message', (message: Message) => {
+				if (roomId === null) return;
+				socket.emit('message', message);
+			});
 
 		/* ==========VOTE==========*/
 		// Joueur vote
