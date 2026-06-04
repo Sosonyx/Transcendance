@@ -7,6 +7,9 @@ import { LlmResponseEmitter } from "./services/llmResponseEmitter.js";
 import { LlmScheduler } from "./services/llmScheduler.js";
 import type { Message } from "./types/messages.js";
 
+// Duplicate type definition, should be moved to a common file
+type playerInput =  { name : string, input : string};
+
 export class Llm {
 	private				_lastMessages: Message[] = [];
 	private 			_llmHistory: llmHistory;
@@ -33,6 +36,14 @@ export class Llm {
 
 	public stopPlaying(): void {
 		this._scheduler.stop();
+	}
+
+	public async askGlobalQuestion(questionsFromUsers: Message[]): Promise<playerInput> {
+		const action = await pipeline(this._llmHistory, this._contextBuilder.buildContext(questionsFromUsers), this._llmPersonnality);
+		if (action.type === "answer_global_question")
+			return {name : this._llmPersonnality.getName() ?? "", input : action.response};
+		else
+			return {name : this._llmPersonnality.getName() ?? "", input : ""};			
 	}
 
 	public async answerGlobalQuestion(responsesFromUsers: Message[]): Promise<void> {

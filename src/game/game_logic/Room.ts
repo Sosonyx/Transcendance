@@ -18,7 +18,7 @@ export enum roomStates {
 	ERROR = "ERROR"
 }
 
-type playerInput =  { name : string, input : string};
+export type playerInput =  { name : string, input : string};
 
 enum gameMode {
 	SCORE,
