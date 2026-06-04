@@ -27,22 +27,22 @@ export function registerSocketHandlers(io: Server)
 			if (roomId === null) return;
 		    switch (state) {
 				case roomStates.LOBBY: {
-					io.to(roomId).emit('startLobby');
+					socket.emit('startLobby');
 					// console.log(`${roomId}: lobby phase, waiting for the players to be ready`);
 					break;
 				}
 				case roomStates.ACTION_1: {
-					io.to(roomId).emit('startAction1');
+					socket.emit('startAction1');
 					// console.log(`${roomId}: starting action_1 phase`);
 					break ;
 				}
 				case roomStates.ACTION_2: {
-					io.to(roomId).emit('startAction2', data);
+					socket.emit('startAction2', data);
 					break ;
 				}
 
 				case roomStates.CHAT: {
-					io.to(roomId).emit('startChat', data);
+					socket.emit('startChat', data);
 					// console.log(`${roomId}: starting action phase`);
 					break;
 				}
@@ -52,7 +52,7 @@ export function registerSocketHandlers(io: Server)
 		            break;
 		        }
 				case roomStates.RESULT: {
-					io.to(roomId).emit('startResult');
+					socket.emit('startResult');
 					// console.log(`${roomId}: result phase`)
 					break;
 				}
@@ -65,15 +65,6 @@ export function registerSocketHandlers(io: Server)
 
 		// Changement d'etat de la room
 		roomEmitter.on('stateChanged', onStateChanged);
-
-		// Relay messages emitted on the roomEmitter to socket.io clients
-		// TODO: redo
-		if (roomEmitter.listenerCount('message') === 0) {
-			roomEmitter.on('message', (message: Message) => {
-				if (roomId === null) return;
-				io.to(roomId).emit('message', message);
-			});
-		}
 
 		/* ==========LOBBY==========*/
 		// Joueur pret
@@ -107,13 +98,12 @@ export function registerSocketHandlers(io: Server)
 			if (content.length > 500) return;
 			
 			roomManager.onChatEvent(socket.id, roomId, content);
+		});
 
-			const message: Message = {
-				senderId: socket.id,
-				content,
-				timestamp: Date.now()
-			};
-			io.to(roomId).emit('message', message);
+		// Relay messages emitted on the roomEmitter to socket.io clients
+		roomEmitter.on('message', (message: Message) => {
+			if (roomId === null) return;
+			socket.emit('message', message);
 		});
 
 		/* ==========VOTE==========*/

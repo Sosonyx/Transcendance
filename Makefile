@@ -1,5 +1,6 @@
 SHELL := /bin/sh
 SRC_DIR := src/
+FRONTEND_DIR := src/frontend
 
 .PHONY: deps build run run-backend run-game clean
 
@@ -13,7 +14,6 @@ deps:
 run: deps
 	docker compose up
 	cd src && node ../build/server.js
-
 
 run-backend:
 	cd src && node ../build/backend/server.js
@@ -31,5 +31,4 @@ fclean: clean
 	rm -rf src/.env
 	rm -rf build/backend/.env
 	rm -rf src/build
-
-
+	rm -rf src/frontend/dist
