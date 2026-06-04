@@ -557,8 +557,8 @@ export class Room extends EventEmitter
 		// this._winCondition = this.__winConditionScore;
 		this._winCondition = this.__winConditionElimination;
 
-		this._llmController = new LlmController(this._id, this as EventEmitter, {}, [], `LlmPlayer${nb}`);
-		this._llmController.startListening();
+		this._llmController = null; // new LlmController(this._id, this as EventEmitter, {}, [], `LlmPlayer${nb}`);
+		// this._llmController.startListening();
 		this._createRoomInDB();
 	}
 }

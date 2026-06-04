@@ -1,4 +1,4 @@
-@import '../node_modules/mini.css/dist/mini-default.min.css';
+@import '../node_modules/mini.css/dist/mini-dark.min.css';
 
 .centered {
     display: flex;
@@ -6,8 +6,84 @@
     align-items: center;
     height: 100vh;
 }
+/*! AI replica of Twitch */
+/* Chat */
+#messages {
+    list-style-type: none;
+    margin: 0;
+    padding: 8px 0;
+    padding-bottom: 4rem;
+    overflow-y: auto;
+    background: #18181b;
+}
 
+#messages li {
+    padding: 4px 14px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #efeff1;
+    word-break: break-word;
+}
+
+#messages li:hover {
+    background: #222226;
+}
+
+/* Bottom bar */
 .bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #18181b;
+    border-top: 1px solid #2d2d2d;
+    padding: 10px 12px;
+    box-sizing: border-box;
+}
+
+#chatform {
+    display: flex;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+}
+
+#input {
+    flex: 1;
+    background: #3d3d42;
+    border: 1px solid #4a4a55;
+    border-radius: 4px;
+    color: #efeff1;
+    font-size: 13px;
+    padding: 8px 10px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+#input:focus {
+    border-color: #9147ff;
+}
+
+#input::placeholder {
+    color: #adadb8;
+}
+
+#send-btn {
+    background: #9147ff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+#send-btn:hover {
+    background: #a970ff;
+}
+
+/* .bottom-bar {
     position: fixed;
     bottom: 0;
     left: 0;
@@ -41,7 +117,7 @@
 
 #input {
     flex: 1;
-}
+} */
 
 .vote-grid {
 	display: flex;
