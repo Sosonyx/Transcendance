@@ -9,6 +9,7 @@ deps:
 	sleep 3
 	npm install --prefix $(SRC_DIR)
 	ln -sfn $(PWD)/.env $(PWD)/src/backend/.env
+	npm install --prefix $(FRONTEND_DIR)
 	
 
 run: deps
@@ -26,8 +27,8 @@ clean:
 	rm -rf src/node_modules
 
 fclean: clean
-	docker compose down postgres
-	podman system prune -a
+	docker compose down postgres transcendence_backend_1 frontend
+# 	podman system prune -a
 	rm -rf src/.env
 	rm -rf build/backend/.env
 	rm -rf src/build

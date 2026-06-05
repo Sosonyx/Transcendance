@@ -4,8 +4,8 @@ services:
     container_name: postgres
     env_file:
       - .env
-    ports:
-      - "5432:5432"
+    # ports:
+    #   - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
   
@@ -15,10 +15,19 @@ services:
       dockerfile: ../docker_files/Dockerfile.backend
     env_file : 
       - .env
-    ports : 
-     - 3000:3000
+    # ports : 
+    #  - 3000:3000
     depends_on :
     - postgres
+
+  frontend :
+    build:
+      context: src/frontend
+      dockerfile: ../../docker_files/Dockerfile.frontend
+    ports :
+     - 8080:80
+    depends_on :
+    - backend
 
 
 volumes:
