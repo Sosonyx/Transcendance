@@ -15,15 +15,15 @@ import { registerSocketHandlers } from './socket/index.js';
 
 export const fastify = Fastify();
 
-// `fastify.register(fastifyStatic, {
-//     root: join(__dirname, '../../src/frontend/dist'),
-//     prefix: '/'
-// });`
+fastify.register(fastifyStatic, {
+    root: join(__dirname, '../../src/frontend/dist'),
+    prefix: '/'
+});
 
 // Pour tester avec l'ancien html statique
-fastify.register(fastifyStatic, {
-    root: join(process.cwd(), './public')
-});
+// fastify.register(fastifyStatic, {
+//     root: join(process.cwd(), './public')
+// });
 
 fastify.setNotFoundHandler((req, reply) => {
     req;
@@ -36,6 +36,6 @@ const io = new Server(fastify.server, {
 
 registerSocketHandlers(io);
 
-fastify.listen({ port: 3000}, () => {
+fastify.listen({ port: 3000, host: '0.0.0.0' },() => {
     console.log('Serveur lancé sur le port 3000');
 });

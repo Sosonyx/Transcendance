@@ -6,6 +6,9 @@ import { existsSync } from "fs";
 import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
 
+import { tools } from "./actions.js";
+import type { phase } from "./actions.js";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -45,67 +48,6 @@ function getSystemPrompt(promptContext : string) : Anthropic.Messages.TextBlockP
     return (SystemPromptBlock);
 }
 
-const tools: Anthropic.Tool[] = [
-    {
-        name: "answer_global_question",
-        description: "Répond à la question globale posée par le jeu. \
-        Utilise cet outil pour répondre à une question posée à tous les joueurs, avant la phase de discussion, tu ne dois utiliser cet outil qu'une seule fois, la toute premiere fois. Tu vas \
-        recevoir les questions posées par les joueurs pour pouvoir adapter ton language, mais tu ne dois pas les utiliser pour formuler ta question.",
-        input_schema: {
-            type: "object",
-            properties: {
-                content: {
-                    type: "string",
-                    description: "La réponse a la question globale posée par un des joueurs lors de la phase de reponse a la question globale.",
-                },
-            },
-            required: ["content"],
-        },
-    },
-    {
-        name: "send_message",
-        description: "Envoie un message dans le chat du jeu. Utilise cet outil quand tu veux parler.",
-        input_schema: {
-            type: "object",
-            properties: {
-                content: {
-                    type: "string",
-                    description: "Le message à poster dans le chat",
-                },
-            },
-            required: ["content"],
-        },
-    },
-    {
-        name: "stay_silent",
-        description: "Ne rien dire ce tour. Utilise cet outil quand parler serait suspect ou inutile.",
-        input_schema: {
-            type: "object",
-            properties: {
-                content: {
-                    type: "string",
-                    description: "Pourquoi tu choisis de te taire (jamais visible par les joueurs)",
-                },
-            },
-            required: ["content"],
-        },
-    },
-    {
-        name: "cast_vote",
-        description: "Voter pour éliminer un joueur. Uniquement pendant la phase de vote.",
-        input_schema: {
-            type: "object",
-            properties: {
-                content: {
-                    type: "string",
-                    description: "Le nom du joueur contre qui tu votes",
-                },
-            },
-            required: ["content"],
-        },
-    },
-];
-
 export type GameAction = 
     | { type: "answer_global_question"; response: string }
     | { type: "message"; text: string }
@@ -120,6 +62,8 @@ function extractAction(res: Anthropic.Message): GameAction {
     // We determine the action type based on the tool name, and extract the relevant information from the tool's input.
     let input = block.input as { content: string };
     switch (block.name) {
+        case "ask_global_question":
+            return { type: "answer_global_question", response: input.content };
         case "answer_global_question":
             return { type: "answer_global_question", response: input.content };
         case "send_message":
@@ -133,16 +77,18 @@ function extractAction(res: Anthropic.Message): GameAction {
     }
 }
 
-export async function askClaude(promptContext: string, conversationHistory: MessageParam[]): Promise<GameAction> {
+export async function askClaude(promptContext: string, conversationHistory: MessageParam[], phase: phase): Promise<GameAction> {
     const llmResponse = await myClientAPI.messages.create({
-        model: "claude-opus-4-7",
+        model: "claude-haiku-4-5-20251001",
         max_tokens: 150,
         temperature: 1.0,
         system: [getSystemPrompt(promptContext)], 
         messages: conversationHistory,
         tool_choice: {type: "any" },
-        tools
+        tools: tools[phase]
 
     });
     return extractAction(llmResponse);
 }
+        // model: "claude-opus-4-7"
+
