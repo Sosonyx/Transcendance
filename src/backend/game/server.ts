@@ -27,7 +27,7 @@ fastify.register(fastifyStatic, {
 
 fastify.setNotFoundHandler((req, reply) => {
     req;
-    reply.sendFile('index.html');
+    reply.sendFile('frontend/index.html');
 });
 
 const io = new Server(fastify.server, {

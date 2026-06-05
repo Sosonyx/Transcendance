@@ -21,7 +21,7 @@ export const app = Fastify({ logger: true });
 
 app.get('/', (request, reply) => {
     request;
-    return reply.sendFile('index_2.html');
+    return reply.sendFile('frontend/public/index_2.html');
 });
 
 await app.register(initRoutes);

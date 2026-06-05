@@ -4,9 +4,6 @@
     "composite": true,
     "outDir": "./build"
   },
-  "files": [
-    "./server.ts",
-  ],
   "references": [
     { "path": "./backend" },
     { "path": "./backend/game" },

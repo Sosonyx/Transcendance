@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY prisma.config.ts ./
 COPY tsconfig*.json ./
-COPY ../public/index_2.html ../public/index_2.html 
+# COPY ../public/index_2.html ../public/index_2.html 
 RUN npm install
 
 COPY . .
@@ -19,4 +19,4 @@ RUN npx tsc -b tsconfig.json
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "npx prisma db push --schema=backend/prisma/schema.prisma && node build/server.js", "node", "build/server.js"]
+CMD ["sh", "-c", "npx prisma db push --schema=backend/prisma/schema.prisma && node build/backend/server.js"]

@@ -3,8 +3,12 @@
   "compilerOptions": {
 	"composite":true,
     "rootDir": "./",
-    "outDir": "../../app/build/backend"
+    "outDir": "../build/backend"
   },
+  "exclude" : [
+    "frontend",
+    "node_modules"
+  ],
   "include": ["**/*"],
   "references": [
 	{"path": "./prisma"}
