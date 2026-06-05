@@ -1,167 +1,317 @@
-@import '../node_modules/mini.css/dist/mini-dark.min.css';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-.centered {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+/* ── Variables ── */
+:root {
+  --twitch:       #9147ff;
+  --twitch-dark:  #6316c1;
+  --twitch-hover: #a970ff;
+
+  --bg:       #18181b;
+  --surface:  #1f1f23;
+  --surface2: #2d2d35;
+  --border:   rgba(255,255,255,0.1);
+  --text:     #efeff1;
+  --muted:    #adadb8;
+  --radius:   4px;
 }
-/*! AI replica of Twitch */
-/* Chat */
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 24px 16px 48px;
+}
+
+/* ── Typography ── */
+h1, h2, h3 {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+}
+
+/* ── Layout ── */
+#app, form {
+  max-width: 560px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ── Messages list ── */
 #messages {
-    list-style-type: none;
-    margin: 0;
-    padding: 8px 0;
-    padding-bottom: 4rem;
-    overflow-y: auto;
-    background: #18181b;
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+  padding-bottom: 4rem;
+  overflow-y: auto;
 }
 
 #messages li {
-    padding: 4px 14px;
-    font-size: 13px;
-    line-height: 1.5;
-    color: #efeff1;
-    word-break: break-word;
+  padding: 4px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+  word-break: break-word;
+  animation: slideIn 0.2s ease;
 }
 
 #messages li:hover {
-    background: #222226;
+  background: #222226;
 }
 
-/* Bottom bar */
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Chat bottom bar ── */
 .bottom-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: #18181b;
-    border-top: 1px solid #2d2d2d;
-    padding: 10px 12px;
-    box-sizing: border-box;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg);
+  border-top: 1px solid #2d2d2d;
+  padding: 10px 12px;
 }
 
 #chatform {
-    display: flex;
-    gap: 8px;
-    margin: 0;
-    padding: 0;
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  max-width: none;
+  width: 100%;
 }
 
 #input {
-    flex: 1;
-    background: #3d3d42;
-    border: 1px solid #4a4a55;
-    border-radius: 4px;
-    color: #efeff1;
-    font-size: 13px;
-    padding: 8px 10px;
-    outline: none;
-    box-sizing: border-box;
+  flex: 1;
+  background: var(--surface2);
+  border: 1px solid #4a4a55;
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  padding: 8px 10px;
+  outline: none;
 }
 
 #input:focus {
-    border-color: #9147ff;
+  border-color: var(--twitch);
+  box-shadow: 0 0 0 2px rgba(145,71,255,0.3);
 }
 
 #input::placeholder {
-    color: #adadb8;
+  color: var(--muted);
 }
 
 #send-btn {
-    background: #9147ff;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    padding: 6px 14px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
+  background: var(--twitch);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 6px 14px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  width: auto;
 }
 
-#send-btn:hover {
-    background: #a970ff;
+#send-btn:hover { background: var(--twitch-hover); }
+
+/* ── Chat context ── */
+#chat-context {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-/* .bottom-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-	height: 5.725rem;
+#chat-question {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
 }
 
-#messages {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-	padding-bottom: 5.725rem;
-	overflow-y: auto;
+#chat-answers {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-#messages > li {
-	padding: 0.5rem 1rem;
+#chat-answers li {
+  background: var(--surface2);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  border-left: 3px solid var(--twitch);
+  color: var(--text);
 }
 
-#messages > li:nth-child(odd) {
-	background: #efefef;
+/* ── Text inputs ── */
+input[type="text"] {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  padding: 10px 14px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
 }
 
-#chatform {
-    display: flex;
-    width: 100%;
-    box-sizing: border-box;
-    overflow: hidden;
-    margin: 0;
+input[type="text"]::placeholder { color: var(--muted); }
+
+input[type="text"]:focus {
+  border-color: var(--twitch);
+  box-shadow: 0 0 0 2px rgba(145,71,255,0.3);
 }
 
-#input {
-    flex: 1;
-} */
+/* ── vbox ── */
+.vbox {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+}
 
+.label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* ── Buttons — base ── */
+button {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  width: 100%;
+}
+
+button:active:not(:disabled) { transform: scale(0.98); }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.centered button {
+  width: auto;
+  min-width: 200px;
+}
+
+/* ── Ready button ── */
+#ready-btn {
+  background: var(--twitch);
+  color: #fff;
+}
+#ready-btn:hover:not(:disabled) { background: var(--twitch-hover); }
+#ready-btn:disabled {
+  background: var(--surface2);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* ── Vote cards ── */
 .vote-grid {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 1rem;
-	justify-content: center;
-	padding: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  padding: 1rem;
 }
 
 .player-card {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	padding: 1rem;
-	border-radius: 8px;
-	background: #333;
-	cursor: pointer;
-	transition: background 0.2s;
-	width: 120px;
-    overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s, border-color 0.15s;
+  width: 120px;
+  overflow: hidden;
 }
 
 .player-card h3 {
-    word-break: break-word;
+  font-size: 13px;
+  font-weight: 600;
+  word-break: break-word;
 }
 
 .player-card:hover:not(.disabled):not(.voted) {
-	background: #c0392b;
+  background: rgba(145,71,255,0.15);
+  border-color: var(--twitch);
+  transform: scale(1.08);
+}
+
+.player-card:active:not(.disabled):not(.voted) {
+  transform: scale(1);
 }
 
 .player-card.voted {
-	background: #c0392b;
-	cursor: default;
+  background: rgba(145,71,255,0.2);
+  border-color: var(--twitch);
+  cursor: default;
+  transform: scale(1.08);
 }
 
 .player-card.disabled {
-	background: #999;
-	cursor: not-allowed;
-	opacity: 0.6;
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .player-avatar {
-	width: 64px;
-	height: 64px;
-	border-radius: 50%;
-	margin-bottom: 0.5rem;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  margin-bottom: 0.5rem;
+}
+
+/* ── Result buttons ── */
+#replay-btn {
+  background: var(--twitch);
+  color: #fff;
+}
+#replay-btn:hover:not(:disabled) { background: var(--twitch-hover); }
+
+#new-game-btn {
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+#new-game-btn:hover:not(:disabled) { background: #3d3d42; }
+
+/* ── Responsive ── */
+@media (max-width: 420px) {
+  body { padding: 16px 12px 40px; }
+  button { font-size: 13px; padding: 10px 16px; }
 }
