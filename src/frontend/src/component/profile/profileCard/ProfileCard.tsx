@@ -1,18 +1,24 @@
 import { type User } from "../../../types/types.js";
-import { useState, type ChangeEvent } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 import './Profile.css'
 import { modifyUser } from "../../../services/api.js";
 
 interface ProfileProps {
   user: User;
+    onUserUpdated?: () => Promise<void> | void;
 }
 
-export function Profile({user} : ProfileProps) {
+export function Profile({user, onUserUpdated} : ProfileProps) {
 	const [isEditing, setIsEditing] = useState<boolean>(false);
 	const [username, setUsername] = useState<string>(user.username);
 	const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [currentUser, setCurrentUser] = useState<User>(user);
 	
+    useEffect(() => {
+        setCurrentUser(user);
+        setUsername(user.username);
+    }, [user]);
+
     const gamePlayed: number = currentUser.playedAs.length;
     let gameWon: number = currentUser.playedAs.filter((game) => game.won).length;
 
@@ -28,8 +34,10 @@ export function Profile({user} : ProfileProps) {
 		try{
 			const data = await modifyUser(username, avatarFile)
             setCurrentUser(data)
+            setUsername(data.username)
             setIsEditing(false);
             setAvatarFile(null)
+			await onUserUpdated?.();
 		} catch (error) {
             alert("Impossible de mettre à jour le profil.");
         }

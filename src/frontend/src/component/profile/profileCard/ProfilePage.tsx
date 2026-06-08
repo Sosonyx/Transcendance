@@ -3,15 +3,17 @@ import { Leaderboard } from "../leaderboard/Leaderboard.js";
 import { OtherProfileSearch } from "./FindProfile.js";
 import { Profile } from "./ProfileCard.js";
 interface ProfileProps {
-  user: User;
+	user: User;
+	onUserUpdated?: () => Promise<void> | void;
 }
 
-export function ProfilePage({user} : ProfileProps) {
+
+export function ProfilePage({ user, onUserUpdated }: ProfileProps) {
 	return (<>
-	<div className="profile-page">
-		<Profile user={user}/>
-		<Leaderboard/>
-		<OtherProfileSearch/>
-	</div>
+		<div className="profile-page">
+			<Profile user={user} {...(onUserUpdated ? { onUserUpdated } : {})} />
+			<Leaderboard />
+			<OtherProfileSearch />
+		</div>
 	</>)
 }
