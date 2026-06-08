@@ -18,11 +18,11 @@ export enum roomStates {
 	ERROR = "ERROR"
 }
 
-type playerInput =  { name : string, input : string};
+// type playerInput =  { name : string, input : string};
 
 enum gameMode {
-	SCORE,
-	ELIMINATION
+	SCORE = 0,
+	ELIMINATION = 1
 }
 
 const action_1_Time : number = 30 * 1000; // 30 seconds
@@ -33,18 +33,20 @@ const replayTime : number = 30 * 1000; // 30 seconds
 const maxPlayerCount : number = 7;
 const scoreCorrectVote : number = 3;
 const scoreGetVoted : number = 1;
-// const scoreObjective : number = 10;
+const scoreObjective : number = 10;
 const eliminationTreshold : number = 1;
 
-// const possibleGameModes : gameMode[] = [gameMode.SCORE, gameMode.ELIMINATION];
+const possibleGameModes : gameMode[] = [gameMode.SCORE, gameMode.ELIMINATION];
 const possibleNames : string[] = ['YELLOW', 'RED', 'BLUE', 'ORANGE', 'GREEN', 'PINK', 'WHITE', 'BLACK'];
 
+type playerInput =  { name : string, input : string};
 type winCondition = () => boolean;
+type computeResult = () => void;
 
 export class Room extends EventEmitter
 {
 	private	readonly _id : string;
-	private	_gamemode : gameMode;
+	private	_gamemode : gameMode | null;
 	private	_gameId? : string | null;
 	private _number : number;
 	private _state : roomStates;
@@ -57,6 +59,7 @@ export class Room extends EventEmitter
 	private _timerId : NodeJS.Timeout | undefined;
 	private _llm: Llm | null;
 	private _winCondition : winCondition | null;
+	private _computeResult : computeResult | null;
 
 	// DATABASE
 
@@ -142,7 +145,7 @@ export class Room extends EventEmitter
 
 	public stateSwitch(newState : roomStates) : void 
 	{
-		let data : string | null = null;
+		let data : any | null = null;
 
 		if (!(newState in roomStates))
 			newState = roomStates.ERROR;
@@ -172,6 +175,10 @@ export class Room extends EventEmitter
 				data = this._input.input;
 				break;
 			case (roomStates.CHAT) :
+				data = {
+					question: this._input?.input,
+					answers : this._inputs.map(p => [p.name, p.input])
+				}
 				this._llm?.startPlaying();
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.VOTE) }, chatTime);
 				break ;
@@ -229,7 +236,7 @@ export class Room extends EventEmitter
 			this.stateSwitch(roomStates.ERROR);
 			return ;
 		}
-		player.switchReady();
+		player.setActed(true);
 		this._checkLobbyStatus();
 	}
 
@@ -250,6 +257,8 @@ export class Room extends EventEmitter
 		}
 		if (this._state == roomStates.ACTION_2)
 		{
+			let name : string = player.getName();
+			this._inputs.push({name, input});
 			console.log(`Player ${player.getName()} (room ${this._number}) : ${input}`);
 			player.setActed(true);
 		}
@@ -361,43 +370,6 @@ export class Room extends EventEmitter
 			this.stateSwitch(roomStates.ACTION_1)
 	}
 
-	private _computeResult() : void
-	{
-		console.log('_computeResult');
-
-		// SCORE MODE
-		if (this._gamemode === gameMode.SCORE)
-		{
-			this._players.forEach(player => {
-				if (!player.getIsLLM() && player.getVoteAgainst() !== null)
-				{
-					let target : Player = player.getVoteAgainst()!;
-					if (target.getIsLLM())
-						player.incrementScore(scoreCorrectVote);
-					else 
-						target.incrementScore(scoreGetVoted);
-				}
-			});
-		}
-
-		// ELIMINATION MODE
-		if (this._gamemode === gameMode.ELIMINATION)
-		{
-			this._players.forEach(player => {
-				if (!player.getEliminated() && player.getVoteAgainst() != null)
-				{
-					let target : Player = player.getVoteAgainst()!;
-					target.incrementScore(1);
-				}}
-			)
-			const highScore = Math.max(...this._players.map(p => p.getScore()));
-			const voted = this._players.filter(p => p.getScore() === highScore);
-
-			voted.forEach(
-				player => player.setEliminated(true));
-		}
-	}
-
 	private _onReplayTimerEnded()
 	{
 		clearTimeout(this._timerId);
@@ -407,11 +379,28 @@ export class Room extends EventEmitter
 		});
 	}
 
+	private _checkLobbyStatus() {
+		if (this._state != roomStates.LOBBY)
+		{
+			this.stateSwitch(roomStates.ERROR);
+				return ;
+		}
+		this._playerCount = this._players.length;
+		this._isAccessible = (this._playerCount !== this._maxPlayerCount);
+		if (this._isLobbyReady())
+		{
+			this._isAccessible = false;
+			this._addLLMPLayer();
+			this._createGameInDB();
+			this.stateSwitch(roomStates.ACTION_1);
+		}
+	}
+
 	private _checkVoteStatus() {
 		console.log(this._checkVoteStatus)
 		if (!this._haveAllPlayersActed())
 			return ;
-		this._computeResult();
+		this._computeResult!();
 		if (this._winCondition!())
 		{
 			console.log('GAME IS OVER !!!')
@@ -457,23 +446,6 @@ export class Room extends EventEmitter
 			this._checkRestart();
 	}
 
-	private _checkLobbyStatus() {
-		if (this._state != roomStates.LOBBY)
-		{
-			this.stateSwitch(roomStates.ERROR);
-				return ;
-		}
-		this._playerCount = this._players.length;
-		this._isAccessible = (this._playerCount !== this._maxPlayerCount);
-		if (this._isLobbyReady())
-		{
-			this._isAccessible = false;
-			this._addLLMPLayer();
-			this._createGameInDB();
-			this.stateSwitch(roomStates.ACTION_1);
-		}
-	}
-
 	private _givePlayersName() {
 		let namePool = [...possibleNames];
 		shuffle(namePool);
@@ -493,13 +465,7 @@ export class Room extends EventEmitter
 	}
 
 	private _isLobbyReady() : boolean {
-		return (this._playerCount > 1 && this._areAllPlayersReady())
-	}
-
-	private _areAllPlayersReady() {
-		if (this._players.find(player => player.isReady() === false))
-			return (false);
-		return (true);
+		return (this._playerCount > 1 && this._haveAllPlayersActed())
 	}
 
 	private _haveAllPlayersActed() : boolean {
@@ -516,6 +482,7 @@ export class Room extends EventEmitter
 
 	private _pickAnInput() : playerInput | null {
 		let input = this._inputs[Math.floor(Math.random() * this._inputs.length)];
+		this._inputs = [];
 		console.log(`Chosen input is : ${input}`);
 		if (input === undefined)
 			return null;
@@ -523,10 +490,66 @@ export class Room extends EventEmitter
 		return input;
 	}
 
-	// private __winConditionScore() : boolean {
-	// 	let winners : Player[] = this._players.filter(player => player.getScore() > scoreObjective);
-	// 	return (winners.length > 0)
-	// }
+	// GAMEMODE
+
+	private _pickGameMode() : void
+	{
+		this._gamemode = possibleGameModes[Math.round(Math.random())]!;
+
+		switch (this._gamemode)
+		{
+			case (gameMode.SCORE) :
+				this._computeResult = this.__computeResultScore;
+				this._winCondition = this.__winConditionScore;
+				break ;
+			case (gameMode.ELIMINATION) :
+				this._computeResult = this.__computeResultElimination;
+				this._winCondition = this.__winConditionElimination;
+				break ;
+			default :
+				console.log(`If you see this it's a bug`);
+		}
+	}
+
+	private __computeResultScore() : void
+	{
+		if (this._gamemode === gameMode.SCORE)
+		{
+			this._players.forEach(player => {
+				if (!player.getIsLLM() && player.getVoteAgainst() !== null)
+				{
+					let target : Player = player.getVoteAgainst()!;
+					if (target.getIsLLM())
+						player.incrementScore(scoreCorrectVote);
+					else 
+						target.incrementScore(scoreGetVoted);
+				}
+			});
+		}
+	}
+
+	private __computeResultElimination() : void
+	{
+		if (this._gamemode === gameMode.ELIMINATION)
+		{
+			this._players.forEach(player => {
+				if (!player.getEliminated() && player.getVoteAgainst() != null)
+				{
+					let target : Player = player.getVoteAgainst()!;
+					target.incrementScore(1);
+				}}
+			)
+			const highScore = Math.max(...this._players.map(p => p.getScore()));
+			const voted = this._players.filter(p => p.getScore() === highScore);
+
+			voted.forEach(player => player.setEliminated(true));
+		}
+	}
+
+	private __winConditionScore() : boolean {
+		let winners : Player[] = this._players.filter(player => player.getScore() > scoreObjective);
+		return (winners.length > 0)
+	}
 
 	private __winConditionElimination() : boolean {
 		let humans : Player[] = this._players.filter(player => !player.getIsLLM() && !player.getEliminated());
@@ -549,7 +572,7 @@ export class Room extends EventEmitter
 		super();
 		console.log("Constructor called for class Room");
 		this._id = uuid();
-		this._gamemode = gameMode.ELIMINATION;
+		this._gamemode = null;
 		this._gameId = null;
 		this._number = nb;
 		this._state = roomStates.INIT;
@@ -560,9 +583,10 @@ export class Room extends EventEmitter
 		this._maxPlayerCount = maxPlayerCount;
 		this._isAccessible = true;
 		this._llm = null;
-		// this._winCondition = this.__winConditionScore;
-		this._winCondition = this.__winConditionElimination;
+		this._computeResult = null;
+		this._winCondition = null;
 
+		this._pickGameMode();
 		this._createRoomInDB();
 	}
 }

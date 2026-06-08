@@ -16,3 +16,5 @@ export interface Message {
 }
 
 export type VoteInfo = [id : string, name : string]
+
+export type AnswersType = [playerName: string, answer: string][]
