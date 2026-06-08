@@ -1,6 +1,6 @@
 import { type User } from "../../../types/types.js";
 import { useEffect, useState, type ChangeEvent } from "react";
-import './Profile.css'
+// import './Profile.css'
 import { modifyUser } from "../../../services/api.js";
 
 interface ProfileProps {

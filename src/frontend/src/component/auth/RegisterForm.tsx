@@ -44,7 +44,7 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
 
   return (
     <form onSubmit={handleSubmit}>
-      <h2 className="title">Créer un compte</h2>
+      <h2 className="title">Subscribe</h2>
       
       <input
         type="email"

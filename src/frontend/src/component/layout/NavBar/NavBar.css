@@ -1,7 +1,8 @@
 .navbar {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start; 
   padding: 10px 20px;
+  padding-top: 0px;
   align-items: center;
   background-color: #303030;
   color: #ffffff99;
@@ -9,8 +10,10 @@
 
 .navbar-brand {
   background-color: transparent;
+  width: 20%;
+  display: inline;
   font-weight: bold;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
 }
 
 .navbar-brand:hover {
@@ -27,7 +30,7 @@
 .nav-button{
   border: none;
   background-color: transparent;
-  margin-right: 20px;
+  margin-right: auto;
   color: #ffffff99;
 }
 

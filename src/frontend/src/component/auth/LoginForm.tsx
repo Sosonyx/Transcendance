@@ -57,7 +57,7 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
 			/>
 			{error && <p className="error-msg">{error}</p>}
 			<div className='auth-button'>
-				<button type="submit" className="button" disabled={submitting}>{submitting ? "Connexion..." : "Connexion"}</button>
+				<button type="submit" className="button" disabled={submitting}>{submitting ? "Connection..." : "Connection"}</button>
 				<button type="button" className="button" onClick={onSwitchToRegister}>Subscribe</button>
 			</div>
 			<div className="oAuthButton">

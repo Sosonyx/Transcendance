@@ -25,7 +25,7 @@ export async function handleOAuthLogin(fastify: FastifyInstance, provider: strin
 		oAuthAccount = await prisma.oAuthAccount.create({
 			data:{
 				provider: provider,
-				providerId: profile.providerId,
+				providerId: profile.providerId.toString(),
 				userId: user.id
 			},
 			include: { user: true }

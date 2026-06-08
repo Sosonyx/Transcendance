@@ -15,7 +15,7 @@ export function Navbar({ user, onLogout, onAuthSuccess, onViewChange}: Props) {
   return (
     <>
       <nav className='navbar'>
-        <h1 onClick={() => onViewChange('home')} className='navbar-brand'>Qui est l'IA ?</h1>
+        <h5 onClick={() => onViewChange('home')} className='navbar-brand'>Qui est l'IA ?</h5>
 
         {user ? (
           <div className='button-div'>
