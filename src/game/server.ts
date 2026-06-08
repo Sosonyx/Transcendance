@@ -36,6 +36,6 @@ const io = new Server(fastify.server, {
 
 registerSocketHandlers(io);
 
-fastify.listen({ port: 3000}, () => {
+fastify.listen({ port: 3000, host: '0.0.0.0' },() => {
     console.log('Serveur lancé sur le port 3000');
 });

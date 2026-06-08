@@ -4,13 +4,14 @@ import type { llmHistory } from "./services/llmHistory.js";
 import type { llmPersonnality } from "./personnality.js";
 import type { MessageParam } from "@anthropic-ai/sdk/resources";
 import type { GameAction } from "./claude.js"
+import type { phase } from "./actions.js";
 
-export async function pipeline(history: llmHistory, lastMessages: string,  personnality : llmPersonnality): Promise<GameAction> 
+export async function pipeline(history: llmHistory, lastMessages: string,  personnality : llmPersonnality, phase: phase): Promise<GameAction> 
 {
-    const promptContext: string = systemPrompt(personnality, lastMessages);
+    const promptContext: string = systemPrompt(personnality, phase);
     const usersMessages: MessageParam[] = [...history.getMessagesHistory(), { role: 'user', content: lastMessages }];
 
-    const action: GameAction = await askClaude(promptContext, usersMessages);
+    const action: GameAction = await askClaude(promptContext, usersMessages, phase);
 
     history.addMessageAsUser(lastMessages);
 
@@ -22,7 +23,6 @@ export async function pipeline(history: llmHistory, lastMessages: string,  perso
             history.addMessageAsAssistant(action.text);
             break;
         case "silent":
-            console.log(`[SILENT] ${action.reason}`);  
             history.addMessageAsAssistant(`[SILENT] ${action.reason}`);  
             break;
         case "vote":

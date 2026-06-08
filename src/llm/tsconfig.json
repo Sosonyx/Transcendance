@@ -5,5 +5,5 @@
     "rootDir": "./",               
     "outDir": "../../build/llm"   
   },
-  "include": ["**/*"]            
+  "include": ["**/*"],
 }

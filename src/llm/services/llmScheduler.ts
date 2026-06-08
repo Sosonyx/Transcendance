@@ -11,7 +11,7 @@ export class LlmScheduler {
 	private			_state: LlmSchedulerState = LlmSchedulerState.Stopped;
 	private			_timer: NodeJS.Timeout | null = null;
 
-	public constructor(intervalMs = 5000, jitterMs = 2000) {
+	public constructor(intervalMs = 6000, jitterMs = 1000) {
 		this._intervalMs = intervalMs;
 		this._jitterMs = jitterMs;
 	}
@@ -67,7 +67,7 @@ export class LlmScheduler {
 			return this._intervalMs;
 
 		const jitter = Math.random() * this._jitterMs;
-		const sign = Math.random() < 0.5 ? -1 : 1;
+		const sign = Math.random() < 0.3 ? -1 : 1;
 
 		return Math.round(this._intervalMs + sign * jitter);
 	}
