@@ -6,7 +6,6 @@ WORKDIR /app
 COPY package*.json ./
 COPY prisma.config.ts ./
 COPY tsconfig*.json ./
-# COPY ../public/index_2.html ../public/index_2.html 
 RUN npm install
 
 COPY . .
@@ -14,8 +13,6 @@ COPY . .
 RUN npx prisma generate --schema=backend/prisma/schema.prisma --config=prisma.config.ts
 
 RUN npx tsc -b tsconfig.json
-
-# RUN mkdir -p public
 
 EXPOSE 3000
 

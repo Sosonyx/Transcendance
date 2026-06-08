@@ -9,7 +9,7 @@
     "frontend",
     "node_modules"
   ],
-  "include": ["**/*"],
+  "include": ["**/*", "../server.ts"],
   "references": [
 	{"path": "./prisma"}
   ]

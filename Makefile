@@ -33,3 +33,5 @@ fclean: clean
 	rm -rf build/backend/.env
 	rm -rf src/build
 	rm -rf src/frontend/dist
+
+re: fclean run

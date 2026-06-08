@@ -11,7 +11,7 @@ function Game() {
     const [players, setPlayers] = useState<VoteInfo[]>([]);
     
     useEffect(() => {
-        const s = io('http://localhost:3000');
+        const s = io();
         setSocket(s);
 
         s.on('startLobby', ()        	=> setState(roomStates.LOBBY));
