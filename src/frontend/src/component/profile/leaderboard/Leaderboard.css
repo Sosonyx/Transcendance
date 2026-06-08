@@ -1,0 +1,10 @@
+.leaderboard-container{
+	background-color: #303030;
+	border-radius: 20px;
+	width: 200px;
+	margin: auto;
+	margin-top: 10px;
+	justify-content: center;
+	text-align: center;
+	display: flex;
+}

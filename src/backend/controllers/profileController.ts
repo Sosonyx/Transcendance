@@ -18,7 +18,6 @@ export async function getProfileController(req: FastifyRequest, reply: FastifyRe
 			avatar: dbUser.avatar,
 			playedAs: dbUser.playedAs
 		}
-		console.log(dbUser)
 		if (!user)
 			return (reply.status(404).send("Error, user not found !"))
 		return (reply.send(user))
@@ -32,7 +31,10 @@ export async function getProfileController(req: FastifyRequest, reply: FastifyRe
 export async function getOtherProfileController(req: FastifyRequest, reply: FastifyReply){
 
     const { username } = req.params as { username: string };
-    const dbUser = await prisma.user.findUnique({where: { username: username }});
+	const dbUser = await prisma.user.findUnique({
+		where: { username },
+		include: { playedAs: true }
+	});
 
     if (!dbUser) {
         console.error("Inexistant user!");
@@ -44,7 +46,8 @@ export async function getOtherProfileController(req: FastifyRequest, reply: Fast
         email: dbUser.email,
         username: dbUser.username,
         avatar: dbUser.avatar,
-        password: dbUser.hashedPassword,
+        password: null,
+		playedAs: dbUser.playedAs,
     };
 
     const safeProfile: UserSafeInterface = user;
@@ -67,7 +70,8 @@ function getUserMap(user : DBUserResponse): UserMap{
     };
 }
 
-export async function getLeaderbordController(){
+export async function getLeaderbordController(req: FastifyRequest, reply: FastifyReply){
+	req;
 	const users : DBUserResponse[] = await prisma.user.findMany({
 	include: {
 		playedAs: {
@@ -77,8 +81,12 @@ export async function getLeaderbordController(){
 	})
 	const userMap : UserMap[] = users.map(getUserMap)
 	const filteredMap = userMap.filter(user => user.numberOfGames > 0)
-	const sortedMap = filteredMap.sort((a, b) => b.winrate - a.winrate)
+	const sortedMap = filteredMap.sort((a, b) => {
+		if (b.winrate !== a.winrate)
+            return b.winrate - a.winrate;  
+        return b.gamesWon - a.gamesWon;})
+
 	const leaderboard = sortedMap.slice(0, 10) 
 
-	return (leaderboard)
+	return (reply.code(200).send(leaderboard))
 }

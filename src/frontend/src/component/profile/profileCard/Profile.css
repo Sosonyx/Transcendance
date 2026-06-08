@@ -1,0 +1,71 @@
+.button-profile{
+	background-color: transparent;
+	border: none;
+	border-radius: 15px;
+	color: #d8d8d8;
+}
+
+.button-profile:hover{
+	color: white;
+	transition: 0.3s;
+}
+
+.username-form{
+	border-radius: 5px;
+	background-color: #303030;
+	color: white;
+}
+.username-form:focus{
+	background-color: #000000;
+	transform: none;
+	color: #f3f1f1;
+	outline:none;
+}
+
+.username-form:focus::placeholder{
+	color: white;
+}
+
+.profile-card{
+	padding: 20px;
+	border-radius: 20px;
+	margin: auto;
+	padding-top: 15px;
+	padding-bottom: 15px;
+	width: 250px;
+	color: white;
+	background-color: #303030;
+	margin-top: 40px;
+	display: block;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+}
+
+.finder-div{
+	text-align: center;
+}
+
+.profile-finder{
+	display: inline;
+	justify-content: center;
+	align-items: center;
+}
+.avatar{
+	width: 100px;
+	height: 100px;
+}
+
+.modify-button{
+	background: transparent;
+	border: none;
+	color: rgb(188, 186, 186);
+ 	box-shadow: 2px 2px 2px 1px rgb(0 0 0 / 20%);
+	margin-left: 10px;
+	margin-top: 10px;
+}
+
+.modify-button:hover{
+	color: white;
+ 	box-shadow: 2px 2px 2px 1px rgb(0 0 0 / 20%);
+}
