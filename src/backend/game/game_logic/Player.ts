@@ -26,8 +26,12 @@ export class Player extends EventEmitter
 	}
 
 	public getIsLLM() : boolean {
-		return this._isLLM;
+		return (false);
 	}
+
+	// public getIsLLM() : boolean {
+	// 	return this._isLLM;
+	// }
 
 	public hasActed() : boolean {
 		return this._acted;
@@ -54,8 +58,6 @@ export class Player extends EventEmitter
 	}
 
 	public reset(full : boolean = true) {
-		console.log('player reset as');
-		console.log(full);
 		if (full)
 		{
 			this._id = uuid();
@@ -90,13 +92,13 @@ export class Player extends EventEmitter
 		console.log(`Eliminated ${this._name} : ${this._isLLM ? 'LLM' : 'human'}`);
 	}
 
-	public constructor(userId : string | null, isLLM : boolean = false) {
+	public constructor(userId : string | null) {
 		super();
 		console.log("Constructor called for class Player");
 		this._id = uuid();
 		this._userId = userId;
 		this._name = 'no-name';
-		this._isLLM = isLLM;
+		// this._isLLM = isLLM;
 		this._acted = false;
 		this._wantReplay = false;
 		this._voteAgainst = null;
