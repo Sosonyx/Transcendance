@@ -18,8 +18,6 @@ export enum roomStates {
 	ERROR = "ERROR"
 }
 
-// type playerInput =  { name : string, input : string};
-
 enum gameMode {
 	SCORE = 0,
 	ELIMINATION = 1
