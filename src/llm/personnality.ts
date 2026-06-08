@@ -6,7 +6,7 @@ const WAY_OF_SPEAKING_OPTIONS = [
 ];
 
 const IA_STRATEGIE_OPTIONS = [
-    "Tu es peut etre une ia qui sait ? Tu peux te faire passer pour l'IA en plaisantant",
+    "Tu es un humain qui veut se faire passer pour une IA, tu peux faire des blagues sur le fait que tu es une IA"
 ];
 
 export class llmPersonnality {

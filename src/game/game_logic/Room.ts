@@ -171,10 +171,10 @@ export class Room extends EventEmitter
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.CHAT) }, action_2_Time);
 				this._input = this._pickAnInput();
 				if (this._input === null)
-					{
-						this.stateSwitch(roomStates.CHAT)
-						return ;
-					}
+				{
+					this.stateSwitch(roomStates.CHAT)
+					return ;
+				}
 				data = this._input.input;
 				break;
 			case (roomStates.CHAT) :

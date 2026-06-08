@@ -79,7 +79,7 @@ function extractAction(res: Anthropic.Message): GameAction {
 
 export async function askClaude(promptContext: string, conversationHistory: MessageParam[], phase: phase): Promise<GameAction> {
     const llmResponse = await myClientAPI.messages.create({
-        model: "claude-haiku-4-5-20251001",
+        model: "claude-opus-4-8",
         max_tokens: 150,
         temperature: 1.0,
         system: [getSystemPrompt(promptContext)], 
@@ -91,4 +91,6 @@ export async function askClaude(promptContext: string, conversationHistory: Mess
     return extractAction(llmResponse);
 }
         // model: "claude-opus-4-7"
+        // model: "claude-haiku-4-5-20251001",
+
 
