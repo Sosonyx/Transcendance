@@ -3,15 +3,14 @@ import { v4 as uuid} from "uuid";
 
 export class Player extends EventEmitter
 {
-	private	_id : string;
-	private _userId : string | null;
-	private _name : string;
-	private	_isLLM : boolean;
-	private _acted : boolean;
-	private _wantReplay : boolean;
-	private	_voteAgainst : Player | null;
-	private	_score : number;
-	private _eliminated : boolean;
+	private		_id : string;
+	private 	_userId : string | null;
+	protected	_name : string;
+	protected	_acted : boolean;
+	private 	_wantReplay : boolean;
+	protected	_voteAgainst : Player | null;
+	private		_score : number;
+	protected 	_eliminated : boolean;
 
 	public getId() : string {
 		return this._id;
@@ -28,10 +27,6 @@ export class Player extends EventEmitter
 	public getIsLLM() : boolean {
 		return (false);
 	}
-
-	// public getIsLLM() : boolean {
-	// 	return this._isLLM;
-	// }
 
 	public hasActed() : boolean {
 		return this._acted;
@@ -89,7 +84,7 @@ export class Player extends EventEmitter
 	public setEliminated(status : boolean)
 	{
 		this._eliminated = status;
-		console.log(`Eliminated ${this._name} : ${this._isLLM ? 'LLM' : 'human'}`);
+		console.log(`Eliminated ${this._name} : ${this.getIsLLM() ? 'LLM' : 'human'}`);
 	}
 
 	public constructor(userId : string | null) {
@@ -98,7 +93,6 @@ export class Player extends EventEmitter
 		this._id = uuid();
 		this._userId = userId;
 		this._name = 'no-name';
-		// this._isLLM = isLLM;
 		this._acted = false;
 		this._wantReplay = false;
 		this._voteAgainst = null;

@@ -37,6 +37,11 @@ export class Llm {
 		this._scheduler.stop();
 	}
 
+	public clearHistory() {
+		this._llmHistory.reset();
+		this._lastMessages = [];
+	}
+
 	public async askGlobalQuestion(questionsFromUsers: Message[]): Promise<playerInput> {
 		const action = await pipeline(this._llmHistory, this._contextBuilder.buildContext(questionsFromUsers), this._llmPersonnality, "askGlobalQuestion");
 		if (action.type === "answer_global_question")
@@ -46,7 +51,7 @@ export class Llm {
 	}
 
 	public async answerGlobalQuestion(globalQuestion: string, responsesFromUsers: Message[]): Promise<playerInput> {
-		this._lastMessages.push({ senderId: "system", content: `Global question: ${globalQuestion}`, timestamp: Date.now() });
+		responsesFromUsers.push({ senderId: "system", content: `Global question: ${globalQuestion}`, timestamp: Date.now() });
 		
 		const action = await pipeline(this._llmHistory, this._contextBuilder.buildContext(responsesFromUsers), this._llmPersonnality, "answerGlobalQuestion");
 		if (action.type === "answer_global_question")
