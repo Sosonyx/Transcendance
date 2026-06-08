@@ -1,4 +1,5 @@
 import type { Message } from "./messages.js";
+import type { playerInput } from "../llm.js";
 
 export interface LlmInterface {
     startPlaying(): void;
@@ -6,7 +7,9 @@ export interface LlmInterface {
 
     setName(name: string): void;
     receiveUserMessage(message: Message): void;
-    setGlobalQuestion(question: string): void;
-    answerGlobalQuestion(responsesFromUsers: Message[]): Promise<void>;
+
+    askGlobalQuestion(questionsFromUsers: Message[]): Promise<playerInput>;
+    answerGlobalQuestion(globalQuestion: string, responsesFromUsers: Message[]): Promise<playerInput>;
+    // setGlobalQuestion(question: string): void;
     vote(): Promise<void>;
 }

@@ -5,5 +5,5 @@
     "rootDir": "./",               
     "outDir": "../../../app/build/backend/llm"   
   },
-  "include": ["**/*"]            
+  "include": ["**/*"],
 }

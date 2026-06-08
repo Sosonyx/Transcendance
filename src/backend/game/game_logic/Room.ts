@@ -18,8 +18,6 @@ export enum roomStates {
 	ERROR = "ERROR"
 }
 
-// type playerInput =  { name : string, input : string};
-
 enum gameMode {
 	SCORE = 0,
 	ELIMINATION = 1
@@ -159,6 +157,11 @@ export class Room extends EventEmitter
 			case (roomStates.ACTION_1) :
 				this._givePlayersName();
 				this._players = shuffle(this._players);
+				// TODO: temporary from Ilies to give the llm name
+				// const llmPlayer = this._players.find(player => player.getIsLLM());
+				// if (llmPlayer)
+				// 	this._llm?.setName(llmPlayer.getName());
+				// TMP END
 				this._allPlayersShouldAct();
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.ACTION_2) }, action_1_Time);
 				break ;
@@ -168,10 +171,10 @@ export class Room extends EventEmitter
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.CHAT) }, action_2_Time);
 				this._input = this._pickAnInput();
 				if (this._input === null)
-					{
-						this.stateSwitch(roomStates.CHAT)
-						return ;
-					}
+				{
+					this.stateSwitch(roomStates.CHAT)
+					return ;
+				}
 				data = this._input.input;
 				break;
 			case (roomStates.CHAT) :
@@ -219,7 +222,6 @@ export class Room extends EventEmitter
 		}
 		)
 		console.log('temp : ', image.id)
-
 
 		if (this._state != roomStates.LOBBY)
 		{
@@ -346,7 +348,7 @@ export class Room extends EventEmitter
 
 	private	_addLLMPLayer() {
 		let LLMPlayer = new Player(null, true);
-		this._llm = new Llm(this as EventEmitter, this._players.map(player => player.getName()));
+		this._llm = new Llm(this as EventEmitter, this._players.map(player => player.getName() ));
 		this._players.push(LLMPlayer);
 	}
 
@@ -413,7 +415,7 @@ export class Room extends EventEmitter
 		}
 	}
 
-	private _checkActionStatus() {
+	private async _checkActionStatus() {
 		if (!this._haveAllPlayersActed())
 		{
 			console.log('Not all players have acted');
@@ -421,11 +423,23 @@ export class Room extends EventEmitter
 		}
 		switch (this._state) {
 			case roomStates.ACTION_1 :
+			{
+				//todo : better context building + safety for stateSwitch
+				let llmInput = await this._llm?.askGlobalQuestion(this._inputs.map(p => ({senderId: p.name, content: p.input, timestamp: Date.now()})));
+				if (llmInput)
+					this._inputs.push(llmInput);
 				this.stateSwitch(roomStates.ACTION_2) ;
 				return ;
+			}
 			case roomStates.ACTION_2 :
+			{
+				//todo : better context building + safety for stateSwitch
+				let llmInput = await this._llm?.answerGlobalQuestion(this._input?.input ?? "", this._inputs.map(p => ({senderId: p.name, content: p.input, timestamp: Date.now()})));
+				if (llmInput)
+					this._inputs.push(llmInput);
 				this.stateSwitch(roomStates.CHAT) ;
 				return ;
+			}
 			default :
 				this.stateSwitch(roomStates.ERROR);
 		}
