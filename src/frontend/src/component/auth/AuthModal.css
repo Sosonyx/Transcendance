@@ -1,0 +1,58 @@
+.auth-overlay {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.auth-modal {
+  background-color: #2a2a35;
+  padding: 30px;
+  border-radius: 8px;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  min-width: 320px;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.modal-close-btn:hover {
+  color: #fff;
+}
+
+.auth-button{
+  margin: 10px;
+  display: flex;
+  justify-content: space-between;
+
+}
+
+.oAuthButton{
+  margin: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.error-msg{
+  text-align: center;
+  color: rgba(227, 3, 3, 0.811);
+  font-style: bold;
+}
+
+.title{
+  color: #fff;
+}

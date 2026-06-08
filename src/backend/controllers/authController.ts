@@ -28,7 +28,7 @@ export async function registerController(req: FastifyRequest, reply: FastifyRepl
             username: user.username
           },
           { expiresIn: '1h' });
-  reply.setCookie('token', token, { httpOnly: false, secure: false /* true en prod (HTTPS seulement)*/, sameSite: 'strict', maxAge: 86400, path: '/'});
+  reply.setCookie('token', token, { httpOnly: true, secure: false /* true en prod (HTTPS seulement)*/, sameSite: 'lax', maxAge: 86400, path: '/'});
   return reply.status(201).send({token, user});
 }
 
@@ -37,15 +37,23 @@ export async function loginController(req : FastifyRequest, reply : FastifyReply
   const body = req.body as Partial <UserInterface>;
   const user = await loginUser(body);
   var token: string = req.server.jwt.sign({ userId: user.id, username: user.username }, { expiresIn: '1h' });
-  reply.setCookie('token', token, { httpOnly: false, secure: false /* true en prod (HTTPS seulement)*/, sameSite: 'strict', maxAge: 86400, path: '/'});
+  reply.setCookie('token', token, { httpOnly: true, secure: false /* true en prod (HTTPS seulement)*/, sameSite: 'lax', maxAge: 86400, path: '/'});
   return reply.send({token, user});
 }
 
 export async function logoutController(req : FastifyRequest, reply: FastifyReply){
   const token = req.cookies.token;
-  const decoded = req.server.jwt.decode<{ exp: number }>(token as string);
-
-  await prisma.blacklistedToken.create({data: {token : token as string, expiresAt: new Date(decoded!.exp * 1000)}})
-  reply.clearCookie('token', {httpOnly: false, secure: false, sameSite: 'strict', path: '/' });
+    const decoded = token ? req.server.jwt.decode<{ exp?: number }>(token as string) : null;
+  
+    if (token) {
+      let expiresAt: Date | null = null;
+      if (decoded && typeof decoded.exp === 'number') {
+        expiresAt = new Date(decoded.exp * 1000);
+      } else {
+        expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+      }
+      await prisma.blacklistedToken.create({ data: { token: token as string, expiresAt } });
+    }
+  reply.clearCookie('token', {httpOnly: true, secure: false, sameSite: 'lax', path: '/' });
   return reply.send({ message: 'Deconnecte' });
 }   

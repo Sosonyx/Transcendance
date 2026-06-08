@@ -1,8 +1,8 @@
-import './Game.css'
 import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { LobbyPanel, Action1Panel, Action2Panel, ChatPanel, VotePanel, ResultPanel } from './panels'
 import { roomStates, type VoteInfo, type AnswersType } from './types';
+import './index.css'
 
 // interface GameProps {
     // user: { id: string };

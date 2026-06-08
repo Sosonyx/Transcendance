@@ -173,6 +173,31 @@ input[type="text"] {
   outline: none;
 }
 
+input[type="password"] {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  padding: 10px 14px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+}
+input[type="email"] {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  padding: 10px 14px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+}
+
 input[type="text"]::placeholder { color: var(--muted); }
 
 input[type="text"]:focus {

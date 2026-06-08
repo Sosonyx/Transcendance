@@ -47,3 +47,22 @@ export interface DBUserResponse {
     avatar: string | null;
     playedAs: Player[];
 }
+
+export interface ProfileGoogle {
+    id: string;
+    email: string;
+    name: string 
+}
+
+export interface Profile42 {
+    id: string;
+    email: string;
+    login: string 
+}
+
+export interface JwtPayload {
+  userId: string;
+  username: string;
+  iat: number;
+  exp: number;
+}
