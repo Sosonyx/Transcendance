@@ -13,9 +13,10 @@ export function registerSocketHandlers(io: Server)
 	/* ===============Connexion client================= */
 	io.on('connection', (socket) => {
 		// console.log(`Joueur connecté : ${socket.id}`);
-
+		
 		// Recupere la room
-		// TODO : remplacer socket.id par userID ?
+		// TODO : remplacer socket.id par userID
+		// const userId: string = socket.handshake.auth.userId;
 
 		let [roomId, roomEmitter, playerEmitter] : [RoomId, EventEmitter, EventEmitter] = roomManager.connectPlayer(socket.id);
 

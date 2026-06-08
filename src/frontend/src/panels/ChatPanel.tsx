@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
-import type { Message } from "../types";
+import type { Message, AnswersType } from "../types";
 
 interface ChatPanelProps {
 	socket: Socket | null;
+	question: string | undefined;
+	answers: AnswersType;
 }
 
-function ChatPanel({ socket }: ChatPanelProps) {
+function ChatPanel({ socket, question, answers }: ChatPanelProps) {
 	const [message, setMessage] = useState<string | null>(null);
 	const [messages, setMessages] = useState<Message[]>([]);
 
@@ -54,6 +56,12 @@ function ChatPanel({ socket }: ChatPanelProps) {
 
 	return (
 	<div>
+		<div id="chat-context">
+			<p id="chat-question" className="label">{question}</p>
+			<ul id="chat-answers">
+				{answers.map(([playerName, answer], id) => (<li key={id}>{playerName} : {answer}</li>))}
+			</ul>
+		</div>
 		<ul id="messages">
 			{messages.map((msg, i) => (
 				<li key={i}>
