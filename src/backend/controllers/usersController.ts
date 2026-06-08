@@ -1,6 +1,6 @@
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import '@fastify/multipart';
-import { prisma } from '../../prisma/prisma.js';
+import { prisma } from '../prisma/prisma.js';
 import type { JwtPayload } from '../types/interfaces.js';
 
 const userProfileSelect = {

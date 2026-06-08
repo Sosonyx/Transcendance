@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { register } from "../../services/api.js"; // Assure-toi d'avoir une fonction register dans ton api.js
-import { API_BASE_URL } from "../../services/api.js";
 
 interface RegisterFormProps {
   onSuccess?: () => void | Promise<void>;
@@ -35,11 +34,11 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
     }
   };
     const handleGoogleSubmit = async () => {
-      window.location.href = `${API_BASE_URL}/api/auth/google`
+      window.location.href = `/api/auth/google`
     };
   
       const handle42Submit = async () => {
-      window.location.href = `${API_BASE_URL}/api/auth/42`
+      window.location.href = `/api/auth/42`
     };
 
   return (

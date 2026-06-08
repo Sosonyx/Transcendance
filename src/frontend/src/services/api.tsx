@@ -1,23 +1,21 @@
 import type { User, LeaderboardUser } from "../types/types.tsx"
 
-export const API_BASE_URL = 'http://localhost:3000' //TMP METTRE URL SUR LEQUEL LE BACK ECOUTES
-
 export async function logout(): Promise<Response> {
-	const res = await fetch(`${API_BASE_URL}/api/logout`, {method: 'POST', credentials: 'include'})
+	const res = await fetch(`/api/logout`, {method: 'POST', credentials: 'include'})
 	if (!res.ok)
 		throw new Error("Logout error")
 	return (res)
 }
 
 export async function getProfile(): Promise<User> {
-	const res = await fetch(`${API_BASE_URL}/api/profile`, {method: 'GET', credentials: 'include'})
+	const res = await fetch(`/api/profile`, {method: 'GET', credentials: 'include'})
 	if (!res.ok) 
 		throw new Error("Profile error")
 	return res.json()
 }
 
 export async function getLeaderbord(): Promise<LeaderboardUser[]> {
-	const res = await fetch(`${API_BASE_URL}/api/leaderboard`, {
+	const res = await fetch(`/api/leaderboard`, {
 		method: 'GET',
 		credentials: 'include'
 	})
@@ -28,7 +26,7 @@ export async function getLeaderbord(): Promise<LeaderboardUser[]> {
 }
 
 export async function getOtherProfiles(username: string): Promise<User>{
-	const res = await fetch(`${API_BASE_URL}/api/profile/${encodeURIComponent(username)}`, {
+	const res = await fetch(`/api/profile/${encodeURIComponent(username)}`, {
 		method: 'GET',
 		credentials: 'include'
 	})
@@ -38,7 +36,7 @@ export async function getOtherProfiles(username: string): Promise<User>{
 }
 
 export async function register(email:string, username: string, password: string): Promise<Response>{
-	const res = await fetch(`${API_BASE_URL}/api/register`, {
+	const res = await fetch(`/api/register`, {
 		method: 'POST',
 		headers: {'Content-type': 'application/json'},
 		credentials: 'include',
@@ -51,7 +49,7 @@ export async function register(email:string, username: string, password: string)
 }
 
 export async function login(username: string, password: string): Promise<Response> {
-	const res = await fetch(`${API_BASE_URL}/api/login`, {
+	const res = await fetch(`/api/login`, {
 		method: 'POST',
 		headers: {'Content-type': 'application/json'},
 		credentials: 'include',
@@ -63,7 +61,7 @@ export async function login(username: string, password: string): Promise<Respons
 }
 
 export async function loginGoogle(): Promise<Response> {
-	const res = await fetch(`${API_BASE_URL}/api/auth/google/callback`, {
+	const res = await fetch(`/api/auth/google/callback`, {
 		method: 'GET',
 		headers: {'Content-type': 'application/json'},
 		credentials: 'include',
@@ -75,7 +73,7 @@ export async function loginGoogle(): Promise<Response> {
 }
 
 export async function login42(): Promise<Response> {
-	const res = await fetch(`${API_BASE_URL}/api/auth/42/callback`, {
+	const res = await fetch(`/api/auth/42/callback`, {
 		method: 'GET',
 		headers: {'Content-type': 'application/json'},
 		credentials: 'include',
@@ -94,7 +92,7 @@ export async function modifyUser(username: string, avatar: File | null) : Promis
 		formData.append('avatar', avatar);
 	}
 
-	const res = await fetch(`${API_BASE_URL}/api/profile`, {
+	const res = await fetch(`/api/profile`, {
 		method: 'PATCH',
 		credentials: 'include',
 		body: formData

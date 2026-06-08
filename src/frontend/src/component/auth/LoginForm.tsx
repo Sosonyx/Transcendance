@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { login } from "../../services/api.js";
-import { API_BASE_URL } from "../../services/api.js";
 import "./AuthModal.css" 
 
 interface LoginFormProps {
@@ -31,11 +30,11 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
 	};
 
 	const handleGoogleSubmit = async () => {
-		window.location.href = `${API_BASE_URL}/api/auth/google`
+		window.location.href = `/api/auth/google`
 	};
 
 		const handle42Submit = async () => {
-		window.location.href = `${API_BASE_URL}/api/auth/42`
+		window.location.href = `/api/auth/42`
 	};
 
 	return (
