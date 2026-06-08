@@ -1,7 +1,26 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
+  "compilerOptions": {
+    "module":           "esnext",
+    "moduleResolution": "bundler",
+    "target":           "esnext",
+    "lib":   ["esnext", "dom", "dom.iterable"],
+    "types": [],
+    "jsx": "react-jsx",
+    "noEmit":       true,
+    "sourceMap":    true,
+    "declaration":  false,
+    "verbatimModuleSyntax":        true,
+    "isolatedModules":             true,
+    "esModuleInterop":             true,
+    "noUncheckedSideEffectImports": true,
+    "strict":                    true,
+    "noImplicitReturns":         true,
+    "noImplicitOverride":        true,
+    "noUnusedLocals":            true,
+    "noUnusedParameters":        true,
+    "noUncheckedIndexedAccess":  true,
+    "exactOptionalPropertyTypes": true,
+    "skipLibCheck": true
+  },
+  "include": ["src"]
 }
