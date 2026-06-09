@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Socket } from "socket.io-client";
-import type { VoteInfo } from "../types";
+import type { VoteInfo } from "../../types/types";
 
 interface VotePanelProps {
 	socket: Socket | null;

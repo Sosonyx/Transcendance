@@ -340,3 +340,21 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   body { padding: 16px 12px 40px; }
   button { font-size: 13px; padding: 10px 16px; }
 }
+
+.transition-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--bg);
+    font-size: 3rem;
+    animation: fadeInOut 2s ease forwards;
+}
+
+@keyframes fadeInOut {
+    0%   { opacity: 0; }
+    20%  { opacity: 1; }
+    80%  { opacity: 1; }
+    100% { opacity: 0; }
+}

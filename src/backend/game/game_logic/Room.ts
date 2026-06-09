@@ -1,7 +1,7 @@
 import { Player } from "./Player.js";
+import { LlmPlayer } from "./LlmPlayer.js";
 import { v4 as uuid } from 'uuid';
 import { EventEmitter } from "node:events";
-import { Llm } from "../../llm/llm.js";
 import type { Message } from "../../llm/types/messages.js";
 import { shuffle } from "../utils/index.js";
 import { prisma } from "../../prisma/prisma.js" 
@@ -55,7 +55,6 @@ export class Room extends EventEmitter
 	private _maxPlayerCount : number;
 	private _isAccessible : boolean;
 	private _timerId : NodeJS.Timeout | undefined;
-	private _llm: Llm | null;
 	private _winCondition : winCondition | null;
 	private _computeResult : computeResult | null;
 
@@ -157,11 +156,6 @@ export class Room extends EventEmitter
 			case (roomStates.ACTION_1) :
 				this._givePlayersName();
 				this._players = shuffle(this._players);
-				// TODO: temporary from Ilies to give the llm name
-				// const llmPlayer = this._players.find(player => player.getIsLLM());
-				// if (llmPlayer)
-				// 	this._llm?.setName(llmPlayer.getName());
-				// TMP END
 				this._allPlayersShouldAct();
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.ACTION_2) }, action_1_Time);
 				break ;
@@ -182,12 +176,18 @@ export class Room extends EventEmitter
 					question: this._input?.input,
 					answers : this._inputs.map(p => [p.name, p.input])
 				}
-				this._llm?.startPlaying();
+				this._players.forEach((player) => {
+					if (player.getIsLLM())
+						(player as LlmPlayer).getBrain()?.startPlaying();
+				});
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.VOTE) }, chatTime);
 				break ;
 
 			case (roomStates.VOTE) :
-				this._llm?.stopPlaying();
+				this._players.forEach((player) => {
+					if (player.getIsLLM())
+						(player as LlmPlayer).getBrain()?.stopPlaying();
+				});
 				this._allPlayersShouldAct();
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.RESULT) }, voteTime);
 				break ;
@@ -210,19 +210,6 @@ export class Room extends EventEmitter
 	// EVENTS
 
 	public async onJoin(player : Player) {
-		// TODO : TEMP 
-		// FIX
-
-		let image = await prisma.user.create({
-			data : {
-				id : player.getUserId() as string,
-				email : uuid(),
-				username : uuid()
-			}
-		}
-		)
-		console.log('temp : ', image.id)
-
 		if (this._state != roomStates.LOBBY)
 		{
 			this.stateSwitch(roomStates.ERROR);
@@ -275,7 +262,10 @@ export class Room extends EventEmitter
 		}
 		const msg: Message = { senderId: player.getName(), content: message, timestamp: Date.now() };
 		this.emit("message", msg);
-		this._llm?.receiveUserMessage(msg);
+		this._players.forEach((player) => {
+			if (player.getIsLLM())
+				(player as LlmPlayer).getBrain()?.receiveUserMessage(msg);
+		})
 		console.log(`Player ${player.getName()} (room ${this._number}) : ${message}`);
 	}
 
@@ -347,14 +337,12 @@ export class Room extends EventEmitter
 	}
 
 	private	_addLLMPLayer() {
-		let LLMPlayer = new Player(null, true);
-		this._llm = new Llm(this as EventEmitter, this._players.map(player => player.getName() ));
+		let LLMPlayer = new LlmPlayer();
 		this._players.push(LLMPlayer);
 	}
 
 	private	_removeLLMPlayers() {
 		this._players = this._players.filter(player => !player.getIsLLM());
-		this._llm = null;
 	}
 
 	private _restartRoom(full : boolean = true) {
@@ -393,6 +381,14 @@ export class Room extends EventEmitter
 		{
 			this._isAccessible = false;
 			this._addLLMPLayer();
+			this._addLLMPLayer();
+
+			//TODO : retirer nom du LLM dans chaque PlayerNames
+			let playerNames = this._players.map(p => p.getName());
+			const llms = this._players.filter(p => p.getIsLLM());
+			(llms as LlmPlayer[]).forEach(llm => {
+				llm._init(this as EventEmitter, playerNames)
+			});
 			this._createGameInDB();
 			this.stateSwitch(roomStates.ACTION_1);
 		}
@@ -421,22 +417,39 @@ export class Room extends EventEmitter
 			console.log('Not all players have acted');
 			return ;
 		}
+		clearTimeout(this._timerId);
 		switch (this._state) {
 			case roomStates.ACTION_1 :
 			{
-				//todo : better context building + safety for stateSwitch
-				let llmInput = await this._llm?.askGlobalQuestion(this._inputs.map(p => ({senderId: p.name, content: p.input, timestamp: Date.now()})));
-				if (llmInput)
-					this._inputs.push(llmInput);
+				const llms = this._players.filter(player => player.getIsLLM());
+				const inputs = this._inputs.map(p => ({senderId: p.name, content: p.input, timestamp: Date.now()}));
+
+				await Promise.all(
+  					(llms as LlmPlayer[]).map(async (llm) => {
+    					const llmInput = await llm.getBrain()?.askGlobalQuestion(inputs);
+    					if (llmInput)
+      						this._inputs.push(llmInput);
+					}));
+				
+				shuffle(inputs);
 				this.stateSwitch(roomStates.ACTION_2) ;
 				return ;
 			}
 			case roomStates.ACTION_2 :
 			{
-				//todo : better context building + safety for stateSwitch
-				let llmInput = await this._llm?.answerGlobalQuestion(this._input?.input ?? "", this._inputs.map(p => ({senderId: p.name, content: p.input, timestamp: Date.now()})));
-				if (llmInput)
-					this._inputs.push(llmInput);
+
+				const llms = this._players.filter(player => player.getIsLLM());
+				const inputs = this._inputs.map(p => ({senderId: p.name, content: p.input, timestamp: Date.now()}));
+
+				await Promise.all(
+					(llms as LlmPlayer[]).map(async (llm) => {
+						const llmInput = await llm.getBrain()?.answerGlobalQuestion(this._input?.input ?? "", inputs);
+						if (llmInput)
+							this._inputs.push(llmInput);
+					})	
+				)
+
+				shuffle(inputs);
 				this.stateSwitch(roomStates.CHAT) ;
 				return ;
 			}
@@ -596,7 +609,6 @@ export class Room extends EventEmitter
 		this._input = null;
 		this._maxPlayerCount = maxPlayerCount;
 		this._isAccessible = true;
-		this._llm = null;
 		this._computeResult = null;
 		this._winCondition = null;
 
