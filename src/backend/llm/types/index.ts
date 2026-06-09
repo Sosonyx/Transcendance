@@ -7,7 +7,7 @@ export interface LlmInterface {
 
     setName(name: string): void;
     receiveUserMessage(message: Message): void;
-    resetHistory(): void;
+    clearHistory(): void;
 
     askGlobalQuestion(questionsFromUsers: Message[]): Promise<playerInput>;
     answerGlobalQuestion(globalQuestion: string, responsesFromUsers: Message[]): Promise<playerInput>;

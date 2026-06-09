@@ -37,7 +37,7 @@ export class Llm {
 		this._scheduler.stop();
 	}
 
-	public resetHistory(): void {
+	public clearHistory(): void {
 		this._llmHistory.reset();
 		this._lastMessages = [];
 	}
