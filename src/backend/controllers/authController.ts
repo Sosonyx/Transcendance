@@ -30,7 +30,7 @@ export async function registerController(req: FastifyRequest, reply: FastifyRepl
           },
           { expiresIn: '1h' });
   reply.setCookie('token', token, { 
-    httpOnly: false,
+    httpOnly: true,
     secure: false /* true en prod (HTTPS seulement)*/,
     sameSite: 'strict',
     maxAge: 86400,
@@ -51,7 +51,7 @@ export async function loginController(req : FastifyRequest, reply : FastifyReply
    );
   
     reply.setCookie('token', token, { 
-        httpOnly: false,
+        httpOnly: true,
         secure: false /* true en prod (HTTPS seulement)*/,
         sameSite: 'strict',
         maxAge: 86400,
@@ -76,7 +76,7 @@ export async function logoutController(req : FastifyRequest, reply: FastifyReply
         expiresAt: new Date(decoded!.exp * 1000)
       }})
     reply.clearCookie('token', {
-      httpOnly: false,
+      httpOnly: true,
       secure: false,
       sameSite: 'strict',
       path: '/'
