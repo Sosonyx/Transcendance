@@ -14,7 +14,7 @@ clean:
 	rm -rf build
 	rm -rf src/node_modules
 
-dataclean :
+data-clean :
 	docker compose down -v
 
 fclean: clean
