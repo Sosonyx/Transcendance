@@ -12,13 +12,12 @@ export function registerSocketHandlers(io: Server)
 
 	/* ===============Connexion client================= */
 	io.on('connection', (socket) => {
-		// console.log(`Joueur connecté : ${socket.id}`);
+		// console.log(`Joueur connecté : ${userId}`);
 		
 		// Recupere la room
-		// TODO : remplacer socket.id par userID
-		// const userId: string = socket.handshake.auth.userId;
+		const userId: string = socket.handshake.auth.userId;
 
-		let [roomId, roomEmitter, playerEmitter] : [RoomId, EventEmitter, EventEmitter] = roomManager.connectPlayer(socket.id);
+		let [roomId, roomEmitter, playerEmitter] : [RoomId, EventEmitter, EventEmitter] = roomManager.connectPlayer(userId);
 
 		// Rejoins sa room
 		if (roomId !== null)
@@ -48,7 +47,7 @@ export function registerSocketHandlers(io: Server)
 					break;
 				}
 		        case roomStates.VOTE: {
-		            socket.emit('startVote', roomManager.getVotePoolFromUser(roomId, socket.id));
+		            socket.emit('startVote', roomManager.getVotePoolFromUser(roomId, userId));
 		            // console.log(`${roomId}: starting vote phase`);
 		            break;
 		        }
@@ -73,7 +72,7 @@ export function registerSocketHandlers(io: Server)
 			// TODO : still need to check the state ?
 			// if (gamestate !== roomStates.LOBBY) return;
 			// console.log(`Ready registered for roomId ${roomId}`);
-			roomManager.onReadyEvent(socket.id, roomId);
+			roomManager.onReadyEvent(userId, roomId);
 		});
 
 		/* ==========ACTION_1==========*/
@@ -86,7 +85,7 @@ export function registerSocketHandlers(io: Server)
 			if (content.trim() === '') return;
 			if (content.length > 500) return;
 			
-			roomManager.onInputEvent(socket.id, roomId, content);
+			roomManager.onInputEvent(userId, roomId, content);
 		});
 
 		/* ==========CHAT==========*/
@@ -98,7 +97,7 @@ export function registerSocketHandlers(io: Server)
 			if (content.trim() === '') return;
 			if (content.length > 500) return;
 			
-			roomManager.onChatEvent(socket.id, roomId, content);
+			roomManager.onChatEvent(userId, roomId, content);
 		});
 
 		// Relay messages emitted on the roomEmitter to socket.io clients
@@ -111,29 +110,29 @@ export function registerSocketHandlers(io: Server)
 		// Joueur vote
 		socket.on('vote', (playerId: string) => {
 			if (roomManager.getRoomState(roomId) !== roomStates.VOTE) return;
-			roomManager.onVoteEvent(socket.id, playerId, roomId);
-			// console.log(`${socket.id} a vote pour ${playerId}`);
+			roomManager.onVoteEvent(userId, playerId, roomId);
+			// console.log(`${userId} a vote pour ${playerId}`);
 		});
 
 		/* ==========RESULT==========*/
 		// Joueur appuie sur "replay"
 		socket.on('replay', () => {
 			if (roomManager.getRoomState(roomId) !== roomStates.RESULT) return;
-			roomManager.onReplayEvent(socket.id, roomId);
-			// console.log(`${socket.id} rejoue dans sa room ${roomId}`);
+			roomManager.onReplayEvent(userId, roomId);
+			// console.log(`${userId} rejoue dans sa room ${roomId}`);
 		});
 
 		// Joueur appuie sur "New game"
 		socket.on('newGame', () => {
 			if (roomManager.getRoomState(roomId) !== roomStates.RESULT) return;
-			roomManager.onDisconnectEvent(socket.id, roomId);
-			process.stdout.write(`${socket.id} quitte la room ${roomId} pour `);
+			roomManager.onDisconnectEvent(userId, roomId);
+			process.stdout.write(`${userId} quitte la room ${roomId} pour `);
 			if (roomId !== null)
 			{
 				socket.leave(roomId);
 				roomEmitter.off('stateChanged', onStateChanged);
 			}
-			[roomId, roomEmitter, playerEmitter] = roomManager.connectPlayer(socket.id);
+			[roomId, roomEmitter, playerEmitter] = roomManager.connectPlayer(userId);
 			if (roomId !== null)
 			{
 				socket.join(roomId);
@@ -148,16 +147,16 @@ export function registerSocketHandlers(io: Server)
 			if (roomId === null) return;
 			socket.emit('timedOut');
 			socket.leave(roomId);
-			roomManager.onDisconnectEvent(socket.id, roomId);
+			roomManager.onDisconnectEvent(userId, roomId);
 			roomId = null;
 		});
 
 		/* ==========Deconnexion client==========*/
 		// Joueur se deconnecte
 		socket.on('disconnect', () => {
-			roomManager.onDisconnectEvent(socket.id, roomId);
+			roomManager.onDisconnectEvent(userId, roomId);
 			roomEmitter.off('stateChanged', onStateChanged);
-			// console.log(`Joueur déconnecté : ${socket.id}`);
+			// console.log(`Joueur déconnecté : ${userId}`);
 		});
 	});
 
