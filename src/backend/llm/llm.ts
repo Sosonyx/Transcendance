@@ -37,7 +37,7 @@ export class Llm {
 		this._scheduler.stop();
 	}
 
-	public clearHistory() {
+	public resetHistory(): void {
 		this._llmHistory.reset();
 		this._lastMessages = [];
 	}
@@ -58,10 +58,7 @@ export class Llm {
 
 		const action = await pipeline(this._llmHistory, this._contextBuilder.buildContext(responsesFromUsers), this._llmPersonnality, "answerGlobalQuestion");
 		if (action.type === "answer_global_question")
-		{
-			this._contextBuilder.clearProcessedMessages(responsesFromUsers, this._contextBuilder.getCutoffTime());
 			return {name: this._llmPersonnality.getName() ?? "PINK", input: action.response};
-		}
 		else
 			return {name: this._llmPersonnality.getName() ?? "PINK", input: ""};
 	}
@@ -88,13 +85,15 @@ export class Llm {
 		try {
 			const cutoff = this._contextBuilder.getCutoffTime();
 			const messages = this._contextBuilder.collectMessagesToAnswer(this._lastMessages, cutoff);
-			this._lastMessages = this._contextBuilder.clearProcessedMessages(this._lastMessages, cutoff);
 
 			const action = await pipeline(this._llmHistory, this._contextBuilder.buildContext(messages), this._llmPersonnality, "chat");
 
 			console.log("LLM action:", action);
 			if (action.type === "message")
+			{
 				this._responseEmitter.emit(action.text, () => this._scheduler.canEmit());
+				this._lastMessages = this._contextBuilder.clearProcessedMessages(this._lastMessages, cutoff);
+			}
 		} 
 		catch (error) {
 			console.error("Error in LLM pipeline:", error);

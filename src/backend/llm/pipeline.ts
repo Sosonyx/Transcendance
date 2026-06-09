@@ -16,20 +16,21 @@ export async function pipeline(history: llmHistory, context: string,  personnali
 
     const action: GameAction = await askClaude(promptContext, usersMessages, phase);
 
-    // TODO: cf. claude, on ne gere plus le silent dans l'history mais on conserve dans _lastMessages prochain tick
     switch (action.type) {
         case "answer_global_question":
+            history.addMessageAsUser(context);
             history.addMessageAsAssistant(action.response);
             break;
         case "message":
             history.addMessageAsUser(context);
             history.addMessageAsAssistant(action.text);
             break;
+        case "silent":
+            console.log(`[SILENT] ${personnality.getName()} is silent because: ${action.reason}`);
+            break;
         case "vote":
             console.log(`[VOTE] ${personnality.getName()} votes against ${action.target}`);
             break;
-        default:
-            throw new Error("Action inconnue");
     }
     return action;
 }
