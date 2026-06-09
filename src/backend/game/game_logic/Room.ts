@@ -210,17 +210,6 @@ export class Room extends EventEmitter
 	// EVENTS
 
 	public async onJoin(player : Player) {
-
-		let image = await prisma.user.create({
-			data : {
-				id : player.getUserId() as string,
-				email : uuid(),
-				username : uuid()
-			}
-		}
-		)
-		console.log('temp : ', image.id)
-
 		if (this._state != roomStates.LOBBY)
 		{
 			this.stateSwitch(roomStates.ERROR);
