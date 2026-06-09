@@ -7,9 +7,9 @@ FRONTEND_DIR := src/frontend
 deps:
 	docker compose build --no-cache
 	sleep 3
-	npm install --prefix $(SRC_DIR)
-	ln -sfn $(PWD)/.env $(PWD)/src/backend/.env
-	npm install --prefix $(FRONTEND_DIR)
+# npm install --prefix $(SRC_DIR)
+# ln -sfn $(PWD)/.env $(PWD)/src/backend/.env
+# npm install --prefix $(FRONTEND_DIR)
 	
 
 run: deps
