@@ -23,7 +23,7 @@ export function registerSocketHandlers(io: Server)
 		if (roomId !== null)
 			socket.join(roomId);
 
-		const onStateChanged = (state: string, data: undefined) => {
+		const onStateChanged = (state: string, data: undefined, timeinfo: number) => {
 			if (roomId === null) return;
 		    switch (state) {
 				case roomStates.LOBBY: {
@@ -32,27 +32,27 @@ export function registerSocketHandlers(io: Server)
 					break;
 				}
 				case roomStates.ACTION_1: {
-					socket.emit('startAction1');
+					socket.emit('startAction1', timeinfo);
 					// console.log(`${roomId}: starting action_1 phase`);
 					break ;
 				}
 				case roomStates.ACTION_2: {
-					socket.emit('startAction2', data);
+					socket.emit('startAction2', data, timeinfo);
 					break ;
 				}
 
 				case roomStates.CHAT: {
-					socket.emit('startChat', data);
+					socket.emit('startChat', data, timeinfo);
 					// console.log(`${roomId}: starting action phase`);
 					break;
 				}
 		        case roomStates.VOTE: {
-		            socket.emit('startVote', roomManager.getVotePoolFromUser(roomId, userId));
+		            socket.emit('startVote', roomManager.getVotePoolFromUser(roomId, userId), timeinfo);
 		            // console.log(`${roomId}: starting vote phase`);
 		            break;
 		        }
 				case roomStates.RESULT: {
-					socket.emit('startResult');
+					socket.emit('startResult', timeinfo);
 					// console.log(`${roomId}: result phase`)
 					break;
 				}

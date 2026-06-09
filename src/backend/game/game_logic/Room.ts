@@ -53,10 +53,10 @@ export class Room extends EventEmitter
 	private _maxPlayerCount : number;
 	private _llmNumber : number;
 	private _isAccessible : boolean;
-	private _timerId : NodeJS.Timeout | undefined;
 	private _winCondition : winCondition | null;
 	private _computeResult : computeResult | null;
-
+	private _timerId : NodeJS.Timeout | undefined;
+	
 	// DATABASE
 
 	private	async _createRoomInDB() {
@@ -142,6 +142,7 @@ export class Room extends EventEmitter
 	public stateSwitch(newState : roomStates) : void 
 	{
 		let data : any | null = null;
+		let timeinfo : number | null = null;
 
 		if (!(newState in roomStates))
 			newState = roomStates.ERROR;
@@ -156,11 +157,13 @@ export class Room extends EventEmitter
 				this._givePlayersName();
 				this._players = shuffle(this._players);
 				this._allPlayersShouldAct();
+				timeinfo = Date.now() + action_1_Time;
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.ACTION_2) }, action_1_Time);
 				break ;
 
 			case (roomStates.ACTION_2) :
 				this._allPlayersShouldAct();
+				timeinfo = Date.now() + action_2_Time;
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.CHAT) }, action_2_Time);
 				this._input = this._pickAnInput();
 				if (this._input === null)
@@ -179,6 +182,7 @@ export class Room extends EventEmitter
 					if (player.getIsLLM())
 						(player as LlmPlayer).getBrain()?.startPlaying();
 				});
+				timeinfo = Date.now() + chatTime;
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.VOTE) }, chatTime);
 				break ;
 
@@ -188,10 +192,12 @@ export class Room extends EventEmitter
 						(player as LlmPlayer).getBrain()?.stopPlaying();
 				});
 				this._allPlayersShouldAct();
+				timeinfo = Date.now() + voteTime;
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.RESULT) }, voteTime);
 				break ;
 
 			case (roomStates.RESULT) :
+				timeinfo = Date.now() + replayTime;
 				this._timerId = setTimeout(() => { this._onReplayTimerEnded() }, replayTime);
 				break ;
 
@@ -199,7 +205,7 @@ export class Room extends EventEmitter
 		}
 		console.log(`\x1b[33m-> Room ${this._number} : switching from ${this._state} to ${newState}\x1b[0m`)
 		this._state = newState;
-		this.emit('stateChanged', this._state, data)
+		this.emit('stateChanged', this._state, data, timeinfo)
 	}
 
 	public start() {
