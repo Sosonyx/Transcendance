@@ -1,7 +1,7 @@
 import { Room } from "./Room.js";
 import { Player } from "./Player.js";
 import { EventEmitter } from "node:events";
-import type { RoomManagerInterface, RoomId, VoteInfo, gameMode, UserInfo } from "../utils/index.js";
+import type { RoomManagerInterface, RoomId, VoteInfo, gameMode, SafeUser } from "../utils/index.js";
 
 export	class RoomManager implements RoomManagerInterface
 {
@@ -16,7 +16,7 @@ export	class RoomManager implements RoomManagerInterface
 		return room
 	}
 
-	public connectPlayer(user : UserInfo, gamemode : gameMode) : [roomId : RoomId, room : EventEmitter, player : EventEmitter]
+	public connectPlayer(user : SafeUser, gamemode : gameMode) : [roomId : RoomId, room : EventEmitter, player : EventEmitter]
 	{
 		let player : Player | undefined;
 		let room : Room | undefined;

@@ -1,5 +1,5 @@
 import EventEmitter from "node:events";
-import type { UserInfo } from "../utils/index.js";
+import type { SafeUser } from "../utils/index.js";
 import { v4 as uuid} from "uuid";
 
 export class Player extends EventEmitter
@@ -102,7 +102,7 @@ export class Player extends EventEmitter
 		console.log(`Eliminated ${this._name} : ${this.getIsLLM() ? 'LLM' : 'human'}`);
 	}
 
-	public constructor(user : UserInfo | null) {
+	public constructor(user : SafeUser | null) {
 		super();
 		console.log("Constructor called for class Player");
 		this._id = uuid();
