@@ -1,7 +1,7 @@
 import { handleOAuthLogin } from "../services/oauthService.js";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import type { Profile42, ProfileGoogle } from "../types/interfaces.js";
-import {prisma} from "../../prisma/prisma.js"
+import {prisma} from "../prisma/prisma.js"
 
 export async function intraHandler(req: FastifyRequest, reply: FastifyReply) {
 

@@ -1,10 +1,13 @@
 import EventEmitter from "node:events";
+import type { UserInfo } from "../utils/index.js";
 import { v4 as uuid} from "uuid";
 
 export class Player extends EventEmitter
 {
 	private		_id : string;
 	private 	_userId : string | null;
+	private		_avatar : string | null;
+	private		_username : string | null;
 	protected	_name : string;
 	protected	_acted : boolean;
 	private 	_wantReplay : boolean;
@@ -18,6 +21,14 @@ export class Player extends EventEmitter
 
 	public getUserId() : string | null {
 		return this._userId;
+	}
+
+	public getAvatar() : string | null {
+		return this._avatar;
+	}
+
+	public getUsername() : string | null {
+		return this._username;
 	}
 
 	public getName() : string {
@@ -91,11 +102,13 @@ export class Player extends EventEmitter
 		console.log(`Eliminated ${this._name} : ${this.getIsLLM() ? 'LLM' : 'human'}`);
 	}
 
-	public constructor(userId : string | null) {
+	public constructor(user : UserInfo | null) {
 		super();
 		console.log("Constructor called for class Player");
 		this._id = uuid();
-		this._userId = userId;
+		this._userId = user ? user.id : null;
+		this._username = user ? user.username : null;
+		this._avatar = user ? user.avatar : null;
 		this._name = 'no-name';
 		this._acted = false;
 		this._wantReplay = false;
