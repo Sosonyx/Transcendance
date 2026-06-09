@@ -25,6 +25,33 @@ export interface RoomManagerInterface {
 	getRoomState(roomId : RoomId) : string | null;
 };
 
+export enum gameMode {
+	SCORE = "SCORE",
+	ELIMINATION = "ELIMINATION"
+}
+
+// export interface GameConfig {
+// 	_gamemode : gameMode | null;
+// 	_maxPlayerCount : number;
+// 	_action_1_Time : number;
+// 	_action_2_Time : number;
+// 	_chatTime : number = 60 * 1000; // 30 seconds
+// 	_voteTime : number = 30 * 1000; // 30 seconds
+// 	_replayTime : number = 30 * 1000; // 30 seconds
+// 	_maxPlayerCount : number = 7;
+// 	_scoreCorrectVote : number = 3;
+// 	_scoreGetVoted : number = 1;
+// 	_scoreObjective : number = 10;
+// 	_eliminationTreshold : number = 1;
+// }
+
+export interface LobbyInfo {
+	_mode : gameMode | null;
+	_llmCount : number;
+	_players : string[];
+	_spots : number;
+}
+
 // implementation found online
 // https://stackoverflow.com/questions/48083353/i-want-to-know-how-to-shuffle-an-array-in-typescript
 // with minor fix
