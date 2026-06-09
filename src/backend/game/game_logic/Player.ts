@@ -72,6 +72,10 @@ export class Player extends EventEmitter
 		this._acted = status;
 	}
 
+	public switchActed() {
+		this._acted = !this._acted;
+	}
+
 	public setWantReplay(status : boolean) {
 		this._wantReplay = status;
 	}

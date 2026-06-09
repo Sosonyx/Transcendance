@@ -224,7 +224,7 @@ export class Room extends EventEmitter
 			this.stateSwitch(roomStates.ERROR);
 			return ;
 		}
-		player.setActed(true);
+		player.switchActed();
 		this._checkLobbyStatus();
 	}
 
