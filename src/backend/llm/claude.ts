@@ -49,6 +49,7 @@ function getSystemPrompt(promptContext : string) : Anthropic.Messages.TextBlockP
 }
 
 export type GameAction = 
+    | { type: "ask_global_question"; question: string } 
     | { type: "answer_global_question"; response: string }
     | { type: "message"; text: string }
     | { type: "silent"; reason: string }
@@ -63,7 +64,7 @@ function extractAction(res: Anthropic.Message): GameAction {
     let input = block.input as { content: string };
     switch (block.name) {
         case "ask_global_question":
-            return { type: "answer_global_question", response: input.content };
+            return { type: "ask_global_question", question: input.content };
         case "answer_global_question":
             return { type: "answer_global_question", response: input.content };
         case "send_message":
@@ -79,7 +80,7 @@ function extractAction(res: Anthropic.Message): GameAction {
 
 export async function askClaude(promptContext: string, conversationHistory: MessageParam[], phase: phase): Promise<GameAction> {
     const llmResponse = await myClientAPI.messages.create({
-		model: "claude-haiku-4-5-20251001",
+        model: "claude-haiku-4-5-20251001",
         max_tokens: 150,
         temperature: 1.0,
         system: [getSystemPrompt(promptContext)], 

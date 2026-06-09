@@ -15,7 +15,7 @@ export class LlmContextBuilder {
 
 	public buildContext(messages: Message[]): string {
 		if (messages.length === 0)
-			return {senderid: "system", content: "No messages yet, sometimes you might have to spontanously respond", timestamp: Date.now()}.content;
+			return "No messages yet, sometimes you might have to spontaneously respond";
 
 		return messages.map(message => `${message.senderId}: ${message.content}`).join("\n");
 	}
