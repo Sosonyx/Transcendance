@@ -5,6 +5,8 @@ FRONTEND_DIR := src/frontend
 .PHONY: deps build run run-backend run-game clean
 
 deps:
+	npm install --prefix $(SRC_DIR)
+	npm install --prefix $(SRC_DIR)frontend
 	docker compose build --no-cache
 
 run: deps
