@@ -510,10 +510,9 @@ export class Room extends EventEmitter
 	private _pickAnInput() : playerInput | null {
 		let input = this._inputs[Math.floor(Math.random() * this._inputs.length)];
 		this._inputs = [];
-		console.log(`Chosen input is : ${input}`);
+		console.log("Input picked for global question:", input);
 		if (input === undefined)
 			return null;
-		// this._llm?.setGlobalQuestion(input);
 		return input;
 	}
 

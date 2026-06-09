@@ -44,18 +44,24 @@ export class Llm {
 
 	public async askGlobalQuestion(questionsFromUsers: Message[]): Promise<playerInput> {
 		const action = await pipeline(this._llmHistory, this._contextBuilder.buildContext(questionsFromUsers), this._llmPersonnality, "askGlobalQuestion");
-		if (action.type === "answer_global_question")
-			return {name : this._llmPersonnality.getName() ?? "PINK", input : action.response};
+		if (action.type === "ask_global_question")
+		{
+			console.log("LLM proposed global question:", action.question);
+			return {name : this._llmPersonnality.getName() ?? "PINK", input : action.question};
+		}
 		else
 			return {name : this._llmPersonnality.getName() ?? "PINK", input : ""};			
 	}
 
 	public async answerGlobalQuestion(globalQuestion: string, responsesFromUsers: Message[]): Promise<playerInput> {
-		responsesFromUsers.push({ senderId: "system", content: `Global question: ${globalQuestion}`, timestamp: Date.now() });
-		
+		responsesFromUsers.push({ senderId: "Message from the server", content: `Global question you have to answer to: ${globalQuestion}`, timestamp: Date.now() });
+
 		const action = await pipeline(this._llmHistory, this._contextBuilder.buildContext(responsesFromUsers), this._llmPersonnality, "answerGlobalQuestion");
 		if (action.type === "answer_global_question")
+		{
+			this._contextBuilder.clearProcessedMessages(responsesFromUsers, this._contextBuilder.getCutoffTime());
 			return {name: this._llmPersonnality.getName() ?? "PINK", input: action.response};
+		}
 		else
 			return {name: this._llmPersonnality.getName() ?? "PINK", input: ""};
 	}

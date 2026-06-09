@@ -11,6 +11,5 @@ export interface LlmInterface {
 
     askGlobalQuestion(questionsFromUsers: Message[]): Promise<playerInput>;
     answerGlobalQuestion(globalQuestion: string, responsesFromUsers: Message[]): Promise<playerInput>;
-    // setGlobalQuestion(question: string): void;
     vote(): Promise<void>;
 }
