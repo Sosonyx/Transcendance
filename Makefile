@@ -6,25 +6,16 @@ FRONTEND_DIR := src/frontend
 
 deps:
 	docker compose build --no-cache
-	sleep 3
-# npm install --prefix $(SRC_DIR)
-# ln -sfn $(PWD)/.env $(PWD)/src/backend/.env
-# npm install --prefix $(FRONTEND_DIR)
-	
 
 run: deps
 	docker compose up
-	cd src && node ../build/server.js
-
-run-backend:
-	cd src && node ../build/backend/server.js
-
-run-game:
-	cd src && node ../build/backend/game/server.js
 
 clean:
 	rm -rf build
 	rm -rf src/node_modules
+
+dataclean :
+	docker compose down -v
 
 fclean: clean
 	docker compose down postgres transcendence_backend_1 frontend
@@ -33,5 +24,6 @@ fclean: clean
 	rm -rf build/backend/.env
 	rm -rf src/build
 	rm -rf src/frontend/dist
+
 
 re: fclean run
