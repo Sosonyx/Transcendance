@@ -2,8 +2,7 @@ import { Server } from 'socket.io';
 import { EventEmitter } from "node:events";
 import { RoomManager } from '../game_logic/RoomManager.js';
 import { roomStates } from '../game_logic/Room.js';
-import { gameMode, type Message , type RoomId } from '../utils/index.js';
-
+import { gameMode, type LobbyInfo, type Message , type RoomId, type SafeUser } from '../utils/index.js';
 import { CLI } from '../game_logic/CommandLine.js';
 
 export function registerSocketHandlers(io: Server) 
@@ -12,31 +11,13 @@ export function registerSocketHandlers(io: Server)
 
 	/* ===============Connexion client================= */
 	io.on('connection', (socket) => {
-		// console.log(`Joueur connecté : ${userId}`);
+		// console.log(`Joueur connecté : ${user.id}`);
 		
 		// Recupere la room
-		const userId: string = socket.handshake.auth.userId;
+		const user: SafeUser = socket.handshake.auth.user;
+		const gameMode: gameMode = socket.handshake.auth.gameMode;
 
-		//TEMP from Theo
-
-		interface UserInfo {
-    	id: string;
-    	username: string;
-    	avatar: string | null;
-		}
-	
-		let user : UserInfo= {
-			id : userId,
-			username : "super_cool_name",
-			avatar : "avatar"
-		}
-
-		let [roomId, roomEmitter, playerEmitter] : [RoomId, EventEmitter, EventEmitter] = roomManager.connectPlayer(user, gameMode.SCORE);
-
-		// END TEMP
-		// Uncomment line under 
-
-		// let [roomId, roomEmitter, playerEmitter] : [RoomId, EventEmitter, EventEmitter] = roomManager.connectPlayer(userId);
+		let [roomId, roomEmitter, playerEmitter] : [RoomId, EventEmitter, EventEmitter] = roomManager.connectPlayer(user, gameMode);
 
 		// Rejoins sa room
 		if (roomId !== null)
@@ -66,7 +47,7 @@ export function registerSocketHandlers(io: Server)
 					break;
 				}
 		        case roomStates.VOTE: {
-		            socket.emit('startVote', roomManager.getVotePoolFromUser(roomId, userId), timeinfo);
+		            socket.emit('startVote', roomManager.getVotePoolFromUser(roomId, user.id), timeinfo);
 		            // console.log(`${roomId}: starting vote phase`);
 		            break;
 		        }
@@ -91,7 +72,12 @@ export function registerSocketHandlers(io: Server)
 			// TODO : still need to check the state ?
 			// if (gamestate !== roomStates.LOBBY) return;
 			// console.log(`Ready registered for roomId ${roomId}`);
-			roomManager.onReadyEvent(userId, roomId);
+			roomManager.onReadyEvent(user.id, roomId);
+		});
+
+		// Affichage des infos de room dans le lobby
+		roomEmitter.on('lobby_info', (lobbyInfo: LobbyInfo) => {
+			socket.emit('lobby_info', lobbyInfo);
 		});
 
 		/* ==========ACTION_1==========*/
@@ -104,7 +90,7 @@ export function registerSocketHandlers(io: Server)
 			if (content.trim() === '') return;
 			if (content.length > 500) return;
 			
-			roomManager.onInputEvent(userId, roomId, content);
+			roomManager.onInputEvent(user.id, roomId, content);
 		});
 
 		/* ==========CHAT==========*/
@@ -116,7 +102,7 @@ export function registerSocketHandlers(io: Server)
 			if (content.trim() === '') return;
 			if (content.length > 500) return;
 			
-			roomManager.onChatEvent(userId, roomId, content);
+			roomManager.onChatEvent(user.id, roomId, content);
 		});
 
 		// Relay messages emitted on the roomEmitter to socket.io clients
@@ -129,23 +115,23 @@ export function registerSocketHandlers(io: Server)
 		// Joueur vote
 		socket.on('vote', (playerId: string) => {
 			if (roomManager.getRoomState(roomId) !== roomStates.VOTE) return;
-			roomManager.onVoteEvent(userId, playerId, roomId);
-			// console.log(`${userId} a vote pour ${playerId}`);
+			roomManager.onVoteEvent(user.id, playerId, roomId);
+			// console.log(`${user.id} a vote pour ${playerId}`);
 		});
 
 		/* ==========RESULT==========*/
 		// Joueur appuie sur "replay"
 		socket.on('replay', () => {
 			if (roomManager.getRoomState(roomId) !== roomStates.RESULT) return;
-			roomManager.onReplayEvent(userId, roomId);
-			// console.log(`${userId} rejoue dans sa room ${roomId}`);
+			roomManager.onReplayEvent(user.id, roomId);
+			// console.log(`${user.id} rejoue dans sa room ${roomId}`);
 		});
 
 		// Joueur appuie sur "New game"
 		socket.on('newGame', () => {
 			if (roomManager.getRoomState(roomId) !== roomStates.RESULT) return;
-			roomManager.onDisconnectEvent(userId, roomId);
-			process.stdout.write(`${userId} quitte la room ${roomId} pour `);
+			roomManager.onDisconnectEvent(user.id, roomId);
+			process.stdout.write(`${user.id} quitte la room ${roomId} pour `);
 			if (roomId !== null)
 			{
 				socket.leave(roomId);
@@ -154,7 +140,7 @@ export function registerSocketHandlers(io: Server)
 
 			//TEMP from Theo
 
-			[roomId, roomEmitter, playerEmitter] = roomManager.connectPlayer(user, gameMode.SCORE)
+			[roomId, roomEmitter, playerEmitter] = roomManager.connectPlayer(user, gameMode)
 
 			// END TEMP
 			// uncomment line under 
@@ -173,16 +159,16 @@ export function registerSocketHandlers(io: Server)
 			if (roomId === null) return;
 			socket.emit('timedOut');
 			socket.leave(roomId);
-			roomManager.onDisconnectEvent(userId, roomId);
+			roomManager.onDisconnectEvent(user.id, roomId);
 			roomId = null;
 		});
 
 		/* ==========Deconnexion client==========*/
 		// Joueur se deconnecte
 		socket.on('disconnect', () => {
-			roomManager.onDisconnectEvent(userId, roomId);
+			roomManager.onDisconnectEvent(user.id, roomId);
 			roomEmitter.off('stateChanged', onStateChanged);
-			// console.log(`Joueur déconnecté : ${userId}`);
+			// console.log(`Joueur déconnecté : ${user.id}`);
 		});
 	});
 

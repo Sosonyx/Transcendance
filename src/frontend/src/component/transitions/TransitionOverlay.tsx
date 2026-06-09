@@ -1,3 +1,4 @@
+import './TransitionOverlay.css'
 
 function TransitionOverlay({ config }: { config: string }) {
 	return (

@@ -1,0 +1,15 @@
+/* Ready button */
+#ready-btn {
+  background: var(--twitch);
+  color: #fff;
+}
+
+#ready-btn:hover:not(:disabled) {
+	background: var(--twitch-hover);
+}
+
+#ready-btn:disabled {
+  background: var(--surface2);
+  color: var(--muted);
+  font-size: 13px;
+}

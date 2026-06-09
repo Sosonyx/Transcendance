@@ -3,14 +3,15 @@ import { io, Socket } from 'socket.io-client';
 import { LobbyPanel, Action1Panel, Action2Panel, ChatPanel, VotePanel, ResultPanel } from './component/panels'
 import { TransitionOverlay } from './component/transitions';
 import { roomStates, type VoteInfo, type AnswersType } from './types/types';
-import './index.css'
-import type { User } from './types/types';
+import './Game.css'
+import type { GameMode, User } from './types/types';
 
 interface GameProps {
     user: User;
+    gameMode: GameMode;
 }
 
-function Game({ user } : GameProps) {
+function Game({ user, gameMode } : GameProps) {
     const [state, setState] = useState<roomStates>(roomStates.LOBBY);
     const [socket, setSocket] = useState<Socket | null>(null);
     const [prompt, setPrompt] = useState<string | null>(null);
@@ -30,13 +31,22 @@ function Game({ user } : GameProps) {
     useEffect(() => {
         const s = io(undefined, {
             auth: {
-                userId: user.id
+                user: { 
+                    id: user.id, 
+                    username: user.username, 
+                    avatar: user.avatar 
+                },
+                gameMode: gameMode
             }
         });
         setSocket(s);
 
         s.on('startLobby', () => setState(roomStates.LOBBY));
-		s.on('startAction1', () => setState(roomStates.ACTION_1));
+		s.on('startAction1', () => {
+            showTransition('Round 1', () => {
+                setState(roomStates.ACTION_1);
+            });
+        });
 		s.on('startAction2', (prompt: string) => {
             setPrompt(prompt);
             setState(roomStates.ACTION_2);
@@ -48,13 +58,13 @@ function Game({ user } : GameProps) {
                 setState(roomStates.CHAT);
             });
         });
-        s.on('startVote', (players: VoteInfo[]) 	=> {
+        s.on('startVote', (players: VoteInfo[]) => {
             setPlayers(players);
             showTransition('Votez !', () => {
                 setState(roomStates.VOTE);
             });
         });
-        s.on('startResult', ()        	=> setState(roomStates.RESULT));
+        s.on('startResult', () => setState(roomStates.RESULT));
 
         return () => { s.disconnect(); };
     }, []);

@@ -79,3 +79,9 @@ export function shuffle<T>(array: T[]): T[] {
   
     return array;
 };
+
+export interface SafeUser {
+    id: string;
+    username: string;
+    avatar?: string;
+}
