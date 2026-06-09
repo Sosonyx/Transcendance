@@ -11,9 +11,10 @@ export interface Player {
 export interface UserInterface {
     id: string;
     email: string;
-	password: string | null;
+	password?: string | null;
     username: string;
     avatar: string | null;
+    twoFactorEnabled?: boolean;
     playedAs?: Player[];
 }
 
@@ -48,6 +49,19 @@ export interface DBUserResponse {
     playedAs: Player[];
 }
 
+export interface TwoFactorSecret {
+  secret: string;            
+  otpauthUrl: string;
+  qrCode: string;
+}
+
+export interface JwtPayload {
+  userId: string;
+  username: string;
+  iat: number;
+  exp: number;
+}
+
 export interface ProfileGoogle {
     id: string;
     email: string;
@@ -58,11 +72,4 @@ export interface Profile42 {
     id: string;
     email: string;
     login: string 
-}
-
-export interface JwtPayload {
-  userId: string;
-  username: string;
-  iat: number;
-  exp: number;
 }

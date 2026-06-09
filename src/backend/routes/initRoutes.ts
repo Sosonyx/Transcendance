@@ -1,6 +1,6 @@
 import { healthRoutes } from "./healthRoutes.js";
 import type { FastifyInstance } from 'fastify';
-import { publicRoutes, privateRoutes } from "./authRoutes.js";
+import { publicRoutes, privateRoutes, twoFactorRoutes } from "./authRoutes.js";
 import { oauthPlugin } from "../plugins/oauthPlugin.js";
 import fastifyJwt from '@fastify/jwt';
 
@@ -10,6 +10,7 @@ export async function initRoutes(fastify: FastifyInstance)
 	await fastify.register(fastifyJwt, {secret: process.env.JWT_SECRET!, cookie: { cookieName: 'token', signed: false }});
 		
 	await fastify.register(publicRoutes);
+	await fastify.register(twoFactorRoutes);
 	await fastify.register(healthRoutes);
 	await fastify.register(privateRoutes);
 }
