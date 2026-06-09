@@ -35,7 +35,7 @@ export function App() {
       {user && isAuthenticated && currentView === 'profile' && (
         <ProfilePage user={ user } onUserUpdated={refreshAuth} />
       )}
-      {currentView === 'game' && user && <Game/>}
+      {currentView === 'game' && user && <Game user={user} />}
       </>
   );
 }

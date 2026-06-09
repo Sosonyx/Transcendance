@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
-import type { Message, AnswersType } from "../types";
+import type { Message, AnswersType } from "../../types/types";
 
 interface ChatPanelProps {
 	socket: Socket | null;

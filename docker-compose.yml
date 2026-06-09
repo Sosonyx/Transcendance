@@ -8,6 +8,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
   
   backend:
+    container_name: backend
     build :
       context : src/
       dockerfile: ../docker_files/Dockerfile.backend
@@ -18,6 +19,7 @@ services:
     - postgres
 
   frontend :
+    container_name: frontend
     build:
       context: src/frontend
       dockerfile: ../../docker_files/Dockerfile.frontend
