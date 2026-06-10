@@ -1,8 +1,9 @@
 .navbar {
   display: flex;
-  justify-content: flex-start; 
+  justify-content: space-between; 
   padding: 10px 20px;
-  padding-top: 0px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   align-items: center;
   background-color: #303030;
   color: #ffffff99;
@@ -30,7 +31,7 @@
 .nav-button{
   border: none;
   background-color: transparent;
-  margin-right: auto;
+  /* margin-right: auto; */
   color: #ffffff99;
 }
 

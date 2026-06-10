@@ -30,6 +30,18 @@
   transition: color 0.2s;
 }
 
+.oauth-logo {
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.oauth-logo:hover {
+  opacity: 1;
+}
+
 .modal-close-btn:hover {
   color: #fff;
 }

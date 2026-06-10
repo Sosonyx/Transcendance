@@ -33,13 +33,13 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
 		window.location.href = `/api/auth/google`
 	};
 
-		const handle42Submit = async () => {
-		window.location.href = `/api/auth/42`
+	const handle42Submit = async () => {
+	window.location.href = `/api/auth/42`
 	};
 
 	return (
 		<form onSubmit={handleSubmit}>
-			<h2>Se connecter</h2>
+			<h2>Connection</h2>
 			<input
 				type="text"
 				placeholder="Username"
@@ -57,11 +57,15 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
 			{error && <p className="error-msg">{error}</p>}
 			<div className='auth-button'>
 				<button type="submit" className="button" disabled={submitting}>{submitting ? "Connection..." : "Connection"}</button>
-				<button type="button" className="button" onClick={onSwitchToRegister}>Subscribe</button>
+				<button type="button" className="button" onClick={onSwitchToRegister}>Sign up</button>
 			</div>
 			<div className="oAuthButton">
-				<button type="button" className="button" onClick={handle42Submit} > Connect with 42 </button>
-				<button type="button" className="button" onClick={handleGoogleSubmit}> Connect with Google</button>
+				{/* <button type="button" className="button" onClick={handle42Submit} > Connect with 42 </button>
+				<button type="button" className="button" onClick={handleGoogleSubmit}> Connect with Google</button> */}
+				<div className="oAuthButton">
+					<img src="/42.svg" alt="" onClick={handle42Submit} className="oauth-logo" />
+					<img src="/google.svg" alt="" onClick={handleGoogleSubmit} className="oauth-logo" />
+				</div>
 			</div>
 
 

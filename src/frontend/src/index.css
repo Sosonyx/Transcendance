@@ -63,7 +63,7 @@ input:where([type="text"], [type="password"], [type="email"]):focus {
 }
 
 /* Buttons - base */
-button {
+/* button {
   font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 600;
@@ -73,7 +73,7 @@ button {
   cursor: pointer;
   transition: background 0.15s, transform 0.1s;
   /* width: 100%; */
-}
+/* } */ */
 
 button:active:not(:disabled) { transform: scale(0.98); }
 button:disabled { opacity: 0.45; cursor: not-allowed; }
