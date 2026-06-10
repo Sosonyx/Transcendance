@@ -278,6 +278,11 @@ export class Room extends EventEmitter
 			console.log(`Player ${playerFrom.getName} has already voted.`);
 			return ;
 		}
+		if (playerFrom.getEliminated() || playerTo.getEliminated())
+		{
+			console.log(`Vote with eliminated player shouldn't be possible`);
+			return ;
+		}
 		playerFrom.setVoteAgainst(playerTo);
 		playerTo.gotVoted();
 		playerFrom.setActed(true);
