@@ -23,7 +23,7 @@ body {
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
-  padding: 24px 16px 48px;
+  /* padding: 24px 16px 48px; */
 }
 
 /* Typography */

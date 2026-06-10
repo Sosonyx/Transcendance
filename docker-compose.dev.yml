@@ -1,0 +1,20 @@
+services:
+  backend:
+    build:
+      context: src/
+      dockerfile: ../docker_files/Dockerfile.backend.dev
+    volumes:
+      - ./src:/app
+      - /app/node_modules
+    command: sh -c "npx prisma generate --schema=backend/prisma/schema.prisma --config=prisma.config.ts && npx prisma db push --schema=backend/prisma/schema.prisma && npx tsx watch backend/server.ts"
+
+  frontend:
+    build:
+      context: src/frontend
+      dockerfile: ../../docker_files/Dockerfile.frontend.dev
+    ports:
+      - 5173:5173
+    volumes:
+      - ./src/frontend:/app
+      - /app/node_modules
+    command: npm run dev -- --host
