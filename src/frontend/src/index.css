@@ -63,12 +63,6 @@ body {
   /* padding: 24px 16px 48px; */
 }
 
-@keyframes chrome {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
 /* Typography */
 
 h1, h2, h3 {
