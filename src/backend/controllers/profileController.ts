@@ -9,7 +9,7 @@ export async function getProfileController(req: FastifyRequest, reply: FastifyRe
 		const dbUser  = await prisma.user.findUnique({ where : {id : currUser.userId}, include:{playedAs: true}})						
 		if (!dbUser) {
        		 console.error("Inexistant user!");
-        	return reply.status(404).send({ error: "Inexistant user" });
+        	return reply.code(404).send({ error: "Inexistant user" });
     	}
 		const user : UserSafeInterface = {
 			id: dbUser.id,
@@ -19,12 +19,11 @@ export async function getProfileController(req: FastifyRequest, reply: FastifyRe
 			playedAs: dbUser.playedAs
 		}
 		if (!user)
-			return (reply.status(404).send("Error, user not found !"))
+			return (reply.code(404).send("Error, user not found !"))
 		return (reply.send(user))
 	}
 	catch (error){
-		console.error("Profile error", error)
-		return (reply.status(500).send({error : "Server error"}))
+		return (reply.code(500).send({error : "Server error"}))
 	}
 }
 
@@ -37,8 +36,7 @@ export async function getOtherProfileController(req: FastifyRequest, reply: Fast
 	});
 
     if (!dbUser) {
-        console.error("Inexistant user!");
-        return reply.status(404).send({ error: "Inexistant user" });
+        return (reply.code(404).send({ error: "Inexistant user" }));
     }
 
     const user: UserInterface = {
@@ -48,6 +46,7 @@ export async function getOtherProfileController(req: FastifyRequest, reply: Fast
         avatar: dbUser.avatar,
         password: null,
 		playedAs: dbUser.playedAs,
+		twoFactorEnabled: dbUser.twoFactorEnabled
     };
 
     const safeProfile: UserSafeInterface = user;

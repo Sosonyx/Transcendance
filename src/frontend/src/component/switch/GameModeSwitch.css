@@ -1,0 +1,90 @@
+/* Conteneur principal */
+.game-mode-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px; /* L'espace entre le texte et le switch */
+  margin: 20px 0;
+}
+
+/* Style des textes */
+.mode-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+  transition: color 0.3s ease;
+  cursor: pointer;
+}
+
+.mode-label.active {
+  color: var(--text);
+  font-weight: 700;
+}
+
+/* Le Switch (Le conteneur de l'input) */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
+/* On cache la case à cocher native */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Le fond du Switch */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 34px; /* Rend les bords ronds */
+  transition: 0.3s;
+}
+
+/* Le petit rond à l'intérieur */
+.slider::before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--muted);
+  border-radius: 50%; /* Fait un cercle parfait */
+  transition: 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); /* Animation fluide */
+}
+
+/* Quand le switch est "coché" (Mode Score) */
+.switch input:checked + .slider {
+  background-color: var(--twitch);
+  border-color: var(--twitch-dark);
+}
+
+.switch input:checked + .slider::before {
+  background-color: #fff;
+  /* On déplace le rond vers la droite (50px largeur - 18px rond - 6px marges = 26px) */
+  transform: translateX(24px);
+}
+
+/* Accessibilité (Focus) */
+.switch input:focus + .slider {
+  box-shadow: 0 0 0 2px rgba(145, 71, 255, 0.3);
+}
+
+@media (max-width: 500px) {
+  .game-mode-container {
+    flex-direction: column; /* On aligne verticalement */
+    gap: 8px;
+  }
+  
+  .switch {
+    order: -1; /* Optionnel : place le switch tout en haut, et les textes en dessous */
+  }
+}

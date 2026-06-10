@@ -1,0 +1,58 @@
+/* Vote cards */
+
+.vote-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.player-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s, border-color 0.15s;
+  width: 120px;
+  overflow: hidden;
+}
+
+.player-card h3 {
+  font-size: 13px;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.player-card:hover:not(.disabled):not(.voted) {
+  background: rgba(145,71,255,0.15);
+  border-color: var(--twitch);
+  transform: scale(1.08);
+}
+
+.player-card:active:not(.disabled):not(.voted) {
+  transform: scale(1);
+}
+
+.player-card.voted {
+  background: rgba(145,71,255,0.2);
+  border-color: var(--twitch);
+  cursor: default;
+  transform: scale(1.08);
+}
+
+.player-card.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.player-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  margin-bottom: 0.5rem;
+}

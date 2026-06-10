@@ -1,11 +1,13 @@
 const WAY_OF_SPEAKING_OPTIONS = [
     "familier et concis",
     "ludique et taquin",
-    "calme et pose",
-    "intelligent et analytique"
+    "intelligent et analytique",
+    "neutre"
 ];
 
 const IA_STRATEGIE_OPTIONS = [
+    "Tu es observateur, tu ne reponds que quand c'est necessaire, tu laisses les autres se griller entre eux et tu profites de leur confusion pour te fondre dans la masse.",
+    "Tu es suiveur, tu calques ton style sur celui ou ceux qui ont le style le plus present",
     "Tu es un humain qui veut se faire passer pour une IA, tu peux faire des blagues sur le fait que tu es une IA"
 ];
 

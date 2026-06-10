@@ -5,10 +5,14 @@ import { ProfilePage } from './component/profile/profileCard/ProfilePage.js';
 import { useState } from 'react';
 import Game from './Game.js';
 import './App.css'
+import GameModeSwitch from './component/switch/GameModeSwitch.js';
+import { GameMode } from './types/types.js';
 
 export function App() {
   const { user, loading, isAuthenticated, refreshAuth } = useAuth();
   const [currentView, setCurrentView] = useState<'home' | 'profile' | 'game'>('home');
+  const [gameMode, setGameMode] = useState<GameMode>(GameMode.SCORE);
+
   const handleLogout = async () => {
     await logout();
     await refreshAuth();
@@ -29,13 +33,18 @@ export function App() {
       {currentView === 'home' && (
         <div className='description'>
           <p>Welcome to Transcendence.</p>
+          <GameModeSwitch gameMode={gameMode} setGameMode={setGameMode} />
         </div>
       )}
 
       {user && isAuthenticated && currentView === 'profile' && (
         <ProfilePage user={ user } onUserUpdated={refreshAuth} />
       )}
-      {currentView === 'game' && user && <Game user={user} />}
-      </>
+
+      {currentView === 'game' && user && (
+        <Game user={user} gameMode={gameMode} />
+      )}
+
+    </>
   );
 }

@@ -5,7 +5,7 @@ FRONTEND_DIR := src/frontend
 .PHONY: deps build run run-backend run-game clean
 
 deps:
-	docker compose build --no-cache
+	docker compose build
 
 run:deps
 	docker compose up -d

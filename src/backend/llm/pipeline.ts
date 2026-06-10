@@ -6,30 +6,31 @@ import type { MessageParam } from "@anthropic-ai/sdk/resources";
 import type { GameAction } from "./claude.js"
 import type { phase } from "./actions.js";
 
-export async function pipeline(history: llmHistory, lastMessages: string,  personnality : llmPersonnality, phase: phase): Promise<GameAction> 
+// "context" can either be the list of questions from users to the global question, 
+// or the list of responses from users to the global question, 
+// or the list of messages in the current conversation (when the LLM has to send a message or vote).
+export async function pipeline(history: llmHistory, context: string,  personnality : llmPersonnality, phase: phase): Promise<GameAction> 
 {
     const promptContext: string = systemPrompt(personnality, phase);
-    const usersMessages: MessageParam[] = [...history.getMessagesHistory(), { role: 'user', content: lastMessages }];
+    const usersMessages: MessageParam[] = [...history.getMessagesHistory(), { role: 'user', content: context }];
 
     const action: GameAction = await askClaude(promptContext, usersMessages, phase);
 
-    history.addMessageAsUser(lastMessages);
-
     switch (action.type) {
         case "answer_global_question":
+            history.addMessageAsUser(context);
             history.addMessageAsAssistant(action.response);
             break;
         case "message":
+            history.addMessageAsUser(context);
             history.addMessageAsAssistant(action.text);
             break;
         case "silent":
-            history.addMessageAsAssistant(`[SILENT] ${action.reason}`);  
+            console.log(`[SILENT] ${personnality.getName()} is silent because: ${action.reason}`);
             break;
         case "vote":
             console.log(`[VOTE] ${personnality.getName()} votes against ${action.target}`);
             break;
-        default:
-            throw new Error("Action inconnue");
     }
     return action;
 }
