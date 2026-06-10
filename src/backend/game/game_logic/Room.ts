@@ -18,9 +18,9 @@ export enum roomStates {
 	ERROR = "ERROR"
 }
 
-const action_1_Time : number = 3 * 1000; // 3 seconds
+const action_1_Time : number = 30 * 1000; // 30 seconds
 const action_2_Time : number = 30 * 1000; // 30 seconds
-const chatTime : number = 3 * 1000; // 3 seconds
+const chatTime : number = 60 * 1000; // 60 seconds
 const voteTime : number = 30 * 1000; // 30 seconds
 const replayTime : number = 30 * 1000; // 30 seconds
 const maxPlayerCount : number = 7;
@@ -28,7 +28,7 @@ const scoreCorrectVote : number = 3;
 const scoreGetVoted : number = 1;
 const scoreObjective : number = 10;
 const eliminationTreshold : number = 1;
-const llmNumber : number = 0;
+const llmNumber : number = 1;
 
 // const possibleGameModes : gameMode[] = [gameMode.SCORE, gameMode.ELIMINATION];
 const possibleNames : string[] = ['YELLOW', 'RED', 'BLUE', 'ORANGE', 'GREEN', 'PINK', 'WHITE', 'BLACK'];
