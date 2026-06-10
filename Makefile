@@ -13,7 +13,7 @@ dev:
 run:deps
 	docker compose up -d
 
-run-logs:
+run: deps
 	docker compose up
 
 stop:
