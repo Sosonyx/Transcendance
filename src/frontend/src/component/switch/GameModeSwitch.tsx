@@ -8,30 +8,29 @@ interface GameModeSwitchProps {
 }
 
 function GameModeSwitch({ gameMode, setGameMode }: GameModeSwitchProps) {
-  const isScoreMode = gameMode === 'SCORE';
-
-  const toggleMode = () => {
-    setGameMode(isScoreMode ? GameMode.ELIMINATION : GameMode.SCORE);
-  };
-
   return (
     <div className="game-mode-container">
-      <span className={`mode-label ${!isScoreMode ? 'active' : ''}`}>
-        Mode élimination
-      </span>
+        <label className={`mode-label ${gameMode === GameMode.ELIMINATION ? 'active' : ''}`}>
+            <input
+                type="radio"
+                name="gameMode"
+                value={GameMode.ELIMINATION}
+                checked={gameMode === GameMode.ELIMINATION}
+                onChange={() => setGameMode(GameMode.ELIMINATION)}
+            />
+            Mode élimination
+        </label>
 
-      <label className="switch">
-        <input 
-          type="checkbox" 
-          checked={isScoreMode} 
-          onChange={toggleMode} 
-        />
-        <span className="slider"></span>
-      </label>
-
-      <span className={`mode-label ${isScoreMode ? 'active' : ''}`}>
-        Mode score
-      </span>
+        <label className={`mode-label ${gameMode === GameMode.SCORE ? 'active' : ''}`}>
+            <input
+                type="radio"
+                name="gameMode"
+                value={GameMode.SCORE}
+                checked={gameMode === GameMode.SCORE}
+                onChange={() => setGameMode(GameMode.SCORE)}
+            />
+            Mode score
+        </label>
     </div>
   );
 }

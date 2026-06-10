@@ -29,7 +29,7 @@
 }
 
 .player-card:hover:not(.disabled):not(.voted) {
-  background: rgba(145,71,255,0.15);
+  background: var(--twitch-surface);
   border-color: var(--twitch);
   transform: scale(1.08);
 }
@@ -39,7 +39,7 @@
 }
 
 .player-card.voted {
-  background: rgba(145,71,255,0.2);
+  background: var(--twitch-surface);
   border-color: var(--twitch);
   cursor: default;
   transform: scale(1.08);
