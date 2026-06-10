@@ -30,6 +30,21 @@
   transition: color 0.2s;
 }
 
+.main-btn {
+  background-color: transparent;
+  border: 2px solid #555555 ridge;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.main-btn:hover {
+  background-color: #9227fc;
+  color: #fff;
+}
+
 .oauth-logo {
   width: 40px;
   height: 40px;
@@ -50,13 +65,13 @@
   margin: 10px;
   display: flex;
   justify-content: space-between;
-
 }
 
 .oAuthButton{
   margin: 10px;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 20px;
 }
 
 .error-msg{
@@ -66,5 +81,6 @@
 }
 
 .title{
+  text-align: center;
   color: #fff;
 }

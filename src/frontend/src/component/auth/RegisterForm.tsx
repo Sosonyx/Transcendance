@@ -43,7 +43,7 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
 
   return (
     <form onSubmit={handleSubmit}>
-      <h2 className="title">Subscribe</h2>
+      <h2 className="title">SIGN UP</h2>
       
       <input
         type="email"
@@ -77,8 +77,8 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
       </button>
       </div>
       <div className="oAuthButton">
-				<button type="button" className="button" onClick={handle42Submit} > Connect with 42 </button>
-				<button type="button" className="button" onClick={handleGoogleSubmit}> Connect with Google</button>
+				{/* <button type="button" className="button" onClick={handle42Submit} > Connect with 42 </button>
+				<button type="button" className="button" onClick={handleGoogleSubmit}> Connect with Google</button> */}
 			</div>
     </form>
   );
