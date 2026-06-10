@@ -1,7 +1,7 @@
 import { Room } from "./Room.js";
 import { Player } from "./Player.js";
 import { EventEmitter } from "node:events";
-import type { RoomManagerInterface, RoomId, VoteInfo, gameMode, SafeUser } from "../utils/index.js";
+import type { RoomManagerInterface, RoomId, gameMode, SafeUser } from "../utils/index.js";
 
 export	class RoomManager implements RoomManagerInterface
 {
@@ -212,30 +212,30 @@ export	class RoomManager implements RoomManagerInterface
 	// 	return res;
 	// }
 
-	public getVotePoolFromUser(roomId : RoomId, userId : string) : VoteInfo[] | null
-	{
+	// public getVotePoolFromUser(roomId : RoomId, userId : string) : VoteInfo[] | null
+	// {
 		
-		if (roomId === null)
-			return null;
+	// 	if (roomId === null)
+	// 		return null;
 
-		let room : Room | undefined;
-		let player : Player | undefined;
+	// 	let room : Room | undefined;
+	// 	let player : Player | undefined;
 
-		room = this._accessRoomById(roomId);
-		player = room?.accessPlayerByUserId(userId);
-		if (room === undefined)
-		{
-			console.error(`\n\x1b[41mNo room found with ID ${roomId}\x1b[0m\n`);
-			return null;
-		}
-		if (player === undefined)
-		{
-			console.error(`\n\x1b[41mNo player with ID ${userId} in room ${roomId}\x1b[0m\n`);
-			return null;
-		}
+	// 	room = this._accessRoomById(roomId);
+	// 	player = room?.accessPlayerByUserId(userId);
+	// 	if (room === undefined)
+	// 	{
+	// 		console.error(`\n\x1b[41mNo room found with ID ${roomId}\x1b[0m\n`);
+	// 		return null;
+	// 	}
+	// 	if (player === undefined)
+	// 	{
+	// 		console.error(`\n\x1b[41mNo player with ID ${userId} in room ${roomId}\x1b[0m\n`);
+	// 		return null;
+	// 	}
 
-		return room.getVotePoolFromPlayer(player.getId());
-	}
+	// 	return room.getVotePoolFromPlayer(player.getId());
+	// }
 
 	private _accessFreeRoom(gamemode : gameMode) : Room {
 		let room : Room | undefined = this._rooms.find(room => room.getIsAccessible() && room.getGameMode() === gamemode);

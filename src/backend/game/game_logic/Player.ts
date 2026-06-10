@@ -12,6 +12,7 @@ export class Player extends EventEmitter
 	protected	_acted : boolean;
 	private 	_wantReplay : boolean;
 	protected	_voteAgainst : Player | null;
+	protected	_voted : number;
 	private		_score : number;
 	protected 	_eliminated : boolean;
 
@@ -47,6 +48,14 @@ export class Player extends EventEmitter
 		return this._wantReplay;
 	}
 
+	public getVoted() : number {
+		return this._voted;
+	}
+
+	public gotVoted() : void {
+		this._voted++;
+	}
+
 	public getVoteAgainst() : Player | null {
 		return (this._voteAgainst)
 	}
@@ -73,6 +82,7 @@ export class Player extends EventEmitter
 		}
 		this._acted = false;
 		this._voteAgainst = null;
+		this._voted = 0;
 	}
 
 	public setName(name : string) {
@@ -113,6 +123,7 @@ export class Player extends EventEmitter
 		this._acted = false;
 		this._wantReplay = false;
 		this._voteAgainst = null;
+		this._voted = 0;
 		this._score = 0;
 		this._eliminated = false;
 	}

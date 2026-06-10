@@ -47,7 +47,8 @@ export function registerSocketHandlers(io: Server)
 					break;
 				}
 		        case roomStates.VOTE: {
-		            socket.emit('startVote', roomManager.getVotePoolFromUser(roomId, user.id), timeinfo);
+		            socket.emit('startVote', data, timeinfo);
+		            // socket.emit('startVote', roomManager.getVotePoolFromUser(roomId, user.id), timeinfo);
 		            // console.log(`${roomId}: starting vote phase`);
 		            break;
 		        }

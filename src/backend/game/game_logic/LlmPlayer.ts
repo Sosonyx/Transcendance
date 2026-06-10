@@ -28,6 +28,7 @@ export class LlmPlayer extends Player
 	public override reset() : void {
 		this._acted = false;
 		this._voteAgainst = null;
+		this._voted = 0;
 		this._brain?.resetHistory();
 	}
 
