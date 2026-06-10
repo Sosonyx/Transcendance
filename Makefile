@@ -5,25 +5,16 @@ FRONTEND_DIR := src/frontend
 .PHONY: deps build run run-backend run-game clean
 
 deps:
-	docker compose build --no-cache
+	docker compose build
 
 run: deps
 	docker compose up
 
-clean:
-	rm -rf build
-	rm -rf src/node_modules
-
 data-clean :
 	docker compose down -v
 
-fclean: clean
+fclean:
 	docker compose down postgres transcendence_backend_1 frontend
 # 	podman system prune -a
-	rm -rf src/.env
-	rm -rf build/backend/.env
-	rm -rf src/build
-	rm -rf src/frontend/dist
-
 
 re: fclean run

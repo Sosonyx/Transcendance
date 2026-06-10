@@ -1,4 +1,4 @@
-import TransitionOverlay from "./transitionOverlay";
+import TransitionOverlay from "./TransitionOverlay";
 
 export {
 	TransitionOverlay,

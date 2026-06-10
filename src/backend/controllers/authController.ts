@@ -1,6 +1,6 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import { registerUser, loginUser } from "../services/authService.js";
-import { prisma } from "../../prisma/prisma.js"
+import { prisma } from "../prisma/prisma.js"
 import type { JwtPayload, UserInterface } from "../types/interfaces.js"
 
 export async function registerController(req: FastifyRequest, reply: FastifyReply)

@@ -58,3 +58,15 @@ export interface Message {
 export type VoteInfo = [id : string, name : string]
 
 export type AnswersType = [playerName: string, answer: string][]
+
+export enum GameMode {
+	SCORE = "SCORE",
+	ELIMINATION = "ELIMINATION"
+}
+
+export interface LobbyInfo {
+	_mode : GameMode | null;
+	_llmCount : number;
+	_players : string[];
+	_spots : number;
+}

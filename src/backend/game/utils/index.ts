@@ -9,10 +9,21 @@ export interface Message {
 
 export type RoomId = string | null;
 
-export type VoteInfo = [id : string, name : string]
+export type VoteInfo = [id : string, name : string, votes : number];
+
+export enum gameMode {
+	SCORE = "SCORE",
+	ELIMINATION = "ELIMINATION"
+};
+
+export interface SafeUser {
+    id: string;
+    username: string;
+    avatar: string;
+};
 
 export interface RoomManagerInterface {
-    connectPlayer(playerId : string, isTTY? : boolean) : [roomId : string | null, room : EventEmitter, player : EventEmitter]; // return RoomId + room as Emitter if new room
+    connectPlayer(user : SafeUser, gamemode : gameMode, isTTY? : boolean) : [roomId : string | null, room : EventEmitter, player : EventEmitter]; // return RoomId + room as Emitter if new room
     onReadyEvent(playerId : string, roomId : RoomId, isTTY? : boolean) : void;
 	onInputEvent(playerId : string, roomId : RoomId, message : string, isTTY? : boolean) : void;
     onChatEvent(playerId : string, roomId : RoomId, message : string, isTTY? : boolean) : void;
@@ -21,14 +32,10 @@ export interface RoomManagerInterface {
 	onReplayEvent(playerId : string, roomId : RoomId, isTTY? : boolean) : void;
 	onSkipEvent(roomId: RoomId, isTTY : boolean) : void;
     // getUsersIdFromRoomId(roomId : RoomId) : readonly  string[]; // return player UserId
-	getVotePoolFromUser(roomId : RoomId, UserId : string) : VoteInfo[] | null;
+	// getVotePoolFromUser(roomId : RoomId, UserId : string) : VoteInfo[] | null;
 	getRoomState(roomId : RoomId) : string | null;
 };
 
-export enum gameMode {
-	SCORE = "SCORE",
-	ELIMINATION = "ELIMINATION"
-}
 
 // export interface GameConfig {
 // 	_gamemode : gameMode | null;
@@ -50,7 +57,7 @@ export interface LobbyInfo {
 	_llmCount : number;
 	_players : string[];
 	_spots : number;
-}
+};
 
 // implementation found online
 // https://stackoverflow.com/questions/48083353/i-want-to-know-how-to-shuffle-an-array-in-typescript

@@ -1,0 +1,20 @@
+/* Result buttons */
+
+#replay-btn {
+  background: var(--twitch);
+  color: #fff;
+}
+
+#replay-btn:hover:not(:disabled) {
+	background: var(--twitch-hover);
+}
+
+#new-game-btn {
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+#new-game-btn:hover:not(:disabled) {
+	background: #3d3d42;
+}

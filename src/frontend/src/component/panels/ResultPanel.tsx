@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
+import './ResultPanel.css';
 
 interface ResultPanelProps {
 	socket: Socket | null;
