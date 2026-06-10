@@ -7,14 +7,22 @@ FRONTEND_DIR := src/frontend
 deps:
 	docker compose build
 
-run: deps
+run:deps
+	docker compose up -d
+
+run-logs:
 	docker compose up
 
-data-clean :
-	docker compose down -v
+stop:
+	docker compose stop
+
+start:
+	docker compose start
+
+clean:
+	docker compose down
 
 fclean:
-	docker compose down postgres transcendence_backend_1 frontend
-# 	podman system prune -a
+	docker compose down -v
 
-re: fclean run
+re:clean run

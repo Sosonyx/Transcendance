@@ -34,4 +34,9 @@ const start = async () => {
     }
 };
 
+process.on('SIGTERM', () => {
+    console.log('stop container backend');
+    process.exit(0);
+});
+
 start();
