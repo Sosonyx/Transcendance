@@ -14,6 +14,7 @@ interface GameProps {
 function Game({ user, gameMode } : GameProps) {
     const [state, setState] = useState<roomStates>(roomStates.LOBBY);
     const [socket, setSocket] = useState<Socket | null>(null);
+    const [timeEnd, setTimeEnd] = useState<number | null>(null);
     const [prompt, setPrompt] = useState<string | null>(null);
     const [players, setPlayers] = useState<VoteInfo[]>([]);
     const [question, setQuestion] = useState<string | undefined>('');
@@ -42,29 +43,36 @@ function Game({ user, gameMode } : GameProps) {
         setSocket(s);
 
         s.on('startLobby', () => setState(roomStates.LOBBY));
-		s.on('startAction1', () => {
+		s.on('startAction1', (timeInfo: number | null) => {
+            setTimeEnd(timeInfo);
             showTransition('Round 1', () => {
                 setState(roomStates.ACTION_1);
             });
         });
-		s.on('startAction2', (prompt: string) => {
+		s.on('startAction2', (prompt: string, timeInfo: number | null) => {
+            setTimeEnd(timeInfo);
             setPrompt(prompt);
             setState(roomStates.ACTION_2);
         });
-        s.on('startChat', (data: { question: string | undefined, answers: AnswersType })			=> {
+        s.on('startChat', (data: { question: string | undefined, answers: AnswersType }, timeInfo: number | null)			=> {
+            setTimeEnd(timeInfo);
             setQuestion(data.question);
             setAnswers(data.answers);
             showTransition('La discussion commence !', () => {
                 setState(roomStates.CHAT);
             });
         });
-        s.on('startVote', (players: VoteInfo[]) => {
+        s.on('startVote', (players: VoteInfo[], timeInfo: number | null) => {
+            setTimeEnd(timeInfo);
             setPlayers(players);
             showTransition('Votez !', () => {
                 setState(roomStates.VOTE);
             });
         });
-        s.on('startResult', () => setState(roomStates.RESULT));
+        s.on('startResult', (timeInfo: number | null) => {
+            setTimeEnd(timeInfo);
+            setState(roomStates.RESULT)
+        });
 
         return () => { s.disconnect(); };
     }, []);
@@ -75,11 +83,11 @@ function Game({ user, gameMode } : GameProps) {
                 <TransitionOverlay config={transition} />
             ) : (<>
                 {state === roomStates.LOBBY  && <LobbyPanel  socket={socket} />}
-                {state === roomStates.ACTION_1 && <Action1Panel socket={socket} />}
-                {state === roomStates.ACTION_2 && <Action2Panel socket={socket} prompt={prompt} />}
-                {state === roomStates.CHAT && <ChatPanel socket={socket} question={question} answers={answers}/>}
-                {state === roomStates.VOTE   && <VotePanel   socket={socket} players={players} />}
-                {state === roomStates.RESULT && <ResultPanel socket={socket} />}
+                {state === roomStates.ACTION_1 && <Action1Panel socket={socket} timeEnd={timeEnd} />}
+                {state === roomStates.ACTION_2 && <Action2Panel socket={socket} timeEnd={timeEnd} prompt={prompt} />}
+                {state === roomStates.CHAT && <ChatPanel socket={socket} timeEnd={timeEnd} question={question} answers={answers}/>}
+                {state === roomStates.VOTE   && <VotePanel socket={socket} timeEnd={timeEnd} players={players} userId={user.id} />}
+                {state === roomStates.RESULT && <ResultPanel socket={socket} timeEnd={timeEnd} />}
             </>)}
         </div>
     );

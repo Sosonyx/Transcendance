@@ -2,14 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import type { Message, AnswersType } from "../../types/types";
 import './ChatPanel.css';
+import Timer from "../timer/Timer";
 
 interface ChatPanelProps {
 	socket: Socket | null;
+	timeEnd: number | null;
 	question: string | undefined;
 	answers: AnswersType;
 }
 
-function ChatPanel({ socket, question, answers }: ChatPanelProps) {
+function ChatPanel({ socket, timeEnd, question, answers }: ChatPanelProps) {
 	const [message, setMessage] = useState<string | null>(null);
 	const [messages, setMessages] = useState<Message[]>([]);
 
@@ -56,29 +58,30 @@ function ChatPanel({ socket, question, answers }: ChatPanelProps) {
 	};
 
 	return (
-	<div>
-		<div id="chat-context">
-			<p id="chat-question" className="label">{question}</p>
-			<ul id="chat-answers">
-				{answers.map(([playerName, answer], id) => (<li key={id}>{playerName} : {answer}</li>))}
+		<div>
+			<Timer timeEnd={timeEnd} />
+			<div id="chat-context">
+				<p id="chat-question" className="label">{question}</p>
+				<ul id="chat-answers">
+					{answers.map(([playerName, answer], id) => (<li key={id}>{playerName} : {answer}</li>))}
+				</ul>
+			</div>
+			<ul id="messages">
+				{messages.map((msg, i) => (
+					<li key={i}>
+						<span style={{ color: getColor(msg.senderId), fontWeight: 700 }}>{msg.senderId}</span>
+						{': '}{msg.content}
+					</li>
+				))}
+				<div ref={messagesEndRef} />
 			</ul>
+			<div className="bottom-bar">
+				<form id="chatform" onSubmit={handleSubmit}>
+					<input id="input" type="text" placeholder="Message..." autoComplete="off" onChange={handleChange} value={message ?? ''} />
+					<button id="send-btn" type="submit">Send</button>
+				</form>
+			</div>
 		</div>
-		<ul id="messages">
-			{messages.map((msg, i) => (
-				<li key={i}>
-					<span style={{ color: getColor(msg.senderId), fontWeight: 700 }}>{msg.senderId}</span>
-					{': '}{msg.content}
-				</li>
-			))}
-			<div ref={messagesEndRef} />
-		</ul>
-		<div className="bottom-bar">
-			<form id="chatform" onSubmit={handleSubmit}>
-				<input id="input" type="text" placeholder="Message..." autoComplete="off" onChange={handleChange} value={message ?? ''} />
-				<button id="send-btn" type="submit">Send</button>
-			</form>
-		</div>
-	</div>
 	);
 };
 
