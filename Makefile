@@ -10,23 +10,22 @@ deps:
 dev:
 	docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 
-run: deps
+run:deps
+	docker compose up -d
+
+run-logs:
 	docker compose up
 
-clean:
-	rm -rf build
-	rm -rf src/node_modules
+stop:
+	docker compose stop
 
-data-clean :
+start:
+	docker compose start
+
+clean:
+	docker compose down
+
+fclean:
 	docker compose down -v
 
-fclean: clean
-	docker compose down postgres transcendence_backend_1 frontend
-# 	podman system prune -a
-	rm -rf src/.env
-	rm -rf build/backend/.env
-	rm -rf src/build
-	rm -rf src/frontend/dist
-
-
-re: fclean run
+re:clean run

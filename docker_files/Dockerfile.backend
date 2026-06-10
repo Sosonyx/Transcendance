@@ -6,6 +6,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY prisma.config.ts ./
 COPY tsconfig*.json ./
+COPY backend/entrypoint.sh ./
 RUN npm install
 
 COPY . .
@@ -16,4 +17,4 @@ RUN npx tsc -b tsconfig.json
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "npx prisma db push --schema=backend/prisma/schema.prisma && node build/backend/server.js"]
+CMD ["sh", "./entrypoint.sh"]
