@@ -18,9 +18,9 @@ export enum roomStates {
 	ERROR = "ERROR"
 }
 
-const action_1_Time : number = 30 * 1000; // 3 seconds
+const action_1_Time : number = 30 * 1000; // 30 seconds
 const action_2_Time : number = 30 * 1000; // 30 seconds
-const chatTime : number = 60 * 1000; // 3 seconds
+const chatTime : number = 60 * 1000; // 60 seconds
 const voteTime : number = 30 * 1000; // 30 seconds
 const replayTime : number = 30 * 1000; // 30 seconds
 const maxPlayerCount : number = 7;
@@ -554,19 +554,6 @@ export class Room extends EventEmitter
 		console.log(votes);
 		return (votes);
 	}
-
-	// public getVotePoolFromPlayer(playerId : string) : VoteInfo[] {
-	// 	let votes : VoteInfo[] = [];
-	// 	let player : Player = this._players.find(player => player.getId() === playerId)!;
-
-	// 	if (player.getEliminated())
-	// 		return votes;
-
-	// 	let votable = this._players.filter(player => player.getId() !== playerId && player.getEliminated() === false);
-	// 	votable.forEach(player => votes.push([player.getId(), player.getName()]));
-
-	// 	return votes;
-	// }
 
 	// GAMEMODE
 
