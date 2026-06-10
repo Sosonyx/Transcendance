@@ -18,9 +18,9 @@ export enum roomStates {
 	ERROR = "ERROR"
 }
 
-const action_1_Time : number = 30 * 1000; // 3 seconds
+const action_1_Time : number = 30 * 1000; // 30 seconds
 const action_2_Time : number = 30 * 1000; // 30 seconds
-const chatTime : number = 60 * 1000; // 3 seconds
+const chatTime : number = 60 * 1000; // 60 seconds
 const voteTime : number = 30 * 1000; // 30 seconds
 const replayTime : number = 30 * 1000; // 30 seconds
 const maxPlayerCount : number = 7;
