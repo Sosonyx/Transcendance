@@ -12,6 +12,8 @@ services:
     build:
       context: src/frontend
       dockerfile: ../../docker_files/Dockerfile.frontend.dev
+    environment:
+      - VITE_API_URL=http://backend:3000
     ports:
       - 5173:5173
     volumes:

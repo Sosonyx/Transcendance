@@ -48,7 +48,7 @@ export function Profile({user, onUserUpdated} : ProfileProps) {
             {currentUser.avatar && currentUser.avatar.trim() !== "" ? (
             <img className="avatar" src={currentUser.avatar} alt="Avatar" />
 			) : (
-			<img className="avatar" src="./defaultUser.png" alt="Avatar par défaut" />
+			<img className="avatar" src="./username.png" alt="Avatar par défaut" />
 			)}
 			{!isEditing ? (
                 <>
@@ -94,10 +94,12 @@ export function Profile({user, onUserUpdated} : ProfileProps) {
                     </div>
                 </form>
             )}
-			<h2>{currentUser.username}'s Profile</h2>
-            Email: {currentUser.email}<br/><br/>
-			Games played : {gamePlayed}<br/><br/>
-			Games won : {gameWon}<br/><br/>
+			<h2>{currentUser.username}'s profil</h2>
+            <br></br>
+            <br></br>
+            Email: {currentUser.email}
+			Games played : {gamePlayed}
+			Games won : {gameWon}
 			Games lose : {gamePlayed - gameWon}
 		</div>
 	</div>

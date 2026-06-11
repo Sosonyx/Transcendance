@@ -38,16 +38,16 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
 	};
 
 	return (
-		<form onSubmit={handleSubmit}>
-			<h2 className="title">LOG IN</h2>
-			<input
+		<form className="auth-form" onSubmit={handleSubmit}>
+			<h2 className="auth-title">LOG IN</h2>
+			<input className="auth-input"
 				type="text"
 				placeholder="Username"
 				value={username}
 				onChange={(e) => setUsername(e.target.value)}
 				required
 			/>
-			<input
+			<input className="auth-input"
 				type="password"
 				placeholder="Password"
 				value={password}
@@ -55,18 +55,18 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
 				required
 			/>
 			{error && <p className="error-msg">{error}</p>}
-			<div className='auth-button'>
-				<button type="submit" className="main-btn" disabled={submitting}>{submitting ? "Connection..." : "Log in"}</button>
-				<button type="button" className="button" onClick={onSwitchToRegister}>Sign up</button>
+			<button type="submit" className="auth-submit-btn" disabled={submitting}>
+				{submitting ? "Connexion..." : "LOG IN"}
+			</button>
+			<p className="auth-switch">
+				Don't have an account ?{' '}
+				<button type="button" className="auth-switch-btn" onClick={onSwitchToRegister}>Sign up</button>
+			</p>
+			<div className="auth-divider">OR</div>
+			<div className="oauth-logos">
+				<img src="/42.png" alt="Connect with 42" onClick={handle42Submit} className="oauth-logo" />
+				<img src="/google.png" alt="Connect with Google" onClick={handleGoogleSubmit} className="oauth-logo" />
 			</div>
-			<div className="oAuthButton">
-				{/* <button type="button" className="button" onClick={handle42Submit} > Connect with 42 </button>
-				<button type="button" className="button" onClick={handleGoogleSubmit}> Connect with Google</button> */}
-					<img src="/42.png" alt="" onClick={handle42Submit} className="oauth-logo" />
-					<img src="/google.png" alt="" onClick={handleGoogleSubmit} className="oauth-logo" />
-				</div>
-
-
 		</form>
 	);
 }
