@@ -16,7 +16,6 @@ export	class RoomManager implements RoomManagerInterface
 		return room
 	}
 
-	// TODO : make sure client is reconnected !!!
 	public connectPlayer(user : SafeUser, gamemode : gameMode) : 
 	[roomId : RoomId, room : EventEmitter, player : EventEmitter, ingame : boolean]
 	{

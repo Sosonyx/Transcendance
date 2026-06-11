@@ -4,7 +4,7 @@ import { v4 as uuid } from 'uuid';
 import { EventEmitter } from "node:events";
 import type { Message } from "../../llm/types/messages.js";
 import { gameMode, shuffle } from "../utils/index.js";
-import { prisma } from "../../prisma/prisma.js" 
+import { prisma } from "../../prisma/prisma.js"
 import type { VoteInfo, LobbyInfo } from "../utils/index.js";
 
 export enum roomStates {
@@ -35,7 +35,7 @@ const possibleNames : string[] = ['YELLOW', 'RED', 'BLUE', 'ORANGE', 'GREEN', 'P
 
 type playerInput =  { name : string, input : string};
 type winCondition = () => boolean;
-type computeResult = () => void;
+type computeVote = () => void;
 
 export class Room extends EventEmitter
 {
@@ -54,10 +54,11 @@ export class Room extends EventEmitter
 	private _llmNumber : number;
 	private _isAccessible : boolean;
 	private _winCondition : winCondition | null;
-	private _computeResult : computeResult | null;
+	private _computeVote : computeVote | null;
 	private _timerId : NodeJS.Timeout | undefined;
 	private _data : any;
 	private _timeInfo : number | null;
+	private _winners : Player[];
 	
 	// DATABASE
 
@@ -363,6 +364,7 @@ export class Room extends EventEmitter
 		this._players.forEach(player => {player.reset(full)});
 		if (full)
 		{
+			this._winners = [];
 			this.stateSwitch(roomStates.LOBBY);
 			this._checkLobbyStatus();
 		}
@@ -418,7 +420,7 @@ export class Room extends EventEmitter
 			this.emit('vote-info', this._constructVoteInfo());
 			return ;
 		}
-		this._computeResult!();
+		this._computeVote!();
 		if (this._winCondition!())
 		{
 			console.log('GAME IS OVER !!!')
@@ -569,11 +571,11 @@ export class Room extends EventEmitter
 		switch (this._gamemode)
 		{
 			case (gameMode.SCORE) :
-				this._computeResult = this.__computeResultScore;
+				this._computeVote = this.__computeVoteScore;
 				this._winCondition = this.__winConditionScore;
 				break ;
 			case (gameMode.ELIMINATION) :
-				this._computeResult = this.__computeResultElimination;
+				this._computeVote = this.__computeVoteElimination;
 				this._winCondition = this.__winConditionElimination;
 				break ;
 			default :
@@ -581,7 +583,7 @@ export class Room extends EventEmitter
 		}
 	}
 
-	private __computeResultScore() : void
+	private __computeVoteScore() : void
 	{
 		if (this._gamemode === gameMode.SCORE)
 		{
@@ -598,7 +600,7 @@ export class Room extends EventEmitter
 		}
 	}
 
-	private __computeResultElimination() : void
+	private __computeVoteElimination() : void
 	{
 		if (this._gamemode === gameMode.ELIMINATION)
 		{
@@ -618,7 +620,12 @@ export class Room extends EventEmitter
 
 	private __winConditionScore() : boolean {
 		let winners : Player[] = this._players.filter(player => player.getScore() > scoreObjective);
-		return (winners.length > 0)
+		if (winners.length > 0)
+		{
+			this._winners = winners;
+			return (true);
+		}
+		return (false);
 	}
 
 	private __winConditionElimination() : boolean {
@@ -626,11 +633,13 @@ export class Room extends EventEmitter
 		if (humans.length <= eliminationTreshold)
 		{
 			console.log('LLM won!');
+			this._winners = this._players.filter(p => p.getIsLLM());
 			return (true);
 		}
 		if (!this._players.find(player => player.getIsLLM() && !player.getEliminated()))
 		{
 			console.log('Humans won!');
+			this._winners = humans;
 			return (true);
 		}
 		return (false);
@@ -653,10 +662,11 @@ export class Room extends EventEmitter
 		this._maxPlayerCount = maxPlayerCount;
 		this._llmNumber = llmNumber;
 		this._isAccessible = true;
-		this._computeResult = null;
+		this._computeVote = null;
 		this._winCondition = null;
 		this._timeInfo = null;
 		this._data = null;
+		this._winners = [];
 
 		this._pickGameMode();
 		this._createRoomInDB();
