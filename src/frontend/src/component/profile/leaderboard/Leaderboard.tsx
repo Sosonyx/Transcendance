@@ -31,5 +31,14 @@ export function Leaderboard() {
 			<h2>Global ranking (Top 10)</h2>
 			{players[0]?.username}
 		</div>
+		<div className='leaderboard-list'>
+			{players.map((player, index) => (
+				<div key={index} className='leaderboard-item'>
+					<span className='leaderboard-rank'>{index + 1}</span>
+					<span className='leaderboard-username'>{player.username}</span>
+					{/* <span className='leaderboard-score'>{player.score}</span> */}
+				</div>
+			))}
+		</div>
 	</>)
 }

@@ -72,7 +72,7 @@ export function Profile({user, onUserUpdated, readonly = false} : ProfileProps) 
         </div>
 
         {!readonly && (!isEditing ? (
-            <button className="profile-edit-btn" onClick={() => setIsEditing(true)}>Modify Profile</button>
+            <button className="profile-modify-btn" onClick={() => setIsEditing(true)}>Modify Profile</button>
         ) : (
             <form onSubmit={handleSubmit} className="edit-form">
                 <div className="form-group">

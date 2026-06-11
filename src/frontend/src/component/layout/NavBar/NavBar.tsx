@@ -15,8 +15,10 @@ export function Navbar({ user, onLogout, onAuthSuccess, onViewChange}: Props) {
   return (
     <>
       <nav className='navbar'>
+      <div className='navbar-left'>
         <img src="/logo.png" alt="Logo" className="navbar-logo" />
         <h5 onClick={() => onViewChange('home')} className='navbar-brand'>Qui est l'IA ?</h5>
+      </div>
 
         {user ? (
 
