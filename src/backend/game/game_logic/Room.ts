@@ -56,6 +56,8 @@ export class Room extends EventEmitter
 	private _winCondition : winCondition | null;
 	private _computeResult : computeResult | null;
 	private _timerId : NodeJS.Timeout | undefined;
+	private _data : any;
+	private _timeInfo : number | null;
 	
 	// DATABASE
 
@@ -131,10 +133,15 @@ export class Room extends EventEmitter
 
 	// STATE LOGIC
 
+	public sendSynchro(player : EventEmitter) : void
+	{
+		player.emit('synchronize', this._state, this._data, this._timeInfo);
+	}
+
 	public stateSwitch(newState : roomStates) : void 
 	{
-		let data : any | null = null;
-		let timeinfo : number | null = null;
+		this._data = null;
+		this._timeInfo = null;
 
 		if (!(newState in roomStates))
 			newState = roomStates.ERROR;
@@ -146,16 +153,17 @@ export class Room extends EventEmitter
 				break ;
 
 			case (roomStates.ACTION_1) :
+				console.log(this);
 				this._givePlayersName();
 				this._players = shuffle(this._players);
 				this._allPlayersShouldAct();
-				timeinfo = Date.now() + action_1_Time;
+				this._timeInfo = Date.now() + action_1_Time;
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.ACTION_2) }, action_1_Time);
 				break ;
 
 			case (roomStates.ACTION_2) :
 				this._allPlayersShouldAct();
-				timeinfo = Date.now() + action_2_Time;
+				this._timeInfo = Date.now() + action_2_Time;
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.CHAT) }, action_2_Time);
 				this._input = this._pickAnInput();
 				if (this._input === null)
@@ -163,10 +171,10 @@ export class Room extends EventEmitter
 					this.stateSwitch(roomStates.CHAT)
 					return ;
 				}
-				data = this._input.input;
+				this._data = this._input.input;
 				break;
 			case (roomStates.CHAT) :
-				data = {
+				this._data = {
 					question: this._input?.input,
 					answers : this._inputs.map(p => [p.name, p.input])
 				}
@@ -174,7 +182,7 @@ export class Room extends EventEmitter
 					if (player.getIsLLM())
 						(player as LlmPlayer).getBrain()?.startPlaying();
 				});
-				timeinfo = Date.now() + chatTime;
+				this._timeInfo = Date.now() + chatTime;
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.VOTE) }, chatTime);
 				break ;
 
@@ -183,14 +191,14 @@ export class Room extends EventEmitter
 					if (player.getIsLLM())
 						(player as LlmPlayer).getBrain()?.stopPlaying();
 				});
-				data = this._constructVoteInfo();
+				this._data = this._constructVoteInfo();
 				this._allPlayersShouldAct();
-				timeinfo = Date.now() + voteTime;
+				this._timeInfo = Date.now() + voteTime;
 				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.RESULT) }, voteTime);
 				break ;
 
 			case (roomStates.RESULT) :
-				timeinfo = Date.now() + replayTime;
+				this._timeInfo = Date.now() + replayTime;
 				this._timerId = setTimeout(() => { this._onReplayTimerEnded() }, replayTime);
 				break ;
 
@@ -198,7 +206,7 @@ export class Room extends EventEmitter
 		}
 		console.log(`\x1b[33m-> Room ${this._number} : switching from ${this._state} to ${newState}\x1b[0m`)
 		this._state = newState;
-		this.emit('stateChanged', this._state, data, timeinfo)
+		this.emit('stateChanged', this._state, this._data, this._timeInfo)
 	}
 
 	public start() {
@@ -207,12 +215,10 @@ export class Room extends EventEmitter
 
 	// EVENTS
 
-	public async onJoin(player : Player) {
-		if (this._state != roomStates.LOBBY)
-		{
-			this.stateSwitch(roomStates.ERROR);
+	public async onJoin(player : Player, ingame : boolean) {
+		player.setConnected(true);
+		if (this._state != roomStates.LOBBY || ingame)
 			return ;
-		}
 		this._players.push(player);
 		this._checkLobbyStatus();
 	}
@@ -220,7 +226,7 @@ export class Room extends EventEmitter
 	public onReady(player : Player) {
 		if (this._state != roomStates.LOBBY)
 		{
-			this.stateSwitch(roomStates.ERROR);
+			// this.stateSwitch(roomStates.ERROR);
 			return ;
 		}
 		player.switchActed();
@@ -319,10 +325,10 @@ export class Room extends EventEmitter
 	public onDisconnect(player : Player) {
 		if (this._state != roomStates.LOBBY && this._state != roomStates.RESULT)
 		{
-			this.stateSwitch(roomStates.ERROR);
+			player.setConnected(false);
 			return ;
 		}
-		let index : number = this._players.findIndex((elem) => elem.getId() === player.getId());
+		let index : number = this._players.findIndex(p => p.getId() === player.getId());
 		this._players.splice(index, 1);
 		if (this._state === roomStates.LOBBY)
 			this._checkLobbyStatus();
@@ -416,6 +422,7 @@ export class Room extends EventEmitter
 		if (this._winCondition!())
 		{
 			console.log('GAME IS OVER !!!')
+			this._players = this._players.filter(p => p.getConnected());
 			this.stateSwitch(roomStates.RESULT)
 		}
 		else
@@ -648,6 +655,8 @@ export class Room extends EventEmitter
 		this._isAccessible = true;
 		this._computeResult = null;
 		this._winCondition = null;
+		this._timeInfo = null;
+		this._data = null;
 
 		this._pickGameMode();
 		this._createRoomInDB();

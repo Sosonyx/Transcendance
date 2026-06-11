@@ -23,13 +23,13 @@ export interface SafeUser {
 };
 
 export interface RoomManagerInterface {
-    connectPlayer(user : SafeUser, gamemode : gameMode, isTTY? : boolean) : [roomId : string | null, room : EventEmitter, player : EventEmitter]; // return RoomId + room as Emitter if new room
-    onReadyEvent(playerId : string, roomId : RoomId, isTTY? : boolean) : void;
-	onInputEvent(playerId : string, roomId : RoomId, message : string, isTTY? : boolean) : void;
-    onChatEvent(playerId : string, roomId : RoomId, message : string, isTTY? : boolean) : void;
-    onVoteEvent(playerIdFrom : string, playerIdTo : string, roomId : RoomId, isTTY? : boolean) : void;
-	onDisconnectEvent(playerId : string, roomId : RoomId | null, isTTY? : boolean) : void;
-	onReplayEvent(playerId : string, roomId : RoomId, isTTY? : boolean) : void;
+    connectPlayer(user : SafeUser, gamemode : gameMode) : [roomId : string | null, room : EventEmitter, player : EventEmitter, ingame : boolean]; // return RoomId + room as Emitter if new room
+    onReadyEvent(playerId : string, roomId : RoomId) : void;
+	onInputEvent(playerId : string, roomId : RoomId, message : string) : void;
+    onChatEvent(playerId : string, roomId : RoomId, message : string) : void;
+    onVoteEvent(playerIdFrom : string, playerIdTo : string, roomId : RoomId) : void;
+	onDisconnectEvent(playerId : string, roomId : RoomId | null) : void;
+	onReplayEvent(playerId : string, roomId : RoomId) : void;
 	onSkipEvent(roomId: RoomId, isTTY : boolean) : void;
     // getUsersIdFromRoomId(roomId : RoomId) : readonly  string[]; // return player UserId
 	// getVotePoolFromUser(roomId : RoomId, UserId : string) : VoteInfo[] | null;

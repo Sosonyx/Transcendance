@@ -17,13 +17,13 @@ export function registerSocketHandlers(io: Server)
 		const user: SafeUser = socket.handshake.auth.user;
 		const gameMode: gameMode = socket.handshake.auth.gameMode;
 
-		let [roomId, roomEmitter, playerEmitter] : [RoomId, EventEmitter, EventEmitter] = roomManager.connectPlayer(user, gameMode);
+		let [roomId, roomEmitter, playerEmitter, ingame] : [RoomId, EventEmitter, EventEmitter, boolean] = roomManager.connectPlayer(user, gameMode);
 
 		// Rejoins sa room
 		if (roomId !== null)
 			socket.join(roomId);
 
-		const onStateChanged = (state: string, data: undefined, timeinfo: number) => {
+		const stateDisplay = (state: string, data: undefined, timeinfo: number) => {
 			if (roomId === null) return;
 		    switch (state) {
 				case roomStates.LOBBY: {
@@ -65,7 +65,7 @@ export function registerSocketHandlers(io: Server)
 		};
 
 		// Changement d'etat de la room
-		roomEmitter.on('stateChanged', onStateChanged);
+		roomEmitter.on('stateChanged', stateDisplay);
 
 		/* ==========LOBBY==========*/
 		// Joueur pret
@@ -136,20 +136,13 @@ export function registerSocketHandlers(io: Server)
 			if (roomId !== null)
 			{
 				socket.leave(roomId);
-				roomEmitter.off('stateChanged', onStateChanged);
+				roomEmitter.off('stateChanged', stateDisplay);
 			}
-
-			//TEMP from Theo
-
 			[roomId, roomEmitter, playerEmitter] = roomManager.connectPlayer(user, gameMode)
-
-			// END TEMP
-			// uncomment line under 
-			// [roomId, roomEmitter, playerEmitter] = roomManager.connectPlayer(userId);
 			if (roomId !== null)
 			{
 				socket.join(roomId);
-				roomEmitter.on('stateChanged', onStateChanged);
+				roomEmitter.on('stateChanged', stateDisplay);
 			}
 			process.stdout.write(`rejouer dans une nouvelle room ${roomId}\n`);
 			socket.emit('startLobby');
@@ -168,9 +161,18 @@ export function registerSocketHandlers(io: Server)
 		// Joueur se deconnecte
 		socket.on('disconnect', () => {
 			roomManager.onDisconnectEvent(user.id, roomId);
-			roomEmitter.off('stateChanged', onStateChanged);
+			roomEmitter.off('stateChanged', stateDisplay);
 			// console.log(`Joueur déconnecté : ${user.id}`);
 		});
+
+		// Joueur demande synchronization (game side)
+		playerEmitter.on('synchronize', (state, data, timeout) => {
+			stateDisplay(state, data, timeout);
+		})
+
+		if (ingame && roomId) {
+			roomManager.askSynchronize(roomId, user.id);
+		}
 	});
 
 	const CommandLineInterpreter = new CLI(roomManager);
