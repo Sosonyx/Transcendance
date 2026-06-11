@@ -18,15 +18,18 @@ export function Navbar({ user, onLogout, onAuthSuccess, onViewChange}: Props) {
         <h5 onClick={() => onViewChange('home')} className='navbar-brand'>Qui est l'IA ?</h5>
 
         {user ? (
+          <div className='logo-div'>
+            <img src="logo.png">  </img>
           <div className='button-div'>
             <img src="/account.svg" alt="Profile" className="profile-edit-btn" onClick={() => onViewChange('profile')} />
             <button className='nav-button' onClick={() => {onLogout(); onViewChange('home')}}>Logout</button>
             <button className='play-btn'   onClick={() => onViewChange('game')}>Play</button>
           </div>
+          </div>
         ) : (
           <div className='button-div'>
-            <img src="/account.svg" alt="Profile" className="profile-edit-btn" onClick={() => onViewChange('profile')} />
-            <button className='play-btn'   onClick={() => onViewChange('profile')}>Play</button>
+            <img src="/account.svg" alt="Profile" className="profile-edit-btn" onClick={() => setShowAuthModal(true)} />
+            <button className='play-btn' onClick={() => setShowAuthModal(true)}>Play</button>
           </div>
         )}
       </nav>

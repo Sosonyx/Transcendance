@@ -9,6 +9,11 @@
 
 @font-face {
   font-family: 'Font';
+  src: url('/fonts/Granit.otf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Font';
   src: url('/fonts/font2.ttf') format('truetype');
 }
 
@@ -31,7 +36,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'font2', sans-serif;
+  font-family: 'Granit', sans-serif;
 
   background: linear-gradient(
     135deg,
@@ -65,13 +70,19 @@ body {
 }
 
 /* Typography */
-/* h1, h2, h3 {
-  font-family: 'Font', sans-serif;
-  font-weight: 700;
-} */
 
-h1, h2, h3, .navbar-brand {
+h1, h2, h3 {
+  font-family: 'Granit', sans-serif;
+}
+
+.play-btn {
+  font-family: 'Granit', sans-serif;
+}
+.navbar-brand {
   font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  font-size: 1.8rem;
+  letter-spacing: 0.05em;
 }
 
 /* Layout */

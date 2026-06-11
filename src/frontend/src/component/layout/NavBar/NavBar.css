@@ -77,3 +77,9 @@
   gap: 25px;
   align-items: center;
 }
+
+.logo-div{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
