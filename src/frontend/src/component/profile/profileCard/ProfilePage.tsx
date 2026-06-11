@@ -15,5 +15,5 @@ export function ProfilePage({ user, onUserUpdated }: ProfileProps) {
 		<Leaderboard />
 		<OtherProfileSearch />
     </div>
-  );
+	);
 }

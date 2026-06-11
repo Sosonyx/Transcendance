@@ -14,7 +14,6 @@ services:
       dockerfile: ../docker_files/Dockerfile.backend
     env_file : 
       - .env
-
     depends_on :
     - postgres
 
