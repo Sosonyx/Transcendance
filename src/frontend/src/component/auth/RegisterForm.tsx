@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { register } from "../../services/api.js"; // Assure-toi d'avoir une fonction register dans ton api.js
+import { login, register } from "../../services/api.js"; // Assure-toi d'avoir une fonction register dans ton api.js
 
 interface RegisterFormProps {
   onSuccess?: () => void | Promise<void>;
@@ -24,7 +24,8 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
 
     try {
       await register(email, username, password);
-      
+      await login(username, password);
+
       if (onSuccess)
         await onSuccess();
     } catch (err) {
@@ -53,6 +54,7 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
       <input className="auth-input"
         type="text"
         placeholder="Username"
+        maxLength={20}
         value={username}
         onChange={(e) => setUsername(e.target.value)}
       />

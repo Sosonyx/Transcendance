@@ -32,10 +32,17 @@
 }
 
 .nav-button{
+  transform: scale(0.8);
   border: none;
   text-decoration: underline;
   background-color: transparent;
   color: #ffffff99;
+}
+
+.nav-button:hover{
+  transition: 0.3s;
+  color: #9147ff;
+  transform: scale(0.9);
 }
 
 .play-btn {
@@ -54,12 +61,6 @@
   transition: 0.3s;
   background-color: #9147ff;
   color: #ffffff;
-  transform: scale(1.1);
-}
-
-.nav-button:hover{
-  transition: 0.3s;
-  color: #9147ff;
   transform: scale(1.1);
 }
 
@@ -98,4 +99,33 @@
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+/* User Info connected */
+.navbar-user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 0.2s;
+}
+
+.navbar-user-info:hover {
+  opacity: 1;
+}
+
+.navbar-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--color-bg-elevated);
+}
+
+.navbar-username {
+  text-decoration: underline;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
 }

@@ -22,11 +22,18 @@ export function Navbar({ user, onLogout, onAuthSuccess, onViewChange}: Props) {
 
         {user ? (
 
-          <div className='button-div'>
-            <img src="/account.svg" alt="Profile" className="profile-edit-btn" onClick={() => onViewChange('profile')} />
-            <button className='nav-button' onClick={() => {onLogout(); onViewChange('home')}}>Logout</button>
-            <button className='play-btn'   onClick={() => onViewChange('game')}>Play</button>
-          </div>
+        <div className='button-div'>
+        <div className='navbar-user-info' onClick={() => onViewChange('profile')}>
+          <img
+            className='navbar-avatar'
+            src={user.avatar && user.avatar.trim() !== '' ? user.avatar : '/username.png'}
+            alt="avatar"
+          />
+          <span className='navbar-username'>{user.username}</span>
+        </div>
+        <button className='nav-button' onClick={() => {onLogout(); onViewChange('home')}}>Logout</button>
+        <button className='play-btn' onClick={() => onViewChange('game')}>Play</button>
+      </div>
         ) : (
           <div className='button-div'>
             <img src="/account.svg" alt="Profile" className="profile-edit-btn" onClick={() => setShowAuthModal(true)} />
