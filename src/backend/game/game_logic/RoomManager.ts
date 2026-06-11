@@ -1,4 +1,4 @@
-import { Room } from "./Room.js";
+import { Room} from "./Room.js";
 import { Player } from "./Player.js";
 import { EventEmitter } from "node:events";
 import type { RoomManagerInterface, RoomId, gameMode, SafeUser } from "../utils/index.js";
@@ -16,10 +16,12 @@ export	class RoomManager implements RoomManagerInterface
 		return room
 	}
 
-	public connectPlayer(user : SafeUser, gamemode : gameMode) : [roomId : RoomId, room : EventEmitter, player : EventEmitter]
+	public connectPlayer(user : SafeUser, gamemode : gameMode) : 
+	[roomId : RoomId, room : EventEmitter, player : EventEmitter, ingame : boolean]
 	{
 		let player : Player | undefined;
 		let room : Room | undefined;
+		let ingame = true;
 
 		room = this._rooms.find(room => room.accessPlayerByUserId(user.id));
 		player = room?.accessPlayerByUserId(user.id);
@@ -28,12 +30,33 @@ export	class RoomManager implements RoomManagerInterface
 			room = this._accessFreeRoom(gamemode);
 			player = new Player(user);
 			room.onJoin(player as Player);
+			ingame = false;
 		}
 		console.log(room);
-		return ([room.getId(), room as EventEmitter, player as EventEmitter]);
+		return ([room.getId(), room as EventEmitter, player as EventEmitter, ingame]);
 	}
 
-	public onReadyEvent(playerId : string, roomId : RoomId)
+	public askSynchronize(roomId : string, userId : string)
+	{
+		let player : Player | undefined;
+		let room : Room | undefined;
+
+		room = this._rooms.find(r => r.getId() === roomId);
+		player = room?.accessPlayerByUserId(userId);
+		if (room === undefined)
+		{
+			console.error(`\n\x1b[41mNo room found with ID ${roomId}\x1b[0m\n`);
+			return ;
+		}
+		if (player === undefined)
+		{
+			console.error(`\n\x1b[41mNo player with ID ${userId} in room ${roomId}\x1b[0m\n`);
+			return ;
+		}
+		room.sendSynchro(player as EventEmitter);
+	}
+
+	public onReadyEvent(userId : string, roomId : RoomId)
 	{
 		if (roomId === null)
 			return ;
@@ -42,7 +65,7 @@ export	class RoomManager implements RoomManagerInterface
 		let player : Player | undefined;
 		
 		room = this._accessRoomById(roomId);
-		player = room?.accessPlayerByUserId(playerId);
+		player = room?.accessPlayerByUserId(userId);
 		if (room === undefined)
 		{
 			console.error(`\n\x1b[41mNo room found with ID ${roomId}\x1b[0m\n`);
@@ -50,14 +73,14 @@ export	class RoomManager implements RoomManagerInterface
 		}
 		if (player === undefined)
 		{
-			console.error(`\n\x1b[41mNo player with ID ${playerId} in room ${roomId}\x1b[0m\n`);
+			console.error(`\n\x1b[41mNo player with ID ${userId} in room ${roomId}\x1b[0m\n`);
 			return ;
 		}
 		room.onReady(player);
 		console.log(room);
 	}
 
-	public onInputEvent(playerId : string, roomId : RoomId, message : string)
+	public onInputEvent(userId : string, roomId : RoomId, message : string)
 	{
 		if (roomId === null)
 			return ;
@@ -66,7 +89,7 @@ export	class RoomManager implements RoomManagerInterface
 		let player : Player | undefined;
 
 		room = this._accessRoomById(roomId);
-		player = room?.accessPlayerByUserId(playerId);
+		player = room?.accessPlayerByUserId(userId);
 		if (room === undefined)
 		{
 			console.error(`\n\x1b[41mNo room found with ID ${roomId}\x1b[0m\n`);
@@ -74,13 +97,13 @@ export	class RoomManager implements RoomManagerInterface
 		}
 		if (player === undefined)
 		{
-			console.error(`\n\x1b[41mNo player with ID ${playerId} in room ${roomId}\x1b[0m\n`);
+			console.error(`\n\x1b[41mNo player with ID ${userId} in room ${roomId}\x1b[0m\n`);
 			return ;
 		}
 		room.onInput(player, message);
 	}
 
-	public onChatEvent(playerId : string, roomId : RoomId, message : string)
+	public onChatEvent(userId : string, roomId : RoomId, message : string)
 	{
 		if (roomId === null)
 			return ;
@@ -89,7 +112,7 @@ export	class RoomManager implements RoomManagerInterface
 		let player : Player | undefined;
 
 		room = this._accessRoomById(roomId);
-		player = room?.accessPlayerByUserId(playerId);
+		player = room?.accessPlayerByUserId(userId);
 		if (room === undefined)
 		{
 			console.error(`\n\x1b[41mNo room found with ID ${roomId}\x1b[0m\n`);
@@ -97,13 +120,13 @@ export	class RoomManager implements RoomManagerInterface
 		}
 		if (player === undefined)
 		{
-			console.error(`\n\x1b[41mNo player with ID ${playerId} in room ${roomId}\x1b[0m\n`);
+			console.error(`\n\x1b[41mNo player with ID ${userId} in room ${roomId}\x1b[0m\n`);
 			return ;
 		}
 		room.onChat(player, message);
 	}
 
-	public onVoteEvent(playerIdFrom : string, playerIdTo : string, roomId : RoomId)
+	public onVoteEvent(userIdFrom : string, playerIdTo : string, roomId : RoomId)
 	{
 		if (roomId === null)
 			return ;
@@ -113,7 +136,7 @@ export	class RoomManager implements RoomManagerInterface
 		let playerTo : Player | undefined;
 
 		room = this._accessRoomById(roomId);
-		playerFrom = room?.accessPlayerByUserId(playerIdFrom);
+		playerFrom = room?.accessPlayerByUserId(userIdFrom);
 		playerTo = room?.accessPlayerById(playerIdTo);
 		if (room === undefined)
 		{
@@ -122,7 +145,7 @@ export	class RoomManager implements RoomManagerInterface
 		}
 		if (playerFrom === undefined)
 		{
-			console.error(`\n\x1b[41mNo player with ID ${playerIdFrom} in room ${roomId}\x1b[0m\n`);
+			console.error(`\n\x1b[41mNo player with ID ${userIdFrom} in room ${roomId}\x1b[0m\n`);
 			return ;
 		}
 		if (playerTo === undefined)
@@ -205,41 +228,6 @@ export	class RoomManager implements RoomManagerInterface
 			return (null);
 		return (room.getState());
 	}
-
-	// public getUsersIdFromRoomId(roomId: string): readonly string[] {
-	// 	let res : string[] = [];
-	// 	let players : Player[] | undefined = this._accessRoomById(roomId)?.getPlayers();
-	// 	// if (players === undefined)
-	// 	// 	return res;
-	// 	// players = players.filter((player) => !player.getIsLLM());
-	// 	players?.forEach((player) => {res.push(player.getUserId()!)});
-	// 	return res;
-	// }
-
-	// public getVotePoolFromUser(roomId : RoomId, userId : string) : VoteInfo[] | null
-	// {
-		
-	// 	if (roomId === null)
-	// 		return null;
-
-	// 	let room : Room | undefined;
-	// 	let player : Player | undefined;
-
-	// 	room = this._accessRoomById(roomId);
-	// 	player = room?.accessPlayerByUserId(userId);
-	// 	if (room === undefined)
-	// 	{
-	// 		console.error(`\n\x1b[41mNo room found with ID ${roomId}\x1b[0m\n`);
-	// 		return null;
-	// 	}
-	// 	if (player === undefined)
-	// 	{
-	// 		console.error(`\n\x1b[41mNo player with ID ${userId} in room ${roomId}\x1b[0m\n`);
-	// 		return null;
-	// 	}
-
-	// 	return room.getVotePoolFromPlayer(player.getId());
-	// }
 
 	private _accessFreeRoom(gamemode : gameMode) : Room {
 		let room : Room | undefined = this._rooms.find(room => room.getIsAccessible() && room.getGameMode() === gamemode);
