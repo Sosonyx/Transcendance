@@ -15,6 +15,7 @@ export class Player extends EventEmitter
 	protected	_voted : number;
 	private		_score : number;
 	protected 	_eliminated : boolean;
+	private		_connected : boolean;
 
 	public getId() : string {
 		return this._id;
@@ -68,6 +69,10 @@ export class Player extends EventEmitter
 		return (this._eliminated)
 	}
 
+	public getConnected() : boolean {
+		return (this._connected);
+	}
+
 	public incrementScore(value : number) {
 		this._score += value;
 	}
@@ -112,6 +117,10 @@ export class Player extends EventEmitter
 		console.log(`Eliminated ${this._name} : ${this.getIsLLM() ? 'LLM' : 'human'}`);
 	}
 
+	public setConnected(status : boolean) {
+		this._connected = status;
+	}
+
 	public constructor(user : SafeUser | null) {
 		super();
 		console.log("Constructor called for class Player");
@@ -126,5 +135,6 @@ export class Player extends EventEmitter
 		this._voted = 0;
 		this._score = 0;
 		this._eliminated = false;
+		this._connected = false;
 	}
 }

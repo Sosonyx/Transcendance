@@ -54,6 +54,7 @@ export	class RoomManager implements RoomManagerInterface
 			return ;
 		}
 		room.onReady(player);
+		console.log(room);
 	}
 
 	public onInputEvent(playerId : string, roomId : RoomId, message : string)
@@ -130,6 +131,7 @@ export	class RoomManager implements RoomManagerInterface
 			return ;
 		}
 		room.onVote(playerFrom, playerTo);
+		console.log(room);
 	}
 
 	public onDisconnectEvent( playerId : string, roomId : RoomId) : void
@@ -153,6 +155,7 @@ export	class RoomManager implements RoomManagerInterface
 			return ;
 		}
 		room.onDisconnect(player);
+		console.log(room);
 	}
 
 	public onReplayEvent(playerId : string, roomId : RoomId) : void
