@@ -1,11 +1,15 @@
+.chat-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
 /* Chat messages */
 
 #messages {
-  list-style: none;
-  margin: 0;
-  padding: 8px 0;
-  padding-bottom: 4rem;
+  flex: 1; /* prend tout l'espace restant */
   overflow-y: auto;
+  padding: 8px 0;
 }
 
 #messages li {
@@ -29,13 +33,11 @@
 /* Chat bottom bar */
 
 .bottom-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--bg);
+  flex-shrink: 0; /* ne rétrécit pas */
+  position: static; /* plus de fixed */
   border-top: 1px solid #2d2d2d;
   padding: 10px 12px;
+  background: var(--bg);
 }
 
 #chatform {
@@ -45,6 +47,7 @@
   padding: 0;
   max-width: none;
   width: 100%;
+  flex-direction: row;
 }
 
 #input {
@@ -71,13 +74,7 @@
 /* Chat context */
 
 #chat-context {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+    flex-shrink: 0; /* ne rétrécit pas */
 }
 
 #chat-question {

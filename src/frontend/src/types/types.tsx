@@ -55,7 +55,7 @@ export interface Message {
     timestamp: number
 }
 
-export type VoteInfo = [id : string, name : string, votes : number];
+export type VoteInfo = [userid: string | null, playerid: string, name: string, votes: number]
 
 export type AnswersType = [playerName: string, answer: string][]
 

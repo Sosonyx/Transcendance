@@ -5,6 +5,7 @@ import { TransitionOverlay } from './component/transitions';
 import { roomStates, type VoteInfo, type AnswersType } from './types/types';
 import './Game.css'
 import type { GameMode, User } from './types/types';
+import Timer from './component/timer/Timer';
 
 interface GameProps {
     user: User;
@@ -22,10 +23,10 @@ function Game({ user, gameMode } : GameProps) {
     const [transition, setTransition] = useState<string | null>(null);
 
     const showTransition = (message: string, callback: () => void) => {
+        callback();
         setTransition(message);
         setTimeout(() => {
             setTransition(null);
-            callback();
         }, 2000);
     };
     
@@ -42,7 +43,10 @@ function Game({ user, gameMode } : GameProps) {
         });
         setSocket(s);
 
-        s.on('startLobby', () => setState(roomStates.LOBBY));
+        s.on('startLobby', () => {
+            setTimeEnd(null);
+            setState(roomStates.LOBBY);
+        });
 		s.on('startAction1', (timeInfo: number | null) => {
             setTimeEnd(timeInfo);
             showTransition('Round 1', () => {
@@ -78,17 +82,15 @@ function Game({ user, gameMode } : GameProps) {
     }, []);
 
     return (
-        <div>
-            {transition ? (
-                <TransitionOverlay config={transition} />
-            ) : (<>
-                {state === roomStates.LOBBY  && <LobbyPanel  socket={socket} />}
-                {state === roomStates.ACTION_1 && <Action1Panel socket={socket} timeEnd={timeEnd} />}
-                {state === roomStates.ACTION_2 && <Action2Panel socket={socket} timeEnd={timeEnd} prompt={prompt} />}
-                {state === roomStates.CHAT && <ChatPanel socket={socket} timeEnd={timeEnd} question={question} answers={answers}/>}
-                {state === roomStates.VOTE   && <VotePanel socket={socket} timeEnd={timeEnd} players={players} userId={user.id} />}
-                {state === roomStates.RESULT && <ResultPanel socket={socket} timeEnd={timeEnd} />}
-            </>)}
+        <div className='game-container'>
+            <Timer timeEnd={timeEnd} />
+            {transition && <TransitionOverlay config={transition} />}
+            {state === roomStates.LOBBY    && <LobbyPanel   socket={socket} />}
+            {state === roomStates.ACTION_1 && <Action1Panel socket={socket} />}
+            {state === roomStates.ACTION_2 && <Action2Panel socket={socket} prompt={prompt} />}
+            {state === roomStates.CHAT     && <ChatPanel socket={socket} question={question} answers={answers} />}
+            {state === roomStates.VOTE     && <VotePanel    socket={socket} players={players} userId={user.id} />}
+            {state === roomStates.RESULT   && <ResultPanel  socket={socket} />}
         </div>
     );
 }

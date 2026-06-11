@@ -1,14 +1,12 @@
 import { useState } from "react";
 import { Socket } from "socket.io-client";
-import Timer from "../timer/Timer";
 
 interface Action2PanelProps {
 	socket: Socket | null;
-	timeEnd: number | null;
 	prompt: string | null;
 }
 
-function Action2Panel({ socket, timeEnd, prompt }: Action2PanelProps) {
+function Action2Panel({ socket, prompt }: Action2PanelProps) {
 	const [response, setResponse] = useState<string | null>(null);
 	const [input, setInput] = useState<boolean>(true);
 
@@ -28,8 +26,6 @@ function Action2Panel({ socket, timeEnd, prompt }: Action2PanelProps) {
 	};
 
 	return (
-		<>
-		<Timer timeEnd={timeEnd} />
 		<div className="centered">
 			<form id="form" onSubmit={handleSubmit}>
 				{
@@ -41,7 +37,6 @@ function Action2Panel({ socket, timeEnd, prompt }: Action2PanelProps) {
 				}
 			</form>
 		</div>
-		</>
 	);
 };
 

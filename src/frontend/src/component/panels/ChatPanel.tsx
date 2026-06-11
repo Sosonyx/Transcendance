@@ -2,16 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import type { Message, AnswersType } from "../../types/types";
 import './ChatPanel.css';
-import Timer from "../timer/Timer";
 
 interface ChatPanelProps {
 	socket: Socket | null;
-	timeEnd: number | null;
 	question: string | undefined;
 	answers: AnswersType;
 }
 
-function ChatPanel({ socket, timeEnd, question, answers }: ChatPanelProps) {
+function ChatPanel({ socket, question, answers }: ChatPanelProps) {
 	const [message, setMessage] = useState<string | null>(null);
 	const [messages, setMessages] = useState<Message[]>([]);
 
@@ -58,8 +56,7 @@ function ChatPanel({ socket, timeEnd, question, answers }: ChatPanelProps) {
 	};
 
 	return (
-		<div>
-			<Timer timeEnd={timeEnd} />
+		<div className="chat-layout">
 			<div id="chat-context">
 				<p id="chat-question" className="label">{question}</p>
 				<ul id="chat-answers">

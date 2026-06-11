@@ -13,8 +13,8 @@ function LobbyPanel({ socket }: LobbyPanelProps) {
 	const players = lobbyInfo?._players.length ?? 0;
 	const llms    = lobbyInfo?._llmCount ?? 0;
 	const spots   = lobbyInfo?._spots ?? 0;
-	const total   = players + llms + spots;
-	const taken   = players + llms;
+	const total   = players + spots;
+	const taken   = players;
 
 	const handleClick = () => {
 		socket?.emit('ready');
@@ -32,10 +32,14 @@ function LobbyPanel({ socket }: LobbyPanelProps) {
 	return (
 		<div className="lobby">
 
-			<h1 className="lobby-mode">{lobbyInfo?._mode}</h1>
-			<p className="lobby-count">
-				{taken} / {total}
-			</p>
+			<div className="lobby-header">
+				<h1 className="lobby-mode">{lobbyInfo?._mode}</h1>
+				<p className="lobby-count">
+					<span>{taken} / {total} joueurs</span>
+					<span className="lobby-llm-count">{llms} LLM{llms !== 1 ? 's' : ''}</span>
+				</p>
+			</div>
+			
 			<div className="lobby-players">
 				{lobbyInfo?._players.map((username, index) => (
 					<div key={index} className="lobby-card player">
@@ -57,9 +61,11 @@ function LobbyPanel({ socket }: LobbyPanelProps) {
 				))}
 			</div>
 
-			<button id="ready-btn" type="button" onClick={handleClick} className={ready ? 'is-ready' : ''}>
-				{ready ? '✓ Ready' : 'Ready'}
-			</button>
+			<div className="lobby-footer">
+				<button id="ready-btn" type="button" onClick={handleClick} className={ready ? 'is-ready' : ''}>
+					{ready ? '✓ Ready' : 'Ready'}
+				</button>
+			</div>
 
 		</div>
 	);
