@@ -215,9 +215,9 @@ export class Room extends EventEmitter
 
 	// EVENTS
 
-	public async onJoin(player : Player) {
+	public async onJoin(player : Player, ingame : boolean) {
 		player.setConnected(true);
-		if (this._state != roomStates.LOBBY)
+		if (this._state != roomStates.LOBBY || ingame)
 			return ;
 		this._players.push(player);
 		this._checkLobbyStatus();
@@ -668,7 +668,8 @@ export class Room extends EventEmitter
 		this._isAccessible = true;
 		this._computeResult = null;
 		this._winCondition = null;
-		this._timeInfo = 0;
+		this._timeInfo = null;
+		this._data = null;
 
 		this._pickGameMode();
 		this._createRoomInDB();

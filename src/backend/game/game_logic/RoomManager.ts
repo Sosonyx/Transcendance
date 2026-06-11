@@ -16,6 +16,7 @@ export	class RoomManager implements RoomManagerInterface
 		return room
 	}
 
+	// TODO : make sure client is reconnected !!!
 	public connectPlayer(user : SafeUser, gamemode : gameMode) : 
 	[roomId : RoomId, room : EventEmitter, player : EventEmitter, ingame : boolean]
 	{
@@ -29,9 +30,9 @@ export	class RoomManager implements RoomManagerInterface
 		{
 			room = this._accessFreeRoom(gamemode);
 			player = new Player(user);
-			room.onJoin(player as Player);
 			ingame = false;
 		}
+		room.onJoin(player as Player, ingame);
 		console.log(room);
 		return ([room.getId(), room as EventEmitter, player as EventEmitter, ingame]);
 	}
