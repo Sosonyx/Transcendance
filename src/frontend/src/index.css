@@ -1,4 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+
+/* Custom fonts */
+@font-face {
+  font-family: 'Font';
+  src: url('/fonts/font.otf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Font';
+  src: url('/fonts/Granit.otf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Font';
+  src: url('/fonts/font2.ttf') format('truetype');
+}
 
 /* Variables */
 :root {
@@ -6,7 +23,7 @@
   --twitch-dark:  #6316c1;
   --twitch-hover: #a970ff;
 
-  --bg:       #18181b;
+  --bg:       #190521b3;
   --surface:  #1f1f23;
   --surface2: #2d2d35;
   --border:   rgba(255,255,255,0.1);
@@ -19,17 +36,47 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'Inter', sans-serif;
-  background: var(--bg);
+  font-family: 'Granit', sans-serif;
+
+  background: linear-gradient(
+    135deg,
+    #05020f 0%,
+    #0f0520 10%,
+    #1a0a35 20%,
+    #0f0520 30%,
+    #05020f 40%,
+    #390a20 50%,
+    #0f0520 60%,
+    #05020f 70%,
+    #1a0a35 80%,
+    #0f0520 90%,
+    #05020f 100%
+  );
+
+  background-size: 400% 400%;
+  animation: chrome 18s ease infinite;
+
+  background-blend-mode: overlay, normal;
+
   color: var(--text);
   min-height: 100vh;
-  padding: 24px 16px 48px;
+  /* padding: 24px 16px 48px; */
 }
 
 /* Typography */
+
 h1, h2, h3 {
-  font-family: 'Inter', sans-serif;
-  font-weight: 700;
+  font-family: 'Granit', sans-serif;
+}
+
+.play-btn {
+  font-family: 'Granit', sans-serif;
+}
+.navbar-brand {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  font-size: 1.5rem;
+  letter-spacing: 0.05em;
 }
 
 /* Layout */
@@ -63,7 +110,7 @@ input:where([type="text"], [type="password"], [type="email"]):focus {
 }
 
 /* Buttons - base */
-button {
+/* button {
   font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 600;
@@ -73,7 +120,7 @@ button {
   cursor: pointer;
   transition: background 0.15s, transform 0.1s;
   /* width: 100%; */
-}
+/* } */
 
 button:active:not(:disabled) { transform: scale(0.98); }
 button:disabled { opacity: 0.45; cursor: not-allowed; }

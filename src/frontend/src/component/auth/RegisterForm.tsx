@@ -42,44 +42,47 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
     };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2 className="title">Subscribe</h2>
-      
-      <input
+    <form className="auth-form" onSubmit={handleSubmit}>
+      <h2 className="auth-title">SIGN UP</h2>
+      <input className="auth-input"
         type="email"
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
-      
-      <input
+      <input className="auth-input"
         type="text"
         placeholder="Username"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
       />
-      
-      <input
+      <input className="auth-input"
         type="password"
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <div className="auth-button">
-      <button className="button" type="submit" onClick={handleSubmit} disabled={submitting}>
-        {submitting ? "Signing up..." : "Sign up"}
+      {error && <p className="error-msg">{error}</p>}
+      <button className="auth-submit-btn" type="submit" disabled={submitting}>
+        {submitting ? "Inscription..." : "SIGN UP"}
       </button>
-      
-      
-      <button className="button" type="button" onClick={onSwitchToLogin}>
-        Already signed up ? Connect
-      </button>
+      <p className="auth-switch-tos-policy">
+        By registering, I agree to the TCU and ToS.
+      </p>
+      <p></p>
+      <p></p>
+
+      <p className="auth-switch">
+        Already have an account ?{' '}
+        <button type="button" className="auth-switch-btn" onClick={onSwitchToLogin}>Log in</button>
+      </p>
+      <div className="auth-divider">OR</div>
+      <div className="oauth-logos">
+        <img src="/42.png" alt="Connect with 42" onClick={handle42Submit} className="oauth-logo" />
+        <img src="/google.png" alt="Connect with Google" onClick={handleGoogleSubmit} className="oauth-logo" />
       </div>
-      <div className="oAuthButton">
-				<button type="button" className="button" onClick={handle42Submit} > Connect with 42 </button>
-				<button type="button" className="button" onClick={handleGoogleSubmit}> Connect with Google</button>
-			</div>
     </form>
   );
 }
+
+// TODO: ajouter ToS and TCU dynamiquement

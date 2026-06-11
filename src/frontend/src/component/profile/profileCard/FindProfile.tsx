@@ -38,9 +38,9 @@ export function OtherProfileSearch() {
 				onKeyDown={(e) => { if (e.key === 'Enter') OtherProfileLookup(); }}
 			/>
 			</div>
-			<button className='button-profile' onClick={OtherProfileLookup}>Chercher</button>
+			<button className='button-profile' onClick={OtherProfileLookup}>Find</button>
 			{profileError && <p>{profileError}</p>}
-			{otherProfile && <Profile user={otherProfile} />}
+			{otherProfile && <Profile user={otherProfile} readonly />}
 		</div>
 	);
 }

@@ -15,16 +15,23 @@ export function Navbar({ user, onLogout, onAuthSuccess, onViewChange}: Props) {
   return (
     <>
       <nav className='navbar'>
+      <div className='navbar-left'>
+        <img src="/logo.png" alt="Logo" className="navbar-logo" />
         <h5 onClick={() => onViewChange('home')} className='navbar-brand'>Qui est l'IA ?</h5>
+      </div>
 
         {user ? (
+
           <div className='button-div'>
-            <button className='nav-button' onClick={() => onViewChange('profile')}>Profile Page</button>
-            <button className='nav-button' onClick={() => onViewChange('game')}>Play</button>
-            <button className='nav-button' onClick={() => {onLogout(); onViewChange('home')}}>Déconnexion</button>
+            <img src="/account.svg" alt="Profile" className="profile-edit-btn" onClick={() => onViewChange('profile')} />
+            <button className='nav-button' onClick={() => {onLogout(); onViewChange('home')}}>Logout</button>
+            <button className='play-btn'   onClick={() => onViewChange('game')}>Play</button>
           </div>
         ) : (
-          <button className='nav-button' onClick={() => setShowAuthModal(true)}>Connexion</button>
+          <div className='button-div'>
+            <img src="/account.svg" alt="Profile" className="profile-edit-btn" onClick={() => setShowAuthModal(true)} />
+            <button className='play-btn' onClick={() => setShowAuthModal(true)}>Play</button>
+          </div>
         )}
       </nav>
       
