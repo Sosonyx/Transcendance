@@ -443,7 +443,7 @@ export class Room extends EventEmitter
 			case roomStates.ACTION_1 :
 			{
 				const llms = this._players.filter(player => player.getIsLLM());
-				const inputs = this._inputs.map(p => ({senderId: p.name, content: p.input, timestamp: Date.now()}));
+				let inputs = this._inputs.map(p => ({senderId: p.name, content: p.input, timestamp: Date.now()}));
 
 				await Promise.all(
   					(llms as LlmPlayer[]).map(async (llm) => {
@@ -452,7 +452,7 @@ export class Room extends EventEmitter
       						this._inputs.push(llmInput);
 					}));
 				
-				shuffle(inputs);
+				this._inputs = shuffle(this._inputs);
 				this.stateSwitch(roomStates.ACTION_2) ;
 				return ;
 			}
@@ -460,7 +460,7 @@ export class Room extends EventEmitter
 			{
 
 				const llms = this._players.filter(player => player.getIsLLM());
-				const inputs = this._inputs.map(p => ({senderId: p.name, content: p.input, timestamp: Date.now()}));
+				let inputs = this._inputs.map(p => ({senderId: p.name, content: p.input, timestamp: Date.now()}));
 
 				await Promise.all(
 					(llms as LlmPlayer[]).map(async (llm) => {
@@ -470,7 +470,7 @@ export class Room extends EventEmitter
 					})	
 				)
 
-				shuffle(inputs);
+				this._inputs = shuffle(this._inputs);
 				this.stateSwitch(roomStates.CHAT) ;
 				return ;
 			}
