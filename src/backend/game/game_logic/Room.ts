@@ -555,7 +555,7 @@ export class Room extends EventEmitter
 		let votes : VoteInfo[] = [];
 
 		const votable = this._players.filter(p => !p.getEliminated());
-		votable.forEach(p => votes.push([p.getUserId(), p.getId(), p.getName(), p.getVoted()]));
+		votable.forEach(p => votes.push([p.getId(), p.getName(), p.getVoted()]));
 
 		console.log('\n\n\nVOTES\n\n\n');
 		console.log(votes);
