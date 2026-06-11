@@ -289,6 +289,11 @@ export class Room extends EventEmitter
 			console.log(`Vote with eliminated player shouldn't be possible`);
 			return ;
 		}
+		if (playerFrom.getEliminated() || playerTo.getEliminated())
+		{
+			console.log(`Vote with eliminated player shouldn't be possible`);
+			return ;
+		}
 		playerFrom.setVoteAgainst(playerTo);
 		playerTo.gotVoted();
 		playerFrom.setActed(true);
@@ -561,19 +566,6 @@ export class Room extends EventEmitter
 		console.log(votes);
 		return (votes);
 	}
-
-	// public getVotePoolFromPlayer(playerId : string) : VoteInfo[] {
-	// 	let votes : VoteInfo[] = [];
-	// 	let player : Player = this._players.find(player => player.getId() === playerId)!;
-
-	// 	if (player.getEliminated())
-	// 		return votes;
-
-	// 	let votable = this._players.filter(player => player.getId() !== playerId && player.getEliminated() === false);
-	// 	votable.forEach(player => votes.push([player.getId(), player.getName()]));
-
-	// 	return votes;
-	// }
 
 	// GAMEMODE
 
