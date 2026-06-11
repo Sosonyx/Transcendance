@@ -15,16 +15,15 @@ export function Navbar({ user, onLogout, onAuthSuccess, onViewChange}: Props) {
   return (
     <>
       <nav className='navbar'>
+        <img src="/logo.png" alt="Logo" className="navbar-logo" />
         <h5 onClick={() => onViewChange('home')} className='navbar-brand'>Qui est l'IA ?</h5>
 
         {user ? (
-          <div className='logo-div'>
-            <img src="logo.png">  </img>
+
           <div className='button-div'>
             <img src="/account.svg" alt="Profile" className="profile-edit-btn" onClick={() => onViewChange('profile')} />
             <button className='nav-button' onClick={() => {onLogout(); onViewChange('home')}}>Logout</button>
             <button className='play-btn'   onClick={() => onViewChange('game')}>Play</button>
-          </div>
           </div>
         ) : (
           <div className='button-div'>

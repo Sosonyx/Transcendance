@@ -1,7 +1,8 @@
 .navbar {
+  height: 40px;
   display: flex;
   justify-content: space-between; 
-  padding: 10px 20px;
+  padding-right: 10px;
   padding-top: 10px;
   padding-bottom: 10px;
   align-items: center;
@@ -11,10 +12,9 @@
 
 .navbar-brand {
   background-color: transparent;
-  width: 20%;
-  display: inline;
   font-weight: bold;
   font-size: 1.5rem;
+  display: inline;
 }
 
 .navbar-brand:hover {
@@ -82,4 +82,11 @@
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.navbar-logo {
+  height: 200%;
+
+  width: auto;
+  object-fit: contain;
 }
