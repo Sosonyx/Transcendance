@@ -9,7 +9,7 @@ import type { phase } from "./actions.js";
 // "context" can either be the list of questions from users to the global question, 
 // or the list of responses from users to the global question, 
 // or the list of messages in the current conversation (when the LLM has to send a message or vote).
-export async function pipeline(history: llmHistory, context: string,  personnality : llmPersonnality, phase: phase): Promise<GameAction> 
+export async function pipeline(history: llmHistory, context: string,  personnality : llmPersonnality, phase: phase, globalQuestion?: string): Promise<GameAction> 
 {
     const promptContext: string = systemPrompt(personnality, phase);
     const usersMessages: MessageParam[] = [...history.getMessagesHistory(), { role: 'user', content: context }];
@@ -18,7 +18,7 @@ export async function pipeline(history: llmHistory, context: string,  personnali
 
     switch (action.type) {
         case "answer_global_question":
-            history.addMessageAsUser(context);
+            history.addMessageAsUser(globalQuestion ?? context);
             history.addMessageAsAssistant(action.response);
             break;
         case "message":
