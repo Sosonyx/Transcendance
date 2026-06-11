@@ -21,14 +21,15 @@ export	class RoomManager implements RoomManagerInterface
 		let player : Player | undefined;
 		let room : Room | undefined;
 
-		room = this._rooms.find(room => room.accessPlayerById(user.id));
+		room = this._rooms.find(room => room.accessPlayerByUserId(user.id));
 		player = room?.accessPlayerByUserId(user.id);
 		if (room === undefined)
 		{
 			room = this._accessFreeRoom(gamemode);
 			player = new Player(user);
+			room.onJoin(player as Player);
 		}
-		room.onJoin(player as Player);
+		console.log(room);
 		return ([room.getId(), room as EventEmitter, player as EventEmitter]);
 	}
 
