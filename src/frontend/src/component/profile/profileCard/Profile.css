@@ -1,73 +1,181 @@
-.button-profile{
-	background-color: transparent;
-	border: none;
-	border-radius: 15px;
-	color: #d8d8d8;
+.profile-page {
+	display: flex;
+	flex-direction: row;
+	gap: 40px;
+	padding: 70px;
+	align-items: flex-start;
 }
 
-.button-profile:hover{
+.profile-right {
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+	gap: 24px;
+	flex: 1;
+	padding: 24px;
+}
+
+.profile-middle {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+	flex: 1;
+}
+
+.profile-card {
+	background-color: #1e1e2a;
+	border-radius: 16px;
+	padding: 28px;
+	width: 340px;
+	margin: 40px auto 0;
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 	color: white;
-	transition: 0.3s;
 }
 
-.username-form{
-	border-radius: 5px;
-	background-color: #303030;
-	color: white;
-}
-.username-form:focus{
-	background-color: #000000;
-	transform: none;
-	color: #f3f1f1;
-	outline:none;
+.profile-avatar-section {
+	display: flex;
+	align-items: center;
+	gap: 16px;
 }
 
-.username-form:focus::placeholder{
-	color: white;
+.avatar {
+	width: 80px;
+	height: 80px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 2px solid #3a3a4a;
 }
 
-.profile-card{
-	padding: 20px;
-	border-radius: 20px;
-	margin: auto;
-	padding-top: 15px;
-	padding-bottom: 15px;
-	width: 250px;
-	color: rgb(247, 255, 8);
-	background-color: #303030;
-	margin-top: 40px;
+.profile-identity {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.profile-username {
+	font-size: 1.2rem;
+	font-weight: 700;
+	color: #fff;
+	margin: 0;
+}
+
+.profile-email {
+	font-size: 13px;
+	color: #8a8a9a;
+	margin: 0;
+}
+
+.profile-stats {
+	display: flex;
+	justify-content: space-between;
+	background: #2a2a38;
+	border-radius: 10px;
+	padding: 16px;
+}
+
+.stat-item {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 10px;
-	justify-content: center;
-	text-align: center;
+	gap: 4px;
 }
 
-.finder-div{
-	text-align: center;
+.stat-value {
+	font-size: 1.4rem;
+	font-weight: 700;
+	color: #9147ff;
 }
 
-.profile-finder{
-	display: inline;
-	justify-content: center;
-	align-items: center;
-}
-.avatar{
-	width: 100px;
-	height: 100px;
+.stat-label {
+	font-size: 11px;
+	color: #8a8a9a;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
 }
 
-.modify-button{
-	background: transparent;
-	border: none;
-	color: rgb(188, 186, 186);
-	box-shadow: 2px 2px 2px 1px rgb(0 0 0 / 20%);
-	margin-left: 10px;
-	margin-top: 10px;
+.profile-edit-btn {
+	width: 16px;
+	height: 16px;
+	cursor: pointer;
+	opacity: 0.7;
+	transition: opacity 0.2s, transform 0.15s;
 }
 
-.modify-button:hover{
-	color: white;
- 	box-shadow: 2px 2px 2px 1px rgb(0 0 0 / 20%);
+.profile-edit-btn:hover {
+	opacity: 1;
+	color: #9147ff;
+	transform: scale(1.2);
+}
+
+.edit-form {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.form-group {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.form-group label {
+	font-size: 12px;
+	color: #8a8a9a;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.form-group input[type="text"] {
+	background: #2a2a38;
+	border: 1px solid #3a3a4a;
+	border-radius: 6px;
+	color: #fff;
+	padding: 10px 12px;
+	font-size: 14px;
+	outline: none;
+	width: 100%;
+}
+
+.form-group input[type="text"]:focus {
+	border-color: #9147ff;
+}
+
+.form-actions {
+	display: flex;
+	gap: 8px;
+}
+
+.modify-button {
+	flex: 1;
+	background: #2a2a38;
+	border: 1px solid #3a3a4a;
+	border-radius: 6px;
+	color: #fff;
+	padding: 10px;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background 0.2s;
+	width: auto;
+}
+
+.modify-button:hover {
+	background: #3a3a4a;
+}
+
+.modify-button[type="submit"] {
+	background: #9147ff;
+	border-color: #9147ff;
+}
+
+.modify-button[type="submit"]:hover {
+	background: #a970ff;
+}
+
+.finder-div {
+	text-align: right;
 }

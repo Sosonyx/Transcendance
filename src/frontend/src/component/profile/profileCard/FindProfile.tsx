@@ -40,7 +40,7 @@ export function OtherProfileSearch() {
 			</div>
 			<button className='button-profile' onClick={OtherProfileLookup}>Chercher</button>
 			{profileError && <p>{profileError}</p>}
-			{otherProfile && <Profile user={otherProfile} />}
+			{otherProfile && <Profile user={otherProfile} readonly />}
 		</div>
 	);
 }

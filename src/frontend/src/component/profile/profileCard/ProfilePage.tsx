@@ -7,13 +7,15 @@ interface ProfileProps {
 	onUserUpdated?: () => Promise<void> | void;
 }
 
-
 export function ProfilePage({ user, onUserUpdated }: ProfileProps) {
-	return (<>
-		<div className="profile-page">
-			<Profile user={user} {...(onUserUpdated ? { onUserUpdated } : {})} />
-			<Leaderboard />
-			<OtherProfileSearch />
-		</div>
-	</>)
+	return (
+    <div className="profile-page">
+		<Profile user={user} {...(onUserUpdated ? { onUserUpdated } : {})} />
+	<div className="profile-middle" />
+		<Leaderboard />
+	<div className="profile-right">
+		<OtherProfileSearch />
+	</div>
+	</div>
+	);
 }

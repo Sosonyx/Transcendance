@@ -31,16 +31,33 @@
 .nav-button{
   border: none;
   background-color: transparent;
-  /* margin-right: auto; */
-  gap: 10px;
   color: #ffffff99;
 }
 
-.nav-button:hover{
-  transition: 0.5s;
-  color: white
+.play-btn {
+  border: 2px solid #9147ff;
+  border-radius: 6px;
+  background: #9147ff;
+  color: #fff;
+  padding: 6px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+  width: auto;
 }
 
+.play-btn:hover {
+  transition: 0.3s;
+  background-color: #9147ff;
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+.nav-button:hover{
+  transition: 0.3s;
+  color: #9147ff;
+  transform: scale(1.1);
+}
 
 .button{
   border: none;
@@ -50,12 +67,13 @@
 }
 
 .button:hover{
-  transition: 0.5s;
+  transition: 0.3s;
   background-color: transparent;
   color: #ffffff;
 }
 
-.button-div{
-  display: inline;
-  justify-content: space-between;
+.button-div {
+  display: flex;
+  gap: 25px;
+  align-items: center;
 }
