@@ -1,15 +1,151 @@
-/* Ready button */
+.lobby {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 1rem 2rem;
+}
+
+/* 20% — titre */
+.lobby-header {
+    height: 20%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.lobby-mode {
+    font-size: clamp(1.5rem, 4vh, 2.5rem); /* s'adapte à la hauteur disponible */
+    color: var(--twitch);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.lobby-count {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    font-size: 1rem;
+    color: var(--muted);
+}
+
+.lobby-llm-count {
+    color: #f44336;
+    font-weight: 600;
+}
+
+/* 70% — joueurs */
+.lobby-players {
+    height: 70%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    align-content: center;
+    overflow-y: auto;
+    padding: 0.5rem;
+}
+
+/* .lobby-players::-webkit-scrollbar {
+    width: 6px;
+}
+
+.lobby-players::-webkit-scrollbar-track {
+    background: var(--surface);
+    border-radius: 3px;
+}
+
+.lobby-players::-webkit-scrollbar-thumb {
+    background: var(--twitch);
+    border-radius: 3px;
+}
+
+.lobby-players::-webkit-scrollbar-thumb:hover {
+    background: var(--twitch-hover);
+} */
+
+.lobby-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-radius: var(--radius);
+    width: 100px;
+    border: 1px solid var(--border);
+}
+
+.lobby-card p {
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    word-break: break-word;
+    color: var(--text);
+}
+
+.lobby-card.player {
+    background: var(--twitch-surface);
+    border-color: var(--twitch);
+}
+
+.lobby-card.llm {
+    background: rgba(244, 67, 54, 0.15);
+    border-color: #f44336;
+}
+
+.lobby-card.llm p {
+    color: #f44336;
+}
+
+.lobby-card.empty {
+    background: var(--surface);
+    opacity: 0.4;
+}
+
+.lobby-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+}
+
+.lobby-avatar-placeholder {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 2px dashed var(--border);
+}
+
+/* 10% — bouton */
+.lobby-footer {
+    height: 10%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 #ready-btn {
-  background: var(--twitch);
-  color: #fff;
+    width: 200px;
+    height: 44px;
+    background: var(--surface2);
+    color: var(--muted);
+    border: 1px solid var(--border);
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 
-#ready-btn:hover:not(:disabled) {
-	background: var(--twitch-hover);
+#ready-btn:hover {
+    background: var(--surface);
+    border-color: var(--twitch);
+    color: var(--text);
 }
 
-#ready-btn:disabled {
-  background: var(--surface2);
-  color: var(--muted);
-  font-size: 13px;
+#ready-btn.is-ready {
+    background: var(--twitch);
+    color: #fff;
+    border-color: var(--twitch);
+}
+
+#ready-btn.is-ready:hover {
+    background: var(--twitch-hover);
 }

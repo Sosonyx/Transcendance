@@ -56,29 +56,29 @@ function ChatPanel({ socket, question, answers }: ChatPanelProps) {
 	};
 
 	return (
-	<div>
-		<div id="chat-context">
-			<p id="chat-question" className="label">{question}</p>
-			<ul id="chat-answers">
-				{answers.map(([playerName, answer], id) => (<li key={id}>{playerName} : {answer}</li>))}
+		<div className="chat-layout">
+			<div id="chat-context">
+				<p id="chat-question" className="label">{question}</p>
+				<ul id="chat-answers">
+					{answers.map(([playerName, answer], id) => (<li key={id}>{playerName} : {answer}</li>))}
+				</ul>
+			</div>
+			<ul id="messages">
+				{messages.map((msg, i) => (
+					<li key={i}>
+						<span style={{ color: getColor(msg.senderId), fontWeight: 700 }}>{msg.senderId}</span>
+						{': '}{msg.content}
+					</li>
+				))}
+				<div ref={messagesEndRef} />
 			</ul>
+			<div className="bottom-bar">
+				<form id="chatform" onSubmit={handleSubmit}>
+					<input id="input" type="text" placeholder="Message..." autoComplete="off" onChange={handleChange} value={message ?? ''} />
+					<button id="send-btn" type="submit">Send</button>
+				</form>
+			</div>
 		</div>
-		<ul id="messages">
-			{messages.map((msg, i) => (
-				<li key={i}>
-					<span style={{ color: getColor(msg.senderId), fontWeight: 700 }}>{msg.senderId}</span>
-					{': '}{msg.content}
-				</li>
-			))}
-			<div ref={messagesEndRef} />
-		</ul>
-		<div className="bottom-bar">
-			<form id="chatform" onSubmit={handleSubmit}>
-				<input id="input" type="text" placeholder="Message..." autoComplete="off" onChange={handleChange} value={message ?? ''} />
-				<button id="send-btn" type="submit">Send</button>
-			</form>
-		</div>
-	</div>
 	);
 };
 

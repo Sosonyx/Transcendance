@@ -10,10 +10,15 @@ interface LobbyPanelProps {
 function LobbyPanel({ socket }: LobbyPanelProps) {
 	const [ready, setReady] = useState<boolean>(false);
 	const [lobbyInfo, setLobbyInfo] = useState<LobbyInfo>();
+	const players = lobbyInfo?._players.length ?? 0;
+	const llms    = lobbyInfo?._llmCount ?? 0;
+	const spots   = lobbyInfo?._spots ?? 0;
+	const total   = players + spots;
+	const taken   = players;
 
 	const handleClick = () => {
 		socket?.emit('ready');
-		setReady(true);
+		setReady(!ready);
 	};
 
 	useEffect(() => {
@@ -25,23 +30,44 @@ function LobbyPanel({ socket }: LobbyPanelProps) {
 	}, [socket]);
 
 	return (
-	<div className="centered">
-		<div>
-			<p>{lobbyInfo?._mode}</p>
-			<div className="row">
-				{lobbyInfo?._players.map((player) => (
-					<div className="cols-sm">
-						<div className="card">
-							<p>{player}</p>
-						</div>
+		<div className="lobby">
+
+			<div className="lobby-header">
+				<h1 className="lobby-mode">{lobbyInfo?._mode}</h1>
+				<p className="lobby-count">
+					<span>{taken} / {total} joueurs</span>
+					<span className="lobby-llm-count">{llms} LLM{llms !== 1 ? 's' : ''}</span>
+				</p>
+			</div>
+			
+			<div className="lobby-players">
+				{lobbyInfo?._players.map((username, index) => (
+					<div key={index} className="lobby-card player">
+						<img src="/avatars/avatar.png" alt={username} className="lobby-avatar" />
+						<p>{username}</p>
+					</div>
+				))}
+				{Array.from({ length: llms }).map((_, index) => (
+					<div key={`llm-${index}`} className="lobby-card llm">
+						<img src="/avatars/llm-avatar.png" alt="LLM" className="lobby-avatar" />
+						<p>LLM</p>
+					</div>
+				))}
+				{Array.from({ length: spots }).map((_, index) => (
+					<div key={`empty-${index}`} className="lobby-card empty">
+						<div className="lobby-avatar-placeholder" />
+						<p>...</p>
 					</div>
 				))}
 			</div>
+
+			<div className="lobby-footer">
+				<button id="ready-btn" type="button" onClick={handleClick} className={ready ? 'is-ready' : ''}>
+					{ready ? '✓ Ready' : 'Ready'}
+				</button>
+			</div>
+
 		</div>
-		<button id="ready-btn" type="button" onClick={handleClick} disabled={ready}>
-			{ready ? 'Waiting for other players...' : 'Ready'}
-		</button>
-	</div>
 	);
 };
 

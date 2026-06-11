@@ -9,7 +9,7 @@ export interface Message {
 
 export type RoomId = string | null;
 
-export type VoteInfo = [id : string, name : string, votes : number];
+export type VoteInfo = [userid : string | null, playerid : string, name : string, votes : number];
 
 export enum gameMode {
 	SCORE = "SCORE",

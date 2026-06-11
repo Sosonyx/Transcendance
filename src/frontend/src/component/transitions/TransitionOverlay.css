@@ -1,5 +1,31 @@
-
 .transition-overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--surface);
+    border: 1px solid var(--twitch);
+    border-radius: var(--radius);
+    padding: 1.5rem 3rem;
+    box-shadow: 0 0 40px rgba(145, 71, 255, 0.3);
+    animation: fadeInOut 2s ease forwards;
+    z-index: 100;
+}
+
+.transition-overlay h1 {
+    font-size: 2rem;
+    color: var(--twitch);
+    white-space: nowrap;
+}
+
+@keyframes fadeInOut {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+    20%  { opacity: 1; transform: translate(-50%, -50%) scale(1);   }
+    80%  { opacity: 1; transform: translate(-50%, -50%) scale(1);   }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+}
+
+/* .transition-overlay {
     position: fixed;
     inset: 0;
     display: flex;
@@ -15,4 +41,4 @@
     20%  { opacity: 1; }
     80%  { opacity: 1; }
     100% { opacity: 0; }
-}
+} */

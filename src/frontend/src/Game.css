@@ -1,3 +1,12 @@
+.game-container {
+  height: calc(100vh - var(--navbar-height));
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
 #send-btn {
   background: var(--twitch);
   color: #fff;
@@ -24,7 +33,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 100%;
+  flex-direction: column;
 }
 
 .centered button {

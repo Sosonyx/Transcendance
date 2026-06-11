@@ -2,7 +2,7 @@ import { Server } from 'socket.io';
 import { EventEmitter } from "node:events";
 import { RoomManager } from '../game_logic/RoomManager.js';
 import { roomStates } from '../game_logic/Room.js';
-import { gameMode, type LobbyInfo, type Message , type RoomId, type SafeUser } from '../utils/index.js';
+import { gameMode, type LobbyInfo, type Message , type RoomId, type SafeUser, type VoteInfo } from '../utils/index.js';
 import { CLI } from '../game_logic/CommandLine.js';
 
 export function registerSocketHandlers(io: Server) 
@@ -118,6 +118,11 @@ export function registerSocketHandlers(io: Server)
 			if (roomManager.getRoomState(roomId) !== roomStates.VOTE) return;
 			roomManager.onVoteEvent(user.id, playerId, roomId);
 			// console.log(`${user.id} a vote pour ${playerId}`);
+		});
+
+		// Envoie les infos de vote
+		roomEmitter.on('vote-info', (voteInfo: VoteInfo) => {
+			socket.emit('vote-info', voteInfo);
 		});
 
 		/* ==========RESULT==========*/

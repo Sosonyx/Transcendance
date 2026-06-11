@@ -22,14 +22,16 @@
   --twitch:       #9147ff;
   --twitch-dark:  #6316c1;
   --twitch-hover: #a970ff;
+  --twitch-surface: #9147ff26;
 
   --bg:       #190521b3;
   --surface:  #1f1f23;
   --surface2: #2d2d35;
-  --border:   rgba(255,255,255,0.1);
+  --border:   #ffffff1a;
   --text:     #efeff1;
   --muted:    #adadb8;
   --radius:   4px;
+  --navbar-height: 47px;
 }
 
 /* Reset */
@@ -124,6 +126,24 @@ input:where([type="text"], [type="password"], [type="email"]):focus {
 
 button:active:not(:disabled) { transform: scale(0.98); }
 button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--surface);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--twitch);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--twitch-hover);
+}
 
 /* Responsive */
 
