@@ -209,11 +209,9 @@ export class Room extends EventEmitter
 	// EVENTS
 
 	public async onJoin(player : Player) {
+		player.setConnected(true);
 		if (this._state != roomStates.LOBBY)
-		{
-			this.stateSwitch(roomStates.ERROR);
 			return ;
-		}
 		this._players.push(player);
 		this._checkLobbyStatus();
 	}
@@ -221,7 +219,7 @@ export class Room extends EventEmitter
 	public onReady(player : Player) {
 		if (this._state != roomStates.LOBBY)
 		{
-			this.stateSwitch(roomStates.ERROR);
+			// this.stateSwitch(roomStates.ERROR);
 			return ;
 		}
 		player.switchActed();
@@ -320,10 +318,10 @@ export class Room extends EventEmitter
 	public onDisconnect(player : Player) {
 		if (this._state != roomStates.LOBBY && this._state != roomStates.RESULT)
 		{
-			this.stateSwitch(roomStates.ERROR);
+			player.setConnected(false);
 			return ;
 		}
-		let index : number = this._players.findIndex((elem) => elem.getId() === player.getId());
+		let index : number = this._players.findIndex(p => p.getId() === player.getId());
 		this._players.splice(index, 1);
 		if (this._state === roomStates.LOBBY)
 			this._checkLobbyStatus();
@@ -417,6 +415,7 @@ export class Room extends EventEmitter
 		if (this._winCondition!())
 		{
 			console.log('GAME IS OVER !!!')
+			this._players = this._players.filter(p => p.getConnected());
 			this.stateSwitch(roomStates.RESULT)
 		}
 		else
