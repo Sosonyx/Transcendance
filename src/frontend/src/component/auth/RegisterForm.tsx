@@ -13,23 +13,20 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (!email || !username || !password) {
       setError("Tous les champs sont obligatoires");
       return;
     }
-
     setSubmitting(true);
     setError(null);
-
     try {
       await register(email, username, password);
-      await login(username, password);
-
       if (onSuccess)
         await onSuccess();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Registration failed");
+      setError(err instanceof Error ? err.message : "Erreur lors de l'inscription");
     } finally {
       setSubmitting(false);
     }

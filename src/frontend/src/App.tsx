@@ -5,8 +5,8 @@ import { ProfilePage } from './component/profile/profileCard/ProfilePage.js';
 import { useState } from 'react';
 import Game from './Game.js';
 import './App.css'
-import GameModeSwitch from './component/switch/GameModeSwitch.js';
 import { GameMode } from './types/types.js';
+import { Home } from './component/home/home.js';
 
 export function App() {
   const { user, loading, isAuthenticated, refreshAuth } = useAuth();
@@ -31,10 +31,13 @@ export function App() {
       <Navbar user={user} onLogout={handleLogout} onAuthSuccess={refreshAuth} onViewChange={setCurrentView}/>
       
       {currentView === 'home' && (
-        <div className='description'>
-          <p>Welcome to Transcendence.</p>
-          <GameModeSwitch gameMode={gameMode} setGameMode={setGameMode} />
-        </div>
+          <Home
+          user={user}
+          gameMode={gameMode}
+          setGameMode={setGameMode}
+          onPlay={() => setCurrentView('game')}
+          onAuth={() => {}}
+        />
       )}
 
       {user && isAuthenticated && currentView === 'profile' && (

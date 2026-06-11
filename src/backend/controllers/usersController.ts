@@ -84,7 +84,7 @@ export async function modifyUserProfile(request: FastifyRequest, reply: FastifyR
         return reply.code(401).send({ error: "Unauthorized" });
     const parts = request.parts()
     const data: { username?: string; avatar?: string } = {};
-   try {
+    try {
         for await (const part of parts) {
             if (part.type === 'file' && part.fieldname === 'avatar') {
                 const buffer = await part.toBuffer();
@@ -118,7 +118,9 @@ export async function modifyUserProfile(request: FastifyRequest, reply: FastifyR
     });
     return reply.send({ user: updatedUser });
     }
-    catch (error) {
+    catch (error: any) {
+        if (error?.code === 'P2002')
+            return reply.code(409).send({ error: "Ce username est déjà utilisé" });
         return reply.code(500).send({ error: "Database update error" });
     }
 }

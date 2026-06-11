@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
+import multipart from '@fastify/multipart';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -17,6 +18,11 @@ import { initRoutes } from './routes/initRoutes.js'
 
 export const fastify = Fastify({logger : true});
 
+await fastify.register(multipart, {
+    limits: {
+        fileSize: 5 * 1024 * 1024, // 5MB
+    }
+});
 
 const io = new Server(fastify.server, {
     connectionStateRecovery: {}

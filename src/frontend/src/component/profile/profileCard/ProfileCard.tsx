@@ -13,6 +13,7 @@ export function Profile({user, onUserUpdated, readonly = false} : ProfileProps) 
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [username, setUsername] = useState<string>(user.username);
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
+    const [editError, setEditError] = useState<string | null>(null);
     const [currentUser, setCurrentUser] = useState<User>(user);
 
     useEffect(() => {
@@ -28,17 +29,18 @@ export function Profile({user, onUserUpdated, readonly = false} : ProfileProps) 
         setAvatarFile(event.target.files[0]);
     };
 
-    const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setEditError(null);
     try {
-        const data = await modifyUser(username, avatarFile);
-        setCurrentUser(data);
-        setUsername(data.username);
+        const data = await modifyUser(username, avatarFile)
+        setCurrentUser(data)
+        setUsername(data.username)
         setIsEditing(false);
-        setAvatarFile(null);
+        setAvatarFile(null)
         await onUserUpdated?.();
-    } catch {
-        alert("Impossible de mettre à jour le profil.");
+    } catch (error) {
+        setEditError(error instanceof Error ? error.message : "Impossible de mettre à jour le profil.");
     }
     };
 
@@ -77,12 +79,13 @@ export function Profile({user, onUserUpdated, readonly = false} : ProfileProps) 
             <form onSubmit={handleSubmit} className="edit-form">
                 <div className="form-group">
                     <label htmlFor="name">New username</label>
-                    <input type="text" id="name" value={username} onChange={(e) => setUsername(e.target.value)} required />
+                    <input type="text" id="name" value={username} maxLength={20} onChange={(e) => setUsername(e.target.value)} required />
                 </div>
                 <div className="form-group">
                     <label htmlFor="avatar">New avatar</label>
                     <input type="file" id="avatar" accept="image/*" onChange={handleAvatarChange} />
                 </div>
+                {editError && <p className="error-msg">{editError}</p>}
                 <div className="form-actions">
                     <button type="submit" className="modify-button">Save</button>
                     <button type="button" className="modify-button" onClick={() => { setIsEditing(false); setAvatarFile(null); setUsername(currentUser.username); }}>

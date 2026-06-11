@@ -99,8 +99,10 @@ export async function modifyUser(username: string, avatar: File | null) : Promis
 		body: formData
 	})
 
-	if (!res.ok)
-		throw new Error("Profile update error")
+	if (!res.ok) {
+		const body = await res.json().catch(() => ({}));
+		throw new Error(body.error ?? "Impossible de mettre à jour le profil");
+	}
 
 	const data: { user: User } = await res.json();
 	return data.user;
