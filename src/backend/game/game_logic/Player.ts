@@ -15,6 +15,7 @@ export class Player extends EventEmitter
 	protected	_voted : number;
 	private		_score : number;
 	protected 	_eliminated : boolean;
+	protected	_justEliminated : boolean;
 	private		_connected : boolean;
 
 	public getId() : string {
@@ -42,15 +43,15 @@ export class Player extends EventEmitter
 	}
 
 	public hasActed() : boolean {
-		return this._acted;
+		return (this._acted);
 	}
 
 	public getWantReplay() : boolean {
-		return this._wantReplay;
+		return (this._wantReplay);
 	}
 
 	public getVoted() : number {
-		return this._voted;
+		return (this._voted);
 	}
 
 	public gotVoted() : void {
@@ -69,6 +70,10 @@ export class Player extends EventEmitter
 		return (this._eliminated)
 	}
 
+	public justGotEliminated() : boolean {
+		return (this._justEliminated)
+	}
+
 	public getConnected() : boolean {
 		return (this._connected);
 	}
@@ -85,6 +90,7 @@ export class Player extends EventEmitter
 			this._wantReplay = false;
 			this._eliminated = false;
 		}
+		this._justEliminated = false;
 		this._acted = false;
 		this._voteAgainst = null;
 		this._voted = 0;
@@ -113,6 +119,8 @@ export class Player extends EventEmitter
 
 	public setEliminated(status : boolean)
 	{
+		if (status)
+			this._justEliminated = true;
 		this._eliminated = status;
 		console.log(`Eliminated ${this._name} : ${this.getIsLLM() ? 'IA' : 'human'}`);
 	}
@@ -135,6 +143,7 @@ export class Player extends EventEmitter
 		this._voted = 0;
 		this._score = 0;
 		this._eliminated = false;
+		this._justEliminated = false;
 		this._connected = false;
 	}
 }

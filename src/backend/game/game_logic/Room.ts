@@ -5,7 +5,7 @@ import { EventEmitter } from "node:events";
 import type { Message } from "../../llm/types/messages.js";
 import { gameMode, shuffle } from "../utils/index.js";
 import { prisma } from "../../prisma/prisma.js"
-import type { VoteInfo, LobbyInfo, ScoreInfo } from "../utils/index.js";
+import type { VoteInfo, LobbyInfo, ScoreInfo, RoundResultInfo } from "../utils/index.js";
 import { names } from "./Names.js"
 
 export enum roomStates {
@@ -203,6 +203,7 @@ export class Room extends EventEmitter
 			case (roomStates.ROUND_RESULT) :
 				this._timeInfo = Date.now() + roundResultTime;
 				this.emit('score_info', this._constructScoreInfo());
+				this._data = this._constructRoundResultInfo();
 				this._timerId = setTimeout(() => { this._checkRoundResultStatus() }, roundResultTime);
 				break ;
 
@@ -554,20 +555,41 @@ export class Room extends EventEmitter
 		return input;
 	};
 
-	// WORKING HERE // WORKING HERE // WORKING HERE
-	// emit (on start playing + end of rounds ) + synchronize
+	private _constructRoundResultInfo() : RoundResultInfo {
+
+		let info : RoundResultInfo = {
+			_players : []
+		};
+
+		if (this._gamemode === gameMode.SCORE)
+		{
+			this._players.forEach(p => {
+				info._players.push([p.getUsername() || 'IA', p.getName(), p.getIsLLM()]);
+			})
+		}
+		else if (this._gamemode === gameMode.ELIMINATION)
+		{
+			let pool = this._players.filter(p => p.justGotEliminated());
+			pool.forEach(p => {
+				info._players.push([p.getUsername() || 'IA', p.getName(), p.getIsLLM()]);
+			})
+		}
+
+		return (info);
+	}
 
 	private _constructScoreInfo() : ScoreInfo {
 		
 		let info : ScoreInfo = {
 			_alive : [],
-			_eliminated : [],
+			_eliminated : []
 		};
 
-		if (this._gamemode === gameMode.SCORE) 
+		if (this._gamemode === gameMode.SCORE)
 		{
-			let pool = this._players.filter(p => p.getIsLLM());
-			info._alive = pool.map(p => [p.getUsername()!, p.getScore()]);
+			let pool = this._players.filter(p => !p.getIsLLM());
+			pool.forEach(p => {
+				info._alive.push([p.getUsername()!, p.getScore()])});
 		}
 		else if (this._gamemode === gameMode.ELIMINATION)
 		{
@@ -579,6 +601,8 @@ export class Room extends EventEmitter
 			})
 		}
 
+		console.log('\n\n\nINFO\n\n\n');
+		console.log(info);
 		return info;
 	}
 

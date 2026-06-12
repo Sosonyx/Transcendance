@@ -64,8 +64,8 @@ export interface ScoreInfo {
 	_eliminated : [login : string][]
 };
 
-export interface VoteResultInfo {
-	_players : [login : string, name : string, _llm : boolean]
+export interface RoundResultInfo {
+	_players : [login : string, name : string, _llm : boolean][];
 }
 
 // implementation found online
