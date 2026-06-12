@@ -6,6 +6,7 @@ import type { Message } from "../../llm/types/messages.js";
 import { gameMode, shuffle } from "../utils/index.js";
 import { prisma } from "../../prisma/prisma.js"
 import type { VoteInfo, LobbyInfo, ScoreInfo } from "../utils/index.js";
+import { names } from "./Names.js"
 
 export enum roomStates {
 	INIT = "INIT",
@@ -33,7 +34,6 @@ const eliminationTreshold : number = 1;
 const llmNumber : number = 0;
 
 // const possibleGameModes : gameMode[] = [gameMode.SCORE, gameMode.ELIMINATION];
-const possibleNames : string[] = ['YELLOW', 'RED', 'BLUE', 'ORANGE', 'GREEN', 'PINK', 'WHITE', 'BLACK'];
 
 type playerInput =  { name : string, input : string};
 type winCondition = () => boolean;
@@ -138,7 +138,7 @@ export class Room extends EventEmitter
 
 	public sendSynchro(player : EventEmitter) : void
 	{
-		player.emit('synchronize', this._state, this._data, this._timeInfo);
+		player.emit('synchronize', this._state, this._data, this._timeInfo, this._constructScoreInfo());
 	}
 
 	public stateSwitch(newState : roomStates) : void 
@@ -203,7 +203,7 @@ export class Room extends EventEmitter
 			case (roomStates.ROUND_RESULT) :
 				this._timeInfo = Date.now() + roundResultTime;
 				this.emit('score_info', this._constructScoreInfo());
-				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.ROUND_RESULT) }, roundResultTime);
+				this._timerId = setTimeout(() => { this._checkRoundResultStatus() }, roundResultTime);
 				break ;
 
 			case (roomStates.RESULT) :
@@ -325,7 +325,7 @@ export class Room extends EventEmitter
 			case (roomStates.ACTION_1) :	newState = roomStates.ACTION_2 ; break ;
 			case (roomStates.ACTION_2) :	newState = roomStates.CHAT ; break ;
 			case (roomStates.CHAT) :		newState = roomStates.VOTE ; break ;
-			case (roomStates.VOTE) :		newState = roomStates.RESULT ; break ;
+			case (roomStates.VOTE) :		newState = roomStates.ROUND_RESULT ; break ;
 			default : 						newState = roomStates.ERROR ; break ;
 		}
 		this.stateSwitch(newState);
@@ -376,8 +376,6 @@ export class Room extends EventEmitter
 			this.stateSwitch(roomStates.LOBBY);
 			this._checkLobbyStatus();
 		}
-		else
-			this.stateSwitch(roomStates.ACTION_1)
 	}
 
 	private _onReplayTimerEnded()
@@ -389,11 +387,11 @@ export class Room extends EventEmitter
 		});
 	}
 
-	private _checkLobbyStatus() {
+	private _checkLobbyStatus()
+	{
 		if (this._state != roomStates.LOBBY)
 		{
-			this.stateSwitch(roomStates.ERROR);
-				return ;
+			return ;
 		}
 		this._playerCount = this._players.length;
 		this._isAccessible = (this._playerCount !== this._maxPlayerCount);
@@ -417,12 +415,12 @@ export class Room extends EventEmitter
 			this.emit('lobby_info', this._constructLobbyInfo());
 	}
 
-	private _checkVoteStatus() {
+	private _checkVoteStatus()
+	{
 		console.log(this._checkVoteStatus);
 		if (this._state != roomStates.VOTE)
 		{
-			this.stateSwitch(roomStates.ERROR);
-				return ;
+			return ;
 		}
 		if (!this._haveAllPlayersActed())
 		{
@@ -430,21 +428,28 @@ export class Room extends EventEmitter
 			return ;
 		}
 		this._computeVote!();
+		this.stateSwitch(roomStates.ROUND_RESULT);
+	}
+
+	private _checkRoundResultStatus()
+	{
 		if (this._winCondition!())
 		{
 			console.log('GAME IS OVER !!!')
 			console.log(this._winners);
 			this._players = this._players.filter(p => p.getConnected());
-			this.stateSwitch(roomStates.ROUND_RESULT)
+			this.stateSwitch(roomStates.RESULT);
 		}
 		else
 		{
 			console.log('GAME CONTINUE !!!')
+			this.stateSwitch(roomStates.ACTION_1);
 			this._restartRoom(false);
 		}
 	}
 
-	private async _checkActionStatus() {
+	private async _checkActionStatus()
+	{
 		if (!this._haveAllPlayersActed())
 		{
 			console.log('Not all players have acted');
@@ -507,7 +512,7 @@ export class Room extends EventEmitter
 	}
 
 	private _givePlayersName() {
-		let namePool = [...possibleNames];
+		let namePool = [...names];
 		shuffle(namePool);
 		this._players.forEach( player => {player.setName(namePool.pop() as string)} );
 	}
@@ -554,7 +559,7 @@ export class Room extends EventEmitter
 
 	private _constructScoreInfo() : ScoreInfo {
 		
-		let score : ScoreInfo = {
+		let info : ScoreInfo = {
 			_alive : [],
 			_eliminated : [],
 		};
@@ -562,45 +567,43 @@ export class Room extends EventEmitter
 		if (this._gamemode === gameMode.SCORE) 
 		{
 			let pool = this._players.filter(p => p.getIsLLM());
-			score._alive = pool.map(p => [p.getUsername()!, p.getScore()]);
+			info._alive = pool.map(p => [p.getUsername()!, p.getScore()]);
 		}
 		else if (this._gamemode === gameMode.ELIMINATION)
 		{
 			this._players.forEach(p => {
 				if (p.getEliminated())
-					score._eliminated.push([p.getUsername() ?? 'IA']);
+					info._eliminated.push([p.getUsername() ?? 'IA']);
 				else 
-					score._alive.push([p.getUsername() ?? 'IA', null]);
+					info._alive.push([p.getUsername() ?? 'IA', null]);
 			})
 		}
 
-		return score;
+		return info;
 	}
 
 	private _constructLobbyInfo() : LobbyInfo {
 
-		let lobby : LobbyInfo = {
+		let info : LobbyInfo = {
 			_mode : this._gamemode,
 			_llmCount : this._llmNumber,
 			_players : [],
 			_spots : this._maxPlayerCount - this._playerCount
 		};
 
-		this._players.forEach(p => lobby._players.push([p.getUsername()!, p.hasActed()]));
+		this._players.forEach(p => info._players.push([p.getUsername()!, p.hasActed()]));
 
-		return (lobby);
+		return (info);
 	}
 
 	private _constructVoteInfo() : VoteInfo[] {
 
-		let votes : VoteInfo[] = [];
+		let info : VoteInfo[] = [];
 
 		const votable = this._players.filter(p => !p.getEliminated());
-		votable.forEach(p => votes.push([p.getUserId(), p.getId(), p.getName(), p.getVoted()]));
+		votable.forEach(p => info.push([p.getUserId(), p.getId(), p.getName(), p.getVoted()]));
 
-		console.log('\n\n\nVOTES\n\n\n');
-		console.log(votes);
-		return (votes);
+		return (info);
 	}
 
 	// GAMEMODE

@@ -55,14 +55,18 @@ export interface RoomManagerInterface {
 export interface LobbyInfo {
 	_mode : gameMode | null,
 	_llmCount : number,
-	_players : [name : string, readyness : boolean][],
+	_players : [login : string, readyness : boolean][],
 	_spots : number
 };
 
 export interface ScoreInfo {
-	_alive : [name : string, score : number | null][],
-	_eliminated : [name : string][]
+	_alive : [login : string, score : number | null][],
+	_eliminated : [login : string][]
 };
+
+export interface VoteResultInfo {
+	_players : [login : string, name : string, _llm : boolean]
+}
 
 // implementation found online
 // https://stackoverflow.com/questions/48083353/i-want-to-know-how-to-shuffle-an-array-in-typescript

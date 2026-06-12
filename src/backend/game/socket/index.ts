@@ -171,8 +171,10 @@ export function registerSocketHandlers(io: Server)
 		});
 
 		// Joueur demande synchronization (game side)
-		playerEmitter.on('synchronize', (state, data, timeout) => {
+		playerEmitter.on('synchronize', (state, data, timeout, scoreInfo) => {
 			stateDisplay(state, data, timeout);
+			//TODO : scoreDisplay();
+			console.log(scoreInfo);
 		})
 
 		if (ingame && roomId) {

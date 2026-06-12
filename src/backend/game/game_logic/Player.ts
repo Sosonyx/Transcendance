@@ -114,7 +114,7 @@ export class Player extends EventEmitter
 	public setEliminated(status : boolean)
 	{
 		this._eliminated = status;
-		console.log(`Eliminated ${this._name} : ${this.getIsLLM() ? 'LLM' : 'human'}`);
+		console.log(`Eliminated ${this._name} : ${this.getIsLLM() ? 'IA' : 'human'}`);
 	}
 
 	public setConnected(status : boolean) {
