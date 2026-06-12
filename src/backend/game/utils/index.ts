@@ -53,10 +53,15 @@ export interface RoomManagerInterface {
 // }
 
 export interface LobbyInfo {
-	_mode : gameMode | null;
-	_llmCount : number;
-	_players : string[];
-	_spots : number;
+	_mode : gameMode | null,
+	_llmCount : number,
+	_players : [name : string, readyness : boolean][],
+	_spots : number
+};
+
+export interface ScoreInfo {
+	_alive : [name : string, score : number | null][],
+	_eliminated : [name : string][]
 };
 
 // implementation found online
