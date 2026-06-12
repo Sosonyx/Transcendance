@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { getOtherProfiles } from '../../../services/api.js';
 import { Profile } from './ProfileCard.js';
 import type { User } from '../../../types/types.js';
+import '../../auth/AuthModal.css'
 import './Profile.css'
 
 export function OtherProfileSearch() {
@@ -39,7 +40,7 @@ export function OtherProfileSearch() {
 			/>
 			</div>
 			<button className='button-profile' onClick={OtherProfileLookup}>Find</button>
-			{profileError && <p>{profileError}</p>}
+			{profileError && <p className='error-msg'>{profileError}</p>}
 			{otherProfile && <Profile user={otherProfile} readonly />}
 		</div>
 	);

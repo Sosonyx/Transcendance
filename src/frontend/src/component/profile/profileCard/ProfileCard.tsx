@@ -83,7 +83,10 @@ export function Profile({user, onUserUpdated, readonly = false} : ProfileProps) 
                 </div>
                 <div className="form-group">
                     <label htmlFor="avatar">New avatar</label>
-                    <input type="file" id="avatar" accept="image/*" onChange={handleAvatarChange} />
+                    <input type="file" id="avatar" accept="image/*" onChange={handleAvatarChange} style={{display: 'none'}} />
+                        <label htmlFor="avatar" className="file-label">
+                            {avatarFile ? avatarFile.name : "Choisir un avatar"}
+                        </label>
                 </div>
                 {editError && <p className="error-msg">{editError}</p>}
                 <div className="form-actions">

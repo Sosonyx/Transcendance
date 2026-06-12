@@ -1,3 +1,4 @@
+/* Profile div */
 .profile-page {
 	display: grid;
 	grid-template-columns: 340px 1fr 340px;
@@ -25,17 +26,18 @@
 .profile-card {
 	width: 100%;
 	box-sizing: border-box;
-	background-color: #1e1e2a;
+	background-color: #bf8cc811;
 	border-radius: 16px;
 	padding: 28px;
 	margin: 40px auto 0;
 	display: flex;
 	flex-direction: column;
 	gap: 24px;
-	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 	color: white;
+	box-shadow: var(--box-shadow);
 }
 
+/* Profile header */
 .profile-avatar-section {
 	display: flex;
 	align-items: center;
@@ -50,6 +52,7 @@
 	border: 2px solid #3a3a4a;
 }
 
+/* Profile identity */
 .profile-identity {
 	display: flex;
 	flex-direction: column;
@@ -72,7 +75,7 @@
 .profile-stats {
 	display: flex;
 	justify-content: space-between;
-	background: #2a2a38;
+	background: #2a2a386f;
 	border-radius: 10px;
 	padding: 16px;
 }
@@ -87,7 +90,7 @@
 .stat-value {
 	font-size: 1.4rem;
 	font-weight: 700;
-	color: #9147ff;
+	color: var(--twitch);
 }
 
 .stat-label {
@@ -97,6 +100,7 @@
 	letter-spacing: 0.05em;
 }
 
+/* Edit button */
 .profile-edit-btn {
 	width: 16px;
 	height: 16px;
@@ -107,7 +111,7 @@
 
 .profile-edit-btn:hover {
 	opacity: 1;
-	color: #9147ff;
+	color: var(--twitch);
 	transform: scale(1.2);
 }
 
@@ -142,7 +146,7 @@
 }
 
 .form-group input[type="text"]:focus {
-	border-color: #9147ff;
+	border-color: var(--twitch);
 }
 
 .form-actions {
@@ -153,8 +157,8 @@
 .profile-modify-btn {
 	width: 100%;
 	background: transparent;
-	color: #9147ff;
-	border: 1px solid #9147ff;
+	color: var(--twitch);
+	border: 1px solid var(--twitch);
 	border-radius: 6px;
 	padding: 10px;
 	font-size: 14px;
@@ -164,19 +168,28 @@
 }
 
 .profile-modify-btn:hover {
-	background: #9147ff;
+	background: var(--twitch);
 	color: #fff;
 }
 
 .modify-button[type="submit"] {
-	background: #9147ff;
-	border-color: #9147ff;
+	width: 100%;
+	background: transparent;
+	color: var(--twitch);
+	border: 1px solid var(--twitch);
+	border-radius: 6px;
+	padding: 10px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background 0.2s, color 0.2s;
 }
 
 .modify-button[type="submit"]:hover {
 	background: #a970ff;
 }
 
+/* Find profile */
 .finder-div {
 	background-color: #1e1e2a;
 	border-radius: 16px;
@@ -184,7 +197,7 @@
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
-	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+	box-shadow: var(--box-shadow);
 	color: white;
 }
 
@@ -207,12 +220,12 @@
 }
 
 .username-form:focus {
-	border-color: #9147ff;
+	border-color: var(--twitch);
 }
 
 .button-profile {
 	width: 100%;
-	background: #9147ff;
+	background: var(--twitch);
 	color: #fff;
 	border: none;
 	border-radius: 6px;
@@ -225,4 +238,21 @@
 
 .button-profile:hover {
 	background: #a970ff;
+}
+
+/* Upload file styles */
+.file-label {
+	display: inline-block;
+	padding: 8px 16px;
+	background: transparent;
+	border: 1px solid var(--twitch);
+	border-radius: 6px;
+	color: var(--twitch);
+	cursor: pointer;
+	font-size: 0.9rem;
+	transition: background 0.2s;
+}
+
+.file-label:hover {
+	background: rgba(163, 116, 233, 0.196);
 }

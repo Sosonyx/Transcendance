@@ -41,14 +41,14 @@
 
 .nav-button:hover{
   transition: 0.3s;
-  color: #9147ff;
+  color: var(--twitch);
   transform: scale(0.9);
 }
 
 .play-btn {
-  border: 2px solid #9147ff;
+  border: 2px solid var(--twitch);
   border-radius: 6px;
-  background: #9147ff;
+  background: var(--twitch);
   color: #fff;
   padding: 6px 16px;
   cursor: pointer;
@@ -59,7 +59,7 @@
 
 .play-btn:hover {
   transition: 0.3s;
-  background-color: #9147ff;
+  background-color: var(--twitch);
   color: #ffffff;
   transform: scale(1.1);
 }
@@ -126,7 +126,7 @@
 }
 
 .navbar-username {
-  text-decoration: underline;
+  /* text-decoration: underline; */
   font-size: 14px;
   font-weight: 600;
   color: var(--color-text);
