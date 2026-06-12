@@ -30,11 +30,11 @@ function Action1Panel({ socket }: Action1PanelProps) {
 				{
 					input ?
 					(<>
-						<p id="prompt-label" className="label"> Ask a question ! </p>
-						<input id="prompt-input" type="text" placeholder="Your question..." autoComplete="off" onChange={handleChange} value={prompt ?? ''} />
-						<button id="send-btn">Send</button>
+						<p id="prompt-label" className="label"> Pose une question ! </p>
+						<input id="prompt-input" type="text" placeholder="Ta question..." autoComplete="off" onChange={handleChange} value={prompt ?? ''} />
+						<button id="send-btn" className="game-button"> Envoyer </button>
 					</>) : (
-						<p id="prompt-label" className="label"> Waiting for other players </p>
+						<p id="prompt-label" className="label"> En attente des autres joueurs... </p>
 					)
 				}
 			</form>

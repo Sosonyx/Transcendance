@@ -75,7 +75,7 @@ function ChatPanel({ socket, question, answers }: ChatPanelProps) {
 			<div className="bottom-bar">
 				<form id="chatform" onSubmit={handleSubmit}>
 					<input id="input" type="text" placeholder="Message..." autoComplete="off" onChange={handleChange} value={message ?? ''} />
-					<button id="send-btn" type="submit">Send</button>
+					<button id="send-btn" className="game-button" type="submit">Envoyer</button>
 				</form>
 			</div>
 		</div>

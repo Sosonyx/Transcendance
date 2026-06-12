@@ -7,7 +7,7 @@
     border: 1px solid var(--twitch);
     border-radius: var(--radius);
     padding: 1.5rem 3rem;
-    box-shadow: 0 0 40px rgba(145, 71, 255, 0.3);
+    box-shadow: 0 0 40px #9147ff4d;
     animation: fadeInOut 2s ease forwards;
     z-index: 100;
 }
@@ -20,8 +20,8 @@
 
 @keyframes fadeInOut {
     0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
-    20%  { opacity: 1; transform: translate(-50%, -50%) scale(1);   }
-    80%  { opacity: 1; transform: translate(-50%, -50%) scale(1);   }
+    20%  { opacity: 1; transform: translate(-50%, -50%) scale(2);   }
+    80%  { opacity: 1; transform: translate(-50%, -50%) scale(2);   }
     100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
 }
 

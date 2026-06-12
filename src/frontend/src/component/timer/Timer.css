@@ -13,6 +13,10 @@
     padding: 8px 16px;
     transition: color 0.3s, border-color 0.3s, background 0.3s;
 }
+/*
+    position: absolute;
+    top: 1rem;
+*/
 
 .timer-urgent {
     color: #f44336;

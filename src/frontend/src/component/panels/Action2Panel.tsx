@@ -30,10 +30,13 @@ function Action2Panel({ socket, prompt }: Action2PanelProps) {
 			<form id="form" onSubmit={handleSubmit}>
 				{
 					input ?
-					(<><p id="prompt-label" className="label"> {prompt || "Waiting for prompt..."} </p>
-					<input id="prompt-input" type="text" placeholder="Your response..." autoComplete="off" onChange={handleChange} value={response ?? ''} />
-					<button id="send-btn">Send</button></>) :
-					(<p id="prompt-label" className="label"> Waiting for other players </p>)
+					(<>
+						<p id="prompt-label" className="label"> {prompt || "Attente de la question..."} </p>
+						<input id="prompt-input" type="text" placeholder="Ta réponse..." autoComplete="off" onChange={handleChange} value={response ?? ''} />
+						<button id="send-btn" className="game-button">Envoyer</button>
+					</>) : (
+						<p id="prompt-label" className="label"> En attente des autres joueurs... </p>
+					)
 				}
 			</form>
 		</div>

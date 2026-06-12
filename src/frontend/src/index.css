@@ -30,8 +30,8 @@
   --border:   #ffffff1a;
   --text:     #efeff1;
   --muted:    #adadb8;
-  --radius:   4px;
-  --navbar-height: 47px;
+  --radius:   15px;
+  --navbar-height: 110px;
 }
 
 /* Reset */

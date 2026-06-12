@@ -1,22 +1,19 @@
 .game-container {
-  height: calc(100vh - var(--navbar-height));
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 0 1rem;
-  background: var(--surface);
+  height: calc(100vh - var(--navbar-height) - 2rem);
+  background: var(--bg);
   border: 1px solid var(--border);
+  border-radius: 12px;
+  max-width: 800px;
+  margin: 1rem auto;
+  padding: 0 1rem;
+  position: relative;
+  overflow: hidden;
 }
 
 #send-btn {
   background: var(--twitch);
   color: #fff;
-  border: none;
-  border-radius: var(--radius);
   padding: 6px 14px;
-  font-family: 'Inter', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
   width: auto;
 }
 
@@ -40,4 +37,15 @@
 .centered button {
   width: auto;
   min-width: 200px;
+}
+
+.game-button {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s; 
 }
