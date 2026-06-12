@@ -7,11 +7,13 @@ import Game from './Game.js';
 import './App.css'
 import { GameMode } from './types/types.js';
 import { Home } from './component/home/home.js';
+import { AuthModal } from './component/auth/AuthModal.js';
 
 export function App() {
   const { user, loading, isAuthenticated, refreshAuth } = useAuth();
   const [currentView, setCurrentView] = useState<'home' | 'profile' | 'game'>('home');
   const [gameMode, setGameMode] = useState<GameMode>(GameMode.SCORE);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -28,15 +30,15 @@ export function App() {
 
   return (
     <>
-      <Navbar user={user} onLogout={handleLogout} onAuthSuccess={refreshAuth} onViewChange={setCurrentView}/>
+      <Navbar user={user} onLogout={handleLogout} setShowAuthModal={setShowAuthModal} onViewChange={setCurrentView}/>
       
       {currentView === 'home' && (
           <Home
           user={user}
           gameMode={gameMode}
           setGameMode={setGameMode}
-          onPlay={() => setCurrentView('game')}
-          onAuth={() => {}}
+          onViewChange={setCurrentView}
+          setShowAuthModal={setShowAuthModal}
         />
       )}
 
@@ -47,7 +49,15 @@ export function App() {
       {currentView === 'game' && user && (
         <Game user={user} gameMode={gameMode} />
       )}
-
+      {showAuthModal && !user && (
+        <AuthModal
+          onClose={() => setShowAuthModal(false)}
+          onSuccess={() => {
+            refreshAuth();
+            setShowAuthModal(false);
+          }}
+        />
+      )}
     </>
   );
 }
