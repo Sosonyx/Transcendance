@@ -1,7 +1,9 @@
+// import { useState } from 'react'
 import type { User } from '../../types/types.js';
 import type { GameMode } from '../../types/types.js';
 import { Footer } from '../layout/NavBar/Footer.js';
 import GameModeSwitch from '../switch/GameModeSwitch.js';
+// import { AuthModal } from '../../auth/AuthModal.js'
 import './home.css';
 import '../layout/NavBar/Footer.css';
 
@@ -10,10 +12,11 @@ interface HomeProps {
     gameMode: GameMode;
     setGameMode: React.Dispatch<React.SetStateAction<GameMode>>;
     onPlay: () => void;
-    onAuth: () => void;
+    onAuthSuccess: () => void | Promise<void>
+
 }
 
-export function Home({ user, gameMode, setGameMode, onPlay, onAuth }: HomeProps) {
+export function Home({ user, gameMode, setGameMode, onPlay, onAuthSuccess }: HomeProps) {
     return (
     <div className="home-page">
         <div className="home-hero">
@@ -33,8 +36,8 @@ export function Home({ user, gameMode, setGameMode, onPlay, onAuth }: HomeProps)
                 Jouer
                 </button>
             ) : (
-                <button className="home-play-btn" onClick={onAuth}>
-                Se connecter pour jouer
+                <button className="home-play-btn" onClick={onAuthSuccess}>
+                Jouer
                 </button>
             )}
         </div>
