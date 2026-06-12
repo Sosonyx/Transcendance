@@ -25,32 +25,25 @@ export function Home({ user, gameMode, setGameMode, onViewChange, setShowAuthMod
                 Une remarque étrange, une réponse décalée ?
                 Trouvez qui parmi vous est une intelligence artificielle.
             </p>
-
-            
-
-        
         </div>
 
         <div className="home-rules">
             <div className="rule-card">
                 <span className="rule-icon"></span>
-                <h3>Bipbip... discutez</h3>
-                <p>Bipbip</p>
+                <h3>Discutez</h3>
             </div>
             <div className="rule-card">
                 <span className="rule-icon"></span>
-                <h3>Bapbap... Analysez</h3>
-                <p>Bapbap</p>
+                <h3>Analysez</h3>
             </div>
             <div className="rule-card">
                 <span className="rule-icon"></span>
-                <h3>Boupboup</h3>
-                <p>Boupboup</p>
+                <h3>Votez</h3>
             </div>
         </div>
 
         <div className="home-gamemode">
-                <GameModeSwitch gameMode={gameMode} setGameMode={setGameMode} />
+            <GameModeSwitch gameMode={gameMode} setGameMode={setGameMode} />
         </div>
         {user ? (
                 <button className="home-play-btn" onClick={() => onViewChange('game')}>
