@@ -91,16 +91,17 @@
   background: var(--bg);
   border: 1px solid rgba(145, 71, 255, 0.4);
   border-radius: 16px;
-  padding: 28px 24px;
+  padding: 65px 24px;
   width: 200px;
   text-align: center;
-  display: flex;
-  flex-direction: column;
+  /* display: flex; */
+  /* flex-direction: auto; */
   gap: 12px;
   height: 150px;
   backdrop-filter: blur(8px);
   transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
   cursor: default;
+  /* align-items: center; */
 }
 
 .rule-card:hover {
