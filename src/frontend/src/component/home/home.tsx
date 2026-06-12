@@ -20,7 +20,7 @@ export function Home({ user, gameMode, setGameMode, onPlay, onAuthSuccess }: Hom
     return (
     <div className="home-page">
         <div className="home-hero">
-            <h1 className="home-title">Qui est l'IA ?</h1>
+            <h1 className="home-title">QUI EST L'<span className="blink-ia">IA</span> ?</h1>
             <p className="home-subtitle">Juste une discussion entre amis... ou peut-être pas.</p>
             <p className="home-desc">
                 Une remarque étrange, une réponse décalée ?
