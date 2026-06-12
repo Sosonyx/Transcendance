@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { login, register } from "../../services/api.js"; // Assure-toi d'avoir une fonction register dans ton api.js
+import { register } from "../../services/api.js"; // Assure-toi d'avoir une fonction register dans ton api.js
 
 interface RegisterFormProps {
   onSuccess?: () => void | Promise<void>;

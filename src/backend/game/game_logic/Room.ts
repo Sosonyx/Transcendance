@@ -31,7 +31,7 @@ const scoreCorrectVote : number = 3;
 const scoreGetVoted : number = 1;
 const scoreObjective : number = 10;
 const eliminationTreshold : number = 1;
-const llmNumber : number = 0;
+const llmNumber : number = 2;
 
 // const possibleGameModes : gameMode[] = [gameMode.SCORE, gameMode.ELIMINATION];
 
