@@ -6,6 +6,7 @@ import { roomStates, type VoteInfo, type AnswersType } from './types/types';
 import './Game.css'
 import type { GameMode, User } from './types/types';
 import Timer from './component/timer/Timer';
+import ScoreBoard from './component/scoreboard/ScoreBoard';
 
 interface GameProps {
     user: User;
@@ -82,15 +83,18 @@ function Game({ user, gameMode } : GameProps) {
     }, []);
 
     return (
-        <div className='game-container'>
-            <Timer timeEnd={timeEnd} />
-            {transition && <TransitionOverlay config={transition} />}
-            {state === roomStates.LOBBY    && <LobbyPanel   socket={socket} />}
-            {state === roomStates.ACTION_1 && <Action1Panel socket={socket} />}
-            {state === roomStates.ACTION_2 && <Action2Panel socket={socket} prompt={prompt} />}
-            {state === roomStates.CHAT     && <ChatPanel socket={socket} question={question} answers={answers} />}
-            {state === roomStates.VOTE     && <VotePanel    socket={socket} players={players} userId={user.id} />}
-            {state === roomStates.RESULT   && <ResultPanel  socket={socket} />}
+        <div className='game-wrapper'>
+            <div className='game-container'>
+                <Timer timeEnd={timeEnd} />
+                {transition && <TransitionOverlay config={transition} />}
+                {state === roomStates.LOBBY    && <LobbyPanel   socket={socket} />}
+                {state === roomStates.ACTION_1 && <Action1Panel socket={socket} />}
+                {state === roomStates.ACTION_2 && <Action2Panel socket={socket} prompt={prompt} />}
+                {state === roomStates.CHAT     && <ChatPanel socket={socket} question={question} answers={answers} />}
+                {state === roomStates.VOTE     && <VotePanel    socket={socket} players={players} userId={user.id} />}
+                {state === roomStates.RESULT   && <ResultPanel  socket={socket} />}
+            </div>
+            <ScoreBoard socket={socket} />
         </div>
     );
 }

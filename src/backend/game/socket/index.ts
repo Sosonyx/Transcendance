@@ -2,7 +2,7 @@ import { Server } from 'socket.io';
 import { EventEmitter } from "node:events";
 import { RoomManager } from '../game_logic/RoomManager.js';
 import { roomStates } from '../game_logic/Room.js';
-import { gameMode, type LobbyInfo, type Message , type RoomId, type SafeUser, type VoteInfo } from '../utils/index.js';
+import { gameMode, type LobbyInfo, type Message , type RoomId, type SafeUser, type ScoreInfo, type VoteInfo } from '../utils/index.js';
 import { CLI } from '../game_logic/CommandLine.js';
 
 export function registerSocketHandlers(io: Server) 
@@ -66,6 +66,10 @@ export function registerSocketHandlers(io: Server)
 
 		// Changement d'etat de la room
 		roomEmitter.on('stateChanged', stateDisplay);
+
+		roomEmitter.on('score_info', (scoreInfo: ScoreInfo) => {
+			socket.emit('score_info', scoreInfo);
+		});
 
 		/* ==========LOBBY==========*/
 		// Joueur pret

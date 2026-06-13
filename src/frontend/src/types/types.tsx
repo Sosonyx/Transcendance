@@ -70,3 +70,8 @@ export interface LobbyInfo {
 	_players : string[];
 	_spots : number;
 }
+
+export interface ScoreInfo {
+	_alive : [login : string, score : number | null][],
+	_eliminated : [login : string][]
+};
