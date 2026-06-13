@@ -4,6 +4,7 @@ import { Profile } from './ProfileCard.js';
 import type { User } from '../../../types/types.js';
 import '../../auth/AuthModal.css'
 import './Profile.css'
+import './FindProfile.css'
 
 export function OtherProfileSearch() {
 	const [profileUsername, setProfileUsername] = useState('');
