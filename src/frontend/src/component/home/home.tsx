@@ -1,9 +1,7 @@
-// import { useState } from 'react'
 import type { User } from '../../types/types.js';
 import type { GameMode } from '../../types/types.js';
 import { Footer } from '../layout/NavBar/Footer.js';
 import GameModeSwitch from '../switch/GameModeSwitch.js';
-// import { AuthModal } from '../../auth/AuthModal.js'
 import './home.css';
 import '../layout/NavBar/Footer.css';
 

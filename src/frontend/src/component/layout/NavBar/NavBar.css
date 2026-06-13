@@ -103,6 +103,18 @@
   box-shadow: 0 0 8px rgba(145, 71, 255, 0.5);
 }
 
+.navbar-account-icon {
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.navbar-account-icon:hover {
+  opacity: 1;
+}
+
 .navbar-username {
   font-size: 1rem;
   font-weight: 700;

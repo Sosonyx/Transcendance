@@ -35,7 +35,7 @@ export function Navbar({ user, onLogout, setShowAuthModal, onViewChange}: Props)
           </div>
         ) : (
           <div className='button-div'>
-            <img src="/account.svg" alt="Profile" className="profile-edit-btn" onClick={() => setShowAuthModal(true)} />
+            <img src="/account.svg" alt="Profile" className="navbar-account-icon" onClick={() => setShowAuthModal(true)} />
             <button className='play-btn' onClick={() => setShowAuthModal(true)}>Play</button>
           </div>
         )}
