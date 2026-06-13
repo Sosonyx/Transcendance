@@ -23,6 +23,7 @@
   --twitch-dark:  #6316c1;
   --twitch-hover: #a970ff;
   --twitch-surface: #9147ff26;
+  --twitch-shadow: #9147ff4d;
 
   --bg:       #190521b3;
   --surface:  #1f1f23;
@@ -108,7 +109,7 @@ input:where([type="text"], [type="password"], [type="email"])::placeholder { col
 
 input:where([type="text"], [type="password"], [type="email"]):focus {
   border-color: var(--twitch);
-  box-shadow: 0 0 0 2px rgba(145,71,255,0.3);
+  box-shadow: 0 0 0 2px var(--twitch-shadow);
 }
 
 /* Buttons - base */
@@ -148,6 +149,5 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 /* Responsive */
 
 @media (max-width: 420px) {
-  body { padding: 16px 12px 40px; }
   button { font-size: 13px; padding: 10px 16px; }
 }

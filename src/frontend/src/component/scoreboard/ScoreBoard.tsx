@@ -13,11 +13,7 @@ function ScoreBoard({ socket }: ScoreBoardProps) {
 	useEffect(()=>{
 		if (!socket) return;
 		
-		socket?.on('score_info', (sI: ScoreInfo) => {
-			setScoreInfo(sI);
-			console.log("Score Info:", sI);
-			console.log("Score Info:", scoreInfo);
-		});
+		socket?.on('score_info', setScoreInfo);
 
 		return (() => { socket?.off('score_info', setScoreInfo); });
 	},[socket])

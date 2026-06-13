@@ -58,7 +58,7 @@ function ChatPanel({ socket, question, answers }: ChatPanelProps) {
 	return (
 		<div className="chat-layout">
 			<div id="chat-context">
-				<p id="chat-question" className="label">{question}</p>
+				<p id="chat-question" className="game-label">{question}</p>
 				<ul id="chat-answers">
 					{answers.map(([playerName, answer], id) => (<li key={id}>{playerName} : {answer}</li>))}
 				</ul>

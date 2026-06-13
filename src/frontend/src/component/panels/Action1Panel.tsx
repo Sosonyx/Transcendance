@@ -26,15 +26,15 @@ function Action1Panel({ socket }: Action1PanelProps) {
 
 	return (
 		<div className="centered">
-			<form id="form" onSubmit={handleSubmit}>
+			<form id="form" className="game-form" onSubmit={handleSubmit}>
 				{
 					input ?
 					(<>
-						<p id="prompt-label" className="label"> Pose une question ! </p>
+						<p id="prompt-label" className="game-label"> Pose une question ! </p>
 						<input id="prompt-input" type="text" placeholder="Ta question..." autoComplete="off" onChange={handleChange} value={prompt ?? ''} />
 						<button id="send-btn" className="game-button"> Envoyer </button>
 					</>) : (
-						<p id="prompt-label" className="label"> En attente des autres joueurs... </p>
+						<p id="prompt-label" className="game-label"> En attente des autres joueurs... </p>
 					)
 				}
 			</form>
