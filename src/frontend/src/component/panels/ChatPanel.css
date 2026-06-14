@@ -72,7 +72,7 @@
 
 #input:focus {
   border-color: var(--twitch);
-  box-shadow: 0 0 0 2px rgba(145,71,255,0.3);
+  box-shadow: 0 0 0 2px var(--twitch-shadow);
 }
 
 #input::placeholder {

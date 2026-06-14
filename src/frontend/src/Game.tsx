@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { LobbyPanel, Action1Panel, Action2Panel, ChatPanel, VotePanel, ResultPanel } from './component/panels'
+import { LobbyPanel, Action1Panel, Action2Panel, ChatPanel, VotePanel, RoundResultPanel, ResultPanel } from './component/panels'
 import { TransitionOverlay } from './component/transitions';
 import { roomStates, type VoteInfo, type AnswersType } from './types/types';
 import './Game.css'
-import { GameMode, RoomType, CustomAction, type User } from './types/types';
+import { GameMode, RoomType, CustomAction, type RoundResultInfo, type User } from './types/types';
 import Timer from './component/timer/Timer';
 import ScoreBoard from './component/scoreboard/ScoreBoard';
 
@@ -27,6 +27,7 @@ function Game({ user, gameMode, roomType, customAction } : GameProps) {
     const [answers, setAnswers] = useState<AnswersType>([]);
     const [transition, setTransition] = useState<string | null>(null);
     const [mobileTab, setMobileTab] = useState<MobileTab>('chat');
+    const [roundResult, setRoundResult] = useState<RoundResultInfo>({ _players: [] });
 
     const isVotePhase = state === roomStates.VOTE;
     const isLobbyPhase = state === roomStates.LOBBY;
@@ -86,6 +87,11 @@ function Game({ user, gameMode, roomType, customAction } : GameProps) {
                 setState(roomStates.VOTE);
             });
         });
+        s.on('startRoundResult', (roundResult: RoundResultInfo, timeInfo: number | null) => {
+            setRoundResult(roundResult);
+            setTimeEnd(timeInfo);
+            setState(roomStates.ROUND_RESULT);
+        });
         s.on('startResult', (timeInfo: number | null) => {
             setTimeEnd(timeInfo);
             setState(roomStates.RESULT)
@@ -121,6 +127,7 @@ function Game({ user, gameMode, roomType, customAction } : GameProps) {
                 {state === roomStates.ACTION_1 	&& <Action1Panel socket={socket} />}
                 {state === roomStates.ACTION_2 	&& <Action2Panel socket={socket} prompt={prompt} />}
                 {isChatOrVote                  	&& <ChatPanel    socket={socket} question={question} answers={answers} />}
+                {state === roomStates.ROUND_RESULT && <RoundResultPanel roundResult={roundResult} />}
                 {state === roomStates.RESULT   	&& <ResultPanel  socket={socket} />}
             </div>
 

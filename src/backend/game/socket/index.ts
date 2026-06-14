@@ -54,6 +54,10 @@ export function registerSocketHandlers(io: Server)
 		            // console.log(`${roomId}: starting vote phase`);
 		            break;
 		        }
+				case roomStates.ROUND_RESULT: {
+					socket.emit('startRoundResult', data, timeinfo);
+					break;
+				}
 				case roomStates.RESULT: {
 					socket.emit('startResult', timeinfo);
 					// console.log(`${roomId}: result phase`)
