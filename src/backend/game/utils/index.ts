@@ -11,10 +11,20 @@ export type RoomId = string | null;
 
 export type VoteInfo = [userid : string | null, playerid : string, name : string, votes : number];
 
-export enum gameMode {
+export enum GameMode {
 	SCORE = "SCORE",
 	ELIMINATION = "ELIMINATION"
 };
+
+export enum RoomType {
+	CLASSIC = "CLASSIC",
+	CUSTOM = "CUSTOM"
+}
+
+export enum CustomAction {
+	CREATE = "CREATE",
+	JOIN = "JOIN"
+}
 
 export interface SafeUser {
     id: string;
@@ -23,7 +33,7 @@ export interface SafeUser {
 };
 
 export interface RoomManagerInterface {
-    connectPlayer(user : SafeUser, gamemode : gameMode) : [roomId : string | null, room : EventEmitter, player : EventEmitter, ingame : boolean]; // return RoomId + room as Emitter if new room
+    connectPlayer(user : SafeUser, gamemode : GameMode, roomType : RoomType, customAction : CustomAction) : [roomId : string | null, room : EventEmitter, player : EventEmitter, ingame : boolean]; // return RoomId + room as Emitter if new room
     onReadyEvent(playerId : string, roomId : RoomId) : void;
 	onInputEvent(playerId : string, roomId : RoomId, message : string) : void;
     onChatEvent(playerId : string, roomId : RoomId, message : string) : void;
@@ -53,7 +63,7 @@ export interface RoomManagerInterface {
 // }
 
 export interface LobbyInfo {
-	_mode : gameMode | null,
+	_mode : GameMode | null,
 	_llmCount : number,
 	_players : [login : string, readyness : boolean][],
 	_spots : number

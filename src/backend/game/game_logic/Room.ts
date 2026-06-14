@@ -3,7 +3,7 @@ import { LlmPlayer } from "./LlmPlayer.js";
 import { v4 as uuid } from 'uuid';
 import { EventEmitter } from "node:events";
 import type { Message } from "../../llm/types/messages.js";
-import { gameMode, shuffle } from "../utils/index.js";
+import { GameMode , RoomType, shuffle } from "../utils/index.js";
 import { prisma } from "../../prisma/prisma.js"
 import type { VoteInfo, LobbyInfo, ScoreInfo, RoundResultInfo } from "../utils/index.js";
 import { names } from "./Names.js"
@@ -44,7 +44,8 @@ export class Room extends EventEmitter
 	private	readonly _id : string;
 
 	// private _config : GameConfig;
-	private	_gamemode : gameMode;
+	private _roomType : RoomType;
+	private	_gameMode : GameMode;
 	private	_gameId? : string | null;
 	private _number : number;
 	private _state : roomStates;
@@ -97,8 +98,12 @@ export class Room extends EventEmitter
 
 	// SETGET
 
-	public getGameMode() : gameMode {
-		return this._gamemode;
+	public getRoomType() : RoomType {
+		return this._roomType;
+	}
+
+	public getGameMode() : GameMode {
+		return this._gameMode;
 	}
 
 	public getId() : string {
@@ -229,6 +234,8 @@ export class Room extends EventEmitter
 		player.setConnected(true);
 		if (this._state != roomStates.LOBBY || ingame)
 			return ;
+		if (this._roomType === RoomType.CUSTOM && this._playerCount === 0)
+			player.setCustomizer(true);
 		this._players.push(player);
 		this._checkLobbyStatus();
 	}
@@ -561,13 +568,13 @@ export class Room extends EventEmitter
 			_players : []
 		};
 
-		if (this._gamemode === gameMode.SCORE)
+		if (this._gameMode === GameMode.SCORE)
 		{
 			this._players.forEach(p => {
 				info._players.push([p.getUsername() || 'IA', p.getName(), p.getIsLLM()]);
 			})
 		}
-		else if (this._gamemode === gameMode.ELIMINATION)
+		else if (this._gameMode === GameMode.ELIMINATION)
 		{
 			let pool = this._players.filter(p => p.justGotEliminated());
 			pool.forEach(p => {
@@ -585,13 +592,13 @@ export class Room extends EventEmitter
 			_eliminated : []
 		};
 
-		if (this._gamemode === gameMode.SCORE)
+		if (this._gameMode === GameMode.SCORE)
 		{
 			let pool = this._players.filter(p => !p.getIsLLM());
 			pool.forEach(p => {
 				info._alive.push([p.getUsername()!, p.getScore()])});
 		}
-		else if (this._gamemode === gameMode.ELIMINATION)
+		else if (this._gameMode === GameMode.ELIMINATION)
 		{
 			this._players.forEach(p => {
 				if (p.getEliminated())
@@ -609,7 +616,7 @@ export class Room extends EventEmitter
 	private _constructLobbyInfo() : LobbyInfo {
 
 		let info : LobbyInfo = {
-			_mode : this._gamemode,
+			_mode : this._gameMode,
 			_llmCount : this._llmNumber,
 			_players : [],
 			_spots : this._maxPlayerCount - this._playerCount
@@ -634,13 +641,13 @@ export class Room extends EventEmitter
 
 	private _pickGameMode() : void
 	{
-		switch (this._gamemode)
+		switch (this._gameMode)
 		{
-			case (gameMode.SCORE) :
+			case (GameMode.SCORE) :
 				this._computeVote = this.__computeVoteScore;
 				this._winCondition = this.__winConditionScore;
 				break ;
-			case (gameMode.ELIMINATION) :
+			case (GameMode.ELIMINATION) :
 				this._computeVote = this.__computeVoteElimination;
 				this._winCondition = this.__winConditionElimination;
 				break ;
@@ -651,7 +658,7 @@ export class Room extends EventEmitter
 
 	private __computeVoteScore() : void
 	{
-		if (this._gamemode === gameMode.SCORE)
+		if (this._gameMode === GameMode.SCORE)
 		{
 			this._players.forEach(player => {
 				if (!player.getIsLLM() && player.getVoteAgainst() !== null)
@@ -668,7 +675,7 @@ export class Room extends EventEmitter
 
 	private __computeVoteElimination() : void
 	{
-		if (this._gamemode === gameMode.ELIMINATION)
+		if (this._gameMode === GameMode.ELIMINATION)
 		{
 			this._players.forEach(player => {
 				if (!player.getEliminated() && player.getVoteAgainst() != null)
@@ -713,11 +720,12 @@ export class Room extends EventEmitter
 
 	// CONSTRUCTOR
 
-	public constructor(nb : number, gamemode : gameMode) {
+	public constructor(nb : number, gameMode : GameMode, roomType : RoomType) {
 		super();
 		console.log("Constructor called for class Room");
 		this._id = uuid();
-		this._gamemode = gamemode;
+		this._gameMode = gameMode;
+		this._roomType = roomType;
 		this._gameId = null;
 		this._number = nb;
 		this._state = roomStates.INIT;

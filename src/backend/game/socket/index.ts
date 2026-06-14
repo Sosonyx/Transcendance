@@ -2,7 +2,7 @@ import { Server } from 'socket.io';
 import { EventEmitter } from "node:events";
 import { RoomManager } from '../game_logic/RoomManager.js';
 import { roomStates } from '../game_logic/Room.js';
-import { gameMode, type LobbyInfo, type Message , type RoomId, type SafeUser, type ScoreInfo, type VoteInfo } from '../utils/index.js';
+import { GameMode, RoomType, CustomAction, type LobbyInfo, type Message , type RoomId, type SafeUser, type ScoreInfo, type VoteInfo } from '../utils/index.js';
 import { CLI } from '../game_logic/CommandLine.js';
 
 export function registerSocketHandlers(io: Server) 
@@ -15,9 +15,11 @@ export function registerSocketHandlers(io: Server)
 		
 		// Recupere la room
 		const user: SafeUser = socket.handshake.auth.user;
-		const gameMode: gameMode = socket.handshake.auth.gameMode;
+		const gameMode: GameMode = socket.handshake.auth.gameMode;
+		const roomType: RoomType = socket.handshake.auth.roomType;
+		const customAction: CustomAction = socket.handshake.auth.customAction;
 
-		let [roomId, roomEmitter, playerEmitter, ingame] : [RoomId, EventEmitter, EventEmitter, boolean] = roomManager.connectPlayer(user, gameMode);
+		let [roomId, roomEmitter, playerEmitter, ingame] : [RoomId, EventEmitter, EventEmitter, boolean] = roomManager.connectPlayer(user, gameMode, roomType, customAction);
 
 		// Rejoins sa room
 		if (roomId !== null)
@@ -147,7 +149,7 @@ export function registerSocketHandlers(io: Server)
 				socket.leave(roomId);
 				roomEmitter.off('stateChanged', stateDisplay);
 			}
-			[roomId, roomEmitter, playerEmitter] = roomManager.connectPlayer(user, gameMode)
+			[roomId, roomEmitter, playerEmitter] = roomManager.connectPlayer(user, gameMode, roomType, CustomAction.CREATE)
 			if (roomId !== null)
 			{
 				socket.join(roomId);

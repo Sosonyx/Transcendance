@@ -1,5 +1,5 @@
 import React from 'react';
-import './GameModeSwitch.css';
+import './Switch.css';
 import { GameMode } from '../../types/types';
 
 interface GameModeSwitchProps {
@@ -9,7 +9,7 @@ interface GameModeSwitchProps {
 
 function GameModeSwitch({ gameMode, setGameMode }: GameModeSwitchProps) {
   return (
-    <div className="game-mode-container">
+    <div className="switch-container">
         <label className={`mode-label ${gameMode === GameMode.ELIMINATION ? 'active' : ''}`}>
             <input
                 type="radio"

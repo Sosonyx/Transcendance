@@ -4,7 +4,7 @@ import { LobbyPanel, Action1Panel, Action2Panel, ChatPanel, VotePanel, ResultPan
 import { TransitionOverlay } from './component/transitions';
 import { roomStates, type VoteInfo, type AnswersType } from './types/types';
 import './Game.css'
-import type { GameMode, User } from './types/types';
+import type { GameMode, RoomType, CustomAction, User } from './types/types';
 import Timer from './component/timer/Timer';
 import ScoreBoard from './component/scoreboard/ScoreBoard';
 
@@ -13,9 +13,11 @@ type MobileTab = 'chat' | 'vote' | 'score';
 interface GameProps {
     user: User;
     gameMode: GameMode;
+	roomType: RoomType;
+	customAction: CustomAction;
 }
 
-function Game({ user, gameMode } : GameProps) {
+function Game({ user, gameMode, roomType, customAction } : GameProps) {
     const [state, setState] = useState<roomStates>(roomStates.LOBBY);
     const [socket, setSocket] = useState<Socket | null>(null);
     const [timeEnd, setTimeEnd] = useState<number | null>(null);
@@ -41,12 +43,15 @@ function Game({ user, gameMode } : GameProps) {
     useEffect(() => {
         const s = io(undefined, {
             auth: {
-                user: { 
+                user: {
                     id: user.id, 
                     username: user.username, 
                     avatar: user.avatar 
                 },
-                gameMode: gameMode
+
+                gameMode: gameMode,
+				roomType: roomType,
+				customAction: customAction
             }
         });
         setSocket(s);

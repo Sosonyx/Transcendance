@@ -16,6 +16,7 @@ export class Player extends EventEmitter
 	private		_score : number;
 	protected 	_eliminated : boolean;
 	protected	_justEliminated : boolean;
+	private		_customizer : boolean;
 	private		_connected : boolean;
 
 	public getId() : string {
@@ -74,6 +75,10 @@ export class Player extends EventEmitter
 		return (this._justEliminated)
 	}
 
+	public getCustomizer() : boolean {
+		return (this._customizer)
+	}
+
 	public getConnected() : boolean {
 		return (this._connected);
 	}
@@ -125,6 +130,11 @@ export class Player extends EventEmitter
 		console.log(`Eliminated ${this._name} : ${this.getIsLLM() ? 'IA' : 'human'}`);
 	}
 
+	public setCustomizer(status : boolean)
+	{
+		this._customizer = status;
+	}
+
 	public setConnected(status : boolean) {
 		this._connected = status;
 	}
@@ -144,6 +154,7 @@ export class Player extends EventEmitter
 		this._score = 0;
 		this._eliminated = false;
 		this._justEliminated = false;
+		this._customizer = false;
 		this._connected = false;
 	}
 }

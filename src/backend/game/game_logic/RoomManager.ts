@@ -1,39 +1,66 @@
 import { Room} from "./Room.js";
 import { Player } from "./Player.js";
 import { EventEmitter } from "node:events";
-import type { RoomManagerInterface, RoomId, gameMode, SafeUser } from "../utils/index.js";
+import { type RoomManagerInterface, type RoomId, type GameMode, type SafeUser, RoomType, CustomAction } from "../utils/index.js";
 
 export	class RoomManager implements RoomManagerInterface
 {
 	private _rooms : Room[];
 	private _roomCount : number;
 
-	private _createRoom(gameMode : gameMode) : Room {
-		let room = new Room(this._roomCount, gameMode);
-		this._roomCount++;
-		this._rooms.push(room);
-		room.start();
-		return room
-	}
+	// --- ROOM ATTRIBUTION / PLAYER CONNECTION MANAGMENT ---------------------
 
-	public connectPlayer(user : SafeUser, gamemode : gameMode) : 
+	public connectPlayer(user : SafeUser, gameMode : GameMode, roomType : RoomType, customAction : CustomAction) : 
 	[roomId : RoomId, room : EventEmitter, player : EventEmitter, ingame : boolean]
 	{
 		let player : Player | undefined;
 		let room : Room | undefined;
 		let ingame = true;
 
+		console.log(`Connecting player fro room : ${gameMode} | ${roomType} | ${customAction}`);
+
+		// Check if player already ingame
 		room = this._rooms.find(room => room.accessPlayerByUserId(user.id));
 		player = room?.accessPlayerByUserId(user.id);
+
+		// Player is not ingame, creating / joining room
 		if (room === undefined)
 		{
-			room = this._accessFreeRoom(gamemode);
+			room = this._accessFreeRoom(gameMode, roomType, customAction);
 			player = new Player(user);
 			ingame = false;
 		}
-		room.onJoin(player as Player, ingame);
+
+		room.onJoin(player!, ingame);
 		console.log(room);
 		return ([room.getId(), room as EventEmitter, player as EventEmitter, ingame]);
+	}
+
+	private _createRoom(gameMode : GameMode, roomType : RoomType) : Room
+	{
+		let room = new Room(this._roomCount, gameMode, roomType);
+		this._roomCount++;
+		this._rooms.push(room);
+		room.start();
+		return room
+	}
+
+	private _accessFreeRoom(gameMode : GameMode, roomType : RoomType, customAction : CustomAction) : Room
+	{
+		// Check if player wanna create a custom game
+		if (roomType === RoomType.CUSTOM && customAction === CustomAction.CREATE)
+		{
+			return (this._createRoom(gameMode, roomType))
+		}
+
+		// Try to find a corresponding room...
+		let room : Room | undefined = this._rooms.find(
+			room => room.getIsAccessible() && room.getGameMode() === gameMode && room.getRoomType() === roomType);
+
+		// ... or create a new one
+		if (room === undefined)
+			room = this._createRoom(gameMode, roomType);
+		return room;
 	}
 
 	public askSynchronize(roomId : string, userId : string)
@@ -55,6 +82,8 @@ export	class RoomManager implements RoomManagerInterface
 		}
 		room.sendSynchro(player as EventEmitter);
 	}
+
+	// ------------------------------------------------------------------------
 
 	public onReadyEvent(userId : string, roomId : RoomId)
 	{
@@ -227,13 +256,6 @@ export	class RoomManager implements RoomManagerInterface
 		if (room === undefined)
 			return (null);
 		return (room.getState());
-	}
-
-	private _accessFreeRoom(gamemode : gameMode) : Room {
-		let room : Room | undefined = this._rooms.find(room => room.getIsAccessible() && room.getGameMode() === gamemode);
-		if (room === undefined)
-			room = this._createRoom(gamemode);
-		return room;
 	}
 
 	private _accessRoomById(id : string) : Room | undefined {
