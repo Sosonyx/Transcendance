@@ -4,6 +4,7 @@ import Action2Panel from "./Action2Panel";
 import ChatPanel from "./ChatPanel";
 import VotePanel from "./VotePanel";
 import ResultPanel from "./ResultPanel";
+import GameConfigPanel from "./GameConfigPanel";
 
 export {
 	LobbyPanel,
@@ -12,4 +13,5 @@ export {
 	ChatPanel,
 	VotePanel,
 	ResultPanel,
+	GameConfigPanel
 };

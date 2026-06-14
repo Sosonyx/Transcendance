@@ -2,7 +2,7 @@ import { Server } from 'socket.io';
 import { EventEmitter } from "node:events";
 import { RoomManager } from '../game_logic/RoomManager.js';
 import { roomStates } from '../game_logic/Room.js';
-import { GameMode, RoomType, CustomAction, type LobbyInfo, type Message , type RoomId, type SafeUser, type ScoreInfo, type VoteInfo } from '../utils/index.js';
+import { GameMode, RoomType, CustomAction, type LobbyInfo, type Message , type RoomId, type SafeUser, type ScoreInfo, type VoteInfo, type GameConfig } from '../utils/index.js';
 import { CLI } from '../game_logic/CommandLine.js';
 
 export function registerSocketHandlers(io: Server) 
@@ -74,6 +74,7 @@ export function registerSocketHandlers(io: Server)
 		});
 
 		/* ==========LOBBY==========*/
+
 		// Joueur pret
 		socket.on('ready', () => {
 			// TODO : still need to check the state ?
@@ -87,7 +88,16 @@ export function registerSocketHandlers(io: Server)
 			socket.emit('lobby_info', lobbyInfo);
 		});
 
+		// Envoi de la config en mode custom
+		socket.on('config', (config: GameConfig, callback) => {
+			
+			let check = roomManager.onConfig(user.id, roomId, config);
+			if (!check)	callback({ status : 'error'});
+			else 		callback({ status : 'ok'});
+		});
+
 		/* ==========ACTION_1==========*/
+
 		// Joueur interragit action_1
 		socket.on('input', (content: string) => {
 			// console.log(`socket backend received an input info !`);
@@ -101,6 +111,7 @@ export function registerSocketHandlers(io: Server)
 		});
 
 		/* ==========CHAT==========*/
+
 		// Joueur envoie un message
 		socket.on('message', (content: string) => {
 			if (roomId === null) return;

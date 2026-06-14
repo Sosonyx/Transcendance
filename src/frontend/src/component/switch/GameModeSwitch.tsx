@@ -1,10 +1,9 @@
-import React from 'react';
 import './Switch.css';
 import { GameMode } from '../../types/types';
 
 interface GameModeSwitchProps {
     gameMode: GameMode;
-    setGameMode: React.Dispatch<React.SetStateAction<GameMode>>;
+    setGameMode: (mode: GameMode) => void;
 }
 
 function GameModeSwitch({ gameMode, setGameMode }: GameModeSwitchProps) {

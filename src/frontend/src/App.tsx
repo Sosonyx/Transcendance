@@ -14,6 +14,7 @@ export function App() {
   const { user, loading, isAuthenticated, refreshAuth } = useAuth();
   const [currentView, setCurrentView] = useState<'home' | 'profile' | 'game'>('home');
   const [gameMode, setGameMode] = useState<GameMode>(GameMode.SCORE);
+
   const [roomType, setRoomType] = useState<RoomType>(RoomType.CLASSIC);
   const [customAction, setCustomAction] = useState<CustomAction>(CustomAction.CREATE);
 
@@ -41,14 +42,11 @@ export function App() {
           
 			{
 				roomType === RoomType.CLASSIC && (
-					<GameModeSwitch gameMode={gameMode} setGameMode={setGameMode} />
-				)
+					<GameModeSwitch gameMode={gameMode} setGameMode={setGameMode} /> )
 			}
-
 			{
 				roomType === RoomType.CUSTOM && (
-					<CustomActionSwitch customAction={customAction} setCustomAction={setCustomAction} />
-				)
+					<CustomActionSwitch customAction={customAction} setCustomAction={setCustomAction} /> )
 			}
 
         </div>
@@ -59,7 +57,7 @@ export function App() {
       )}
 
       {currentView === 'game' && user && (
-        <Game user={user} gameMode={gameMode} roomType={roomType} customAction={customAction}/>
+        <Game user={user} gameMode={gameMode} roomType={roomType} customAction={customAction} />
       )}
 
     </>

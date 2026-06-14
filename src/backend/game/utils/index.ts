@@ -46,21 +46,15 @@ export interface RoomManagerInterface {
 	getRoomState(roomId : RoomId) : string | null;
 };
 
-
-// export interface GameConfig {
-// 	_gamemode : gameMode | null;
-// 	_maxPlayerCount : number;
-// 	_action_1_Time : number;
-// 	_action_2_Time : number;
-// 	_chatTime : number = 60 * 1000; // 30 seconds
-// 	_voteTime : number = 30 * 1000; // 30 seconds
-// 	_replayTime : number = 30 * 1000; // 30 seconds
-// 	_maxPlayerCount : number = 7;
-// 	_scoreCorrectVote : number = 3;
-// 	_scoreGetVoted : number = 1;
-// 	_scoreObjective : number = 10;
-// 	_eliminationTreshold : number = 1;
-// }
+export interface GameConfig {
+	gameMode : GameMode;
+	chatTime : number; // 30 seconds
+	voteTime : number; // 30 seconds
+	maxPlayerCount : number;
+	scoreObjective : number;
+	eliminationTreshold : number;
+	llmNumber : number;
+}
 
 export interface LobbyInfo {
 	_mode : GameMode | null,

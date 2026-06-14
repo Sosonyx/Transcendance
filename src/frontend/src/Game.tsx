@@ -4,7 +4,7 @@ import { LobbyPanel, Action1Panel, Action2Panel, ChatPanel, VotePanel, ResultPan
 import { TransitionOverlay } from './component/transitions';
 import { roomStates, type VoteInfo, type AnswersType } from './types/types';
 import './Game.css'
-import type { GameMode, RoomType, CustomAction, User } from './types/types';
+import { GameMode, RoomType, CustomAction, type User } from './types/types';
 import Timer from './component/timer/Timer';
 import ScoreBoard from './component/scoreboard/ScoreBoard';
 
@@ -117,11 +117,11 @@ function Game({ user, gameMode, roomType, customAction } : GameProps) {
             {/* Game container — caché sur mobile si tab !== chat */}
             <div className={`game-container ${mobileTab !== 'chat' ? 'mobile-hidden' : ''}`}>
                 {transition && <TransitionOverlay config={transition} />}
-                {state === roomStates.LOBBY    && <LobbyPanel   socket={socket} />}
-                {state === roomStates.ACTION_1 && <Action1Panel socket={socket} />}
-                {state === roomStates.ACTION_2 && <Action2Panel socket={socket} prompt={prompt} />}
-                {isChatOrVote                  && <ChatPanel    socket={socket} question={question} answers={answers} />}
-                {state === roomStates.RESULT   && <ResultPanel  socket={socket} />}
+                {state === roomStates.LOBBY		&& <LobbyPanel   socket={socket} isCustom={true} />}
+                {state === roomStates.ACTION_1 	&& <Action1Panel socket={socket} />}
+                {state === roomStates.ACTION_2 	&& <Action2Panel socket={socket} prompt={prompt} />}
+                {isChatOrVote                  	&& <ChatPanel    socket={socket} question={question} answers={answers} />}
+                {state === roomStates.RESULT   	&& <ResultPanel  socket={socket} />}\
             </div>
 
             {/* Side panel */}

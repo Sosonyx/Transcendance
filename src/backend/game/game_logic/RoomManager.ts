@@ -1,7 +1,7 @@
-import { Room} from "./Room.js";
+import { Room, roomStates} from "./Room.js";
 import { Player } from "./Player.js";
 import { EventEmitter } from "node:events";
-import { type RoomManagerInterface, type RoomId, type GameMode, type SafeUser, RoomType, CustomAction } from "../utils/index.js";
+import { type RoomManagerInterface, type RoomId, type GameMode, type SafeUser, RoomType, CustomAction, type GameConfig } from "../utils/index.js";
 
 export	class RoomManager implements RoomManagerInterface
 {
@@ -84,6 +84,19 @@ export	class RoomManager implements RoomManagerInterface
 	}
 
 	// ------------------------------------------------------------------------
+
+	public onConfig(userId : string, roomId : RoomId, config : GameConfig) : boolean
+	{
+		let player : Player | undefined;
+		let room : Room | undefined;
+
+		room = this._rooms.find(r => r.getId() === roomId);
+		player = room?.accessPlayerByUserId(userId);
+		if (!player?.getCustomizer() || room?.getState() !== roomStates.LOBBY)
+			return (false);
+
+		return (room.registerConfig(config))
+	}
 
 	public onReadyEvent(userId : string, roomId : RoomId)
 	{

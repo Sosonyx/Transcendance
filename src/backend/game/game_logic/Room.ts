@@ -5,7 +5,7 @@ import { EventEmitter } from "node:events";
 import type { Message } from "../../llm/types/messages.js";
 import { GameMode , RoomType, shuffle } from "../utils/index.js";
 import { prisma } from "../../prisma/prisma.js"
-import type { VoteInfo, LobbyInfo, ScoreInfo, RoundResultInfo } from "../utils/index.js";
+import type { VoteInfo, LobbyInfo, ScoreInfo, RoundResultInfo, GameConfig } from "../utils/index.js";
 import { names } from "./Names.js"
 
 export enum roomStates {
@@ -20,18 +20,29 @@ export enum roomStates {
 	ERROR = "ERROR"
 }
 
-const action_1_Time : number = 30 * 1000; // 30 seconds
-const action_2_Time : number = 30 * 1000; // 30 seconds
-const chatTime : number = 60 * 1000; // 60 seconds
-const voteTime : number = 30 * 1000; // 30 seconds
-const roundResultTime : number = 10 * 1000; // 10 seconds
-const replayTime : number = 30 * 1000; // 30 seconds
+const action_1_Time : number = 30; // 30 seconds
+const action_2_Time : number = 30; // 30 seconds
+const chatTime : number = 60; // 60 seconds
+const voteTime : number = 30; // 30 seconds
+const roundResultTime : number = 10; // 10 seconds
+const replayTime : number = 30; // 30 seconds
 const maxPlayerCount : number = 7;
 const scoreCorrectVote : number = 3;
 const scoreGetVoted : number = 1;
 const scoreObjective : number = 10;
 const eliminationTreshold : number = 1;
 const llmNumber : number = 0;
+
+const minTime : number = 10;
+const maxTime : number = 120;
+const minPlayer : number = 2;
+const maxPlayer : number = 100;
+const minLlm : number = 0;
+const maxLlm : number = 100;
+const minScore : number = 1;
+const maxScore : number = 100;
+const minElim : number = 1;
+const maxElim : number = 99;
 
 // const possibleGameModes : gameMode[] = [gameMode.SCORE, gameMode.ELIMINATION];
 
@@ -42,10 +53,10 @@ type computeVote = () => void;
 export class Room extends EventEmitter
 {
 	private	readonly _id : string;
-
-	// private _config : GameConfig;
 	private _roomType : RoomType;
-	private	_gameMode : GameMode;
+
+	private _config : GameConfig;
+	
 	private	_gameId? : string | null;
 	private _number : number;
 	private _state : roomStates;
@@ -53,8 +64,6 @@ export class Room extends EventEmitter
 	private _inputs : playerInput[];
 	private _input : playerInput | null;
 	private _playerCount : number;
-	private _maxPlayerCount : number;
-	private _llmNumber : number;
 	private _isAccessible : boolean;
 	private _winCondition : winCondition | null;
 	private _computeVote : computeVote | null;
@@ -103,7 +112,7 @@ export class Room extends EventEmitter
 	}
 
 	public getGameMode() : GameMode {
-		return this._gameMode;
+		return this._config.gameMode;
 	}
 
 	public getId() : string {
@@ -123,7 +132,7 @@ export class Room extends EventEmitter
 	}
 
 	public getMaxPlayerCount() : number {
-		return this._maxPlayerCount;
+		return this._config.maxPlayerCount;
 	}
 
 	public getState() : string {
@@ -165,14 +174,14 @@ export class Room extends EventEmitter
 				this._givePlayersName();
 				this._players = shuffle(this._players);
 				this._allPlayersShouldAct();
-				this._timeInfo = Date.now() + action_1_Time;
-				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.ACTION_2) }, action_1_Time);
+				this._timeInfo = Date.now() + action_1_Time * 1000;
+				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.ACTION_2) }, action_1_Time * 1000);
 				break ;
 
 			case (roomStates.ACTION_2) :
 				this._allPlayersShouldAct();
-				this._timeInfo = Date.now() + action_2_Time;
-				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.CHAT) }, action_2_Time);
+				this._timeInfo = Date.now() + action_2_Time * 1000;
+				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.CHAT) }, action_2_Time * 1000);
 				this._input = this._pickAnInput();
 				if (this._input === null)
 				{
@@ -190,8 +199,8 @@ export class Room extends EventEmitter
 					if (player.getIsLLM())
 						(player as LlmPlayer).getBrain()?.startPlaying();
 				});
-				this._timeInfo = Date.now() + chatTime;
-				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.VOTE) }, chatTime);
+				this._timeInfo = Date.now() + this._config.chatTime * 1000;
+				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.VOTE) }, this._config.chatTime * 1000);
 				break ;
 
 			case (roomStates.VOTE) :
@@ -201,8 +210,8 @@ export class Room extends EventEmitter
 				});
 				this._data = this._constructVoteInfo();
 				this._allPlayersShouldAct();
-				this._timeInfo = Date.now() + voteTime;
-				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.ROUND_RESULT) }, voteTime);
+				this._timeInfo = Date.now() + this._config.voteTime * 1000;
+				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.ROUND_RESULT) }, this._config.voteTime * 1000);
 				break ;
 
 			case (roomStates.ROUND_RESULT) :
@@ -213,8 +222,8 @@ export class Room extends EventEmitter
 				break ;
 
 			case (roomStates.RESULT) :
-				this._timeInfo = Date.now() + replayTime;
-				this._timerId = setTimeout(() => { this._onReplayTimerEnded() }, replayTime);
+				this._timeInfo = Date.now() + replayTime * 1000;
+				this._timerId = setTimeout(() => { this._onReplayTimerEnded() }, replayTime * 1000);
 				break ;
 
 			default : break ;
@@ -229,6 +238,32 @@ export class Room extends EventEmitter
 	}
 
 	// EVENTS
+
+	public registerConfig(config : GameConfig) : boolean {
+		if (this._state !== roomStates.LOBBY)
+			return (false);
+		if (config.maxPlayerCount < this._playerCount || config.maxPlayerCount < minPlayer || config.maxPlayerCount > maxPlayer)
+			return (false);
+		if (config.chatTime < minTime || config.chatTime > maxTime)
+			return (false);
+		if (config.voteTime < minTime || config.voteTime > maxTime)
+			return (false);
+		if (config.llmNumber < minLlm || config.llmNumber > maxLlm)
+			return (false);
+		if (config.gameMode === GameMode.SCORE) {
+			if (config.scoreObjective < minScore || config.scoreObjective > maxScore)
+				return (false);
+		}
+		if (config.gameMode === GameMode.ELIMINATION) {
+			if (config.eliminationTreshold < minElim || config.eliminationTreshold > maxElim || config.eliminationTreshold > config.maxPlayerCount)
+				return (false);
+		}
+
+		console.log('\n\n\n CONFIG VALIDEEE \n\n\n ');
+		this._config = config;
+		this._checkLobbyStatus();
+		return (true);
+	}
 
 	public async onJoin(player : Player, ingame : boolean) {
 		player.setConnected(true);
@@ -402,11 +437,11 @@ export class Room extends EventEmitter
 			return ;
 		}
 		this._playerCount = this._players.length;
-		this._isAccessible = (this._playerCount !== this._maxPlayerCount);
+		this._isAccessible = (this._playerCount !== this._config.maxPlayerCount);
 		if (this._isLobbyReady())
 		{
 			this._isAccessible = false;
-			for (let i = 0; i < this._llmNumber; i++)
+			for (let i = 0; i < this._config.llmNumber; i++)
 				this._addLLMPLayer();
 
 			//TODO : retirer nom du LLM dans chaque PlayerNames
@@ -568,13 +603,13 @@ export class Room extends EventEmitter
 			_players : []
 		};
 
-		if (this._gameMode === GameMode.SCORE)
+		if (this._config.gameMode === GameMode.SCORE)
 		{
 			this._players.forEach(p => {
 				info._players.push([p.getUsername() || 'IA', p.getName(), p.getIsLLM()]);
 			})
 		}
-		else if (this._gameMode === GameMode.ELIMINATION)
+		else if (this._config.gameMode === GameMode.ELIMINATION)
 		{
 			let pool = this._players.filter(p => p.justGotEliminated());
 			pool.forEach(p => {
@@ -592,13 +627,13 @@ export class Room extends EventEmitter
 			_eliminated : []
 		};
 
-		if (this._gameMode === GameMode.SCORE)
+		if (this._config.gameMode === GameMode.SCORE)
 		{
 			let pool = this._players.filter(p => !p.getIsLLM());
 			pool.forEach(p => {
 				info._alive.push([p.getUsername()!, p.getScore()])});
 		}
-		else if (this._gameMode === GameMode.ELIMINATION)
+		else if (this._config.gameMode === GameMode.ELIMINATION)
 		{
 			this._players.forEach(p => {
 				if (p.getEliminated())
@@ -616,10 +651,10 @@ export class Room extends EventEmitter
 	private _constructLobbyInfo() : LobbyInfo {
 
 		let info : LobbyInfo = {
-			_mode : this._gameMode,
-			_llmCount : this._llmNumber,
+			_mode : this._config.gameMode,
+			_llmCount : this._config.llmNumber,
 			_players : [],
-			_spots : this._maxPlayerCount - this._playerCount
+			_spots : this._config.maxPlayerCount - this._playerCount
 		};
 
 		this._players.forEach(p => info._players.push([p.getUsername()!, p.hasActed()]));
@@ -641,7 +676,7 @@ export class Room extends EventEmitter
 
 	private _pickGameMode() : void
 	{
-		switch (this._gameMode)
+		switch (this._config.gameMode)
 		{
 			case (GameMode.SCORE) :
 				this._computeVote = this.__computeVoteScore;
@@ -658,7 +693,7 @@ export class Room extends EventEmitter
 
 	private __computeVoteScore() : void
 	{
-		if (this._gameMode === GameMode.SCORE)
+		if (this._config.gameMode === GameMode.SCORE)
 		{
 			this._players.forEach(player => {
 				if (!player.getIsLLM() && player.getVoteAgainst() !== null)
@@ -675,7 +710,7 @@ export class Room extends EventEmitter
 
 	private __computeVoteElimination() : void
 	{
-		if (this._gameMode === GameMode.ELIMINATION)
+		if (this._config.gameMode === GameMode.ELIMINATION)
 		{
 			this._players.forEach(player => {
 				if (!player.getEliminated() && player.getVoteAgainst() != null)
@@ -720,12 +755,24 @@ export class Room extends EventEmitter
 
 	// CONSTRUCTOR
 
-	public constructor(nb : number, gameMode : GameMode, roomType : RoomType) {
-		super();
+	public constructor(nb : number, gameMode : GameMode, roomType : RoomType)
+	{
 		console.log("Constructor called for class Room");
+		super();
+
 		this._id = uuid();
-		this._gameMode = gameMode;
 		this._roomType = roomType;
+
+		this._config = {
+			gameMode : gameMode,
+			chatTime : chatTime,
+			voteTime : voteTime,
+			maxPlayerCount : maxPlayerCount,
+			scoreObjective : scoreObjective,
+			eliminationTreshold : eliminationTreshold,
+			llmNumber : llmNumber
+		}
+
 		this._gameId = null;
 		this._number = nb;
 		this._state = roomStates.INIT;
@@ -733,8 +780,6 @@ export class Room extends EventEmitter
 		this._playerCount = 0;
 		this._inputs = [];
 		this._input = null;
-		this._maxPlayerCount = maxPlayerCount;
-		this._llmNumber = llmNumber;
 		this._isAccessible = true;
 		this._computeVote = null;
 		this._winCondition = null;
