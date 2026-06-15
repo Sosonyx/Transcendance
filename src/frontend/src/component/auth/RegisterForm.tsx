@@ -45,13 +45,13 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
   return (
     <>
       <form className="auth-form" onSubmit={handleSubmit}>
-        <h2 className="auth-title">SIGN UP</h2>
+        <h2 className="auth-title">S'INSCRIRE</h2>
         <input className="auth-input" type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-        <input className="auth-input" type="text" placeholder="Username" maxLength={20} value={username} onChange={(e) => setUsername(e.target.value)} />
-        <input className="auth-input" type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        <input className="auth-input" type="text" placeholder="Nom de compte" maxLength={20} value={username} onChange={(e) => setUsername(e.target.value)} />
+        <input className="auth-input" type="password" placeholder="Mot de passe" value={password} onChange={(e) => setPassword(e.target.value)} />
         {error && <p className="error-msg">{error}</p>}
         <button className="auth-submit-btn" type="submit" disabled={submitting}>
-          {submitting ? "Inscription..." : "SIGN UP"}
+          {submitting ? "Inscription..." : "S'INSCRIRE"}
         </button>
         <p className="auth-switch-tos-policy">
           En m'inscrivant, j'accepte les{' '}
@@ -60,10 +60,10 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
           <button type="button" className="auth-tos-link" onClick={() => openLegal('policy/privacy-policy.html')}>Politique de confidentialité</button>.
         </p>
         <p className="auth-switch">
-          Already have an account ?{' '}
-          <button type="button" className="auth-switch-btn" onClick={onSwitchToLogin}>Log in</button>
+          Vous avez déjà un compte? {' '}
+          <button type="button" className="auth-switch-btn" onClick={onSwitchToLogin}>Se connecter</button>
         </p>
-        <div className="auth-divider">OR</div>
+        <div className="auth-divider">OU</div>
         <div className="oauth-logos">
           <img src="/42.png" alt="Connect with 42" onClick={handle42Submit} className="oauth-logo" />
           <img src="/google.png" alt="Connect with Google" onClick={handleGoogleSubmit} className="oauth-logo" />

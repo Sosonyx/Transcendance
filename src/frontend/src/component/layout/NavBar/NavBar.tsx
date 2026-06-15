@@ -31,12 +31,12 @@ export function Navbar({ user, onLogout, setShowAuthModal, onViewChange}: Props)
               <span className='navbar-username'>{user.username}</span>
             </div>
             <button className='nav-button' onClick={() => {onLogout(); onViewChange('home')}}>Logout</button>
-            <button className='play-btn' onClick={() => onViewChange('game')}>Play</button>
+            <button className='play-btn' onClick={() => onViewChange('game')}>JOUER</button>
           </div>
         ) : (
           <div className='button-div'>
             <img src="/account.svg" alt="Profile" className="navbar-account-icon" onClick={() => setShowAuthModal(true)} />
-            <button className='play-btn' onClick={() => setShowAuthModal(true)}>Play</button>
+            <button className='play-btn' onClick={() => setShowAuthModal(true)}>JOUER</button>
           </div>
         )}
       </nav>
