@@ -6,39 +6,22 @@
     background: var(--surface);
     border: 1px solid var(--twitch);
     border-radius: var(--radius);
-    padding: 1.5rem 3rem;
-    box-shadow: 0 0 40px rgba(145, 71, 255, 0.3);
+    padding: 1.5rem clamp(1rem, 5vw, 3rem);
+    max-width: 90vw;
+    box-shadow: 0 0 40px var(--twitch-shadow);
     animation: fadeInOut 2s ease forwards;
     z-index: 100;
 }
 
 .transition-overlay h1 {
-    font-size: 2rem;
+    font-size: clamp(1rem, 5vw, 2rem);
     color: var(--twitch);
     white-space: nowrap;
 }
 
 @keyframes fadeInOut {
-    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
     20%  { opacity: 1; transform: translate(-50%, -50%) scale(1);   }
     80%  { opacity: 1; transform: translate(-50%, -50%) scale(1);   }
-    100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
 }
-
-/* .transition-overlay {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: var(--bg);
-    font-size: 3rem;
-    animation: fadeInOut 2s ease forwards;
-}
-
-@keyframes fadeInOut {
-    0%   { opacity: 0; }
-    20%  { opacity: 1; }
-    80%  { opacity: 1; }
-    100% { opacity: 0; }
-} */

@@ -1,0 +1,34 @@
+.score-layout {
+    background: var(--twitch-surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+.score-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.score-list li {
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: var(--radius);
+}
+
+.score-list li.alive {
+    color: var(--text);
+    background: var(--bg);
+    border-left: 3px solid var(--twitch);
+}
+
+.score-list li.dead {
+    color: var(--muted);
+    background: var(--bg);
+    border-left: 3px solid #f44336;
+    text-decoration: line-through;
+    opacity: 0.5;
+}

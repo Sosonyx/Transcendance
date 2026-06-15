@@ -1,4 +1,4 @@
-.game-mode-container {
+.switch-container{
     display: flex;
     gap: 12px;
     justify-content: center;

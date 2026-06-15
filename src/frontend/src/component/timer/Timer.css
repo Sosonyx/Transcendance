@@ -1,7 +1,24 @@
 .timer {
-    position: fixed;
-    top: calc(var(--navbar-height) + 1rem);
-    right: 1rem;
+    flex-shrink: 0;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--muted);
+    padding: 4px 0 10px 0;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    background: none;
+    border-radius: 0;
+    min-width: unset;
+    transition: color 0.3s;
+}
+
+.timer-urgent {
+    color: #f44336;
+    animation: pulse 1s ease infinite;
+}
+
+/* .timer {
     min-width: 64px;
     text-align: center;
     font-size: 1.8rem;
@@ -19,7 +36,7 @@
     border-color: #f44336;
     background: rgba(244, 67, 54, 0.1);
     animation: pulse 1s ease infinite;
-}
+} */
 
 @keyframes pulse {
     0%, 100% { opacity: 1; }

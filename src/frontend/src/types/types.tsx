@@ -64,9 +64,24 @@ export enum GameMode {
 	ELIMINATION = "ELIMINATION"
 }
 
+export enum RoomType {
+	CLASSIC = "CLASSIC",
+	CUSTOM = "CUSTOM"
+}
+
+export enum CustomAction {
+	CREATE = "CREATE",
+	JOIN = "JOIN"
+}
+
 export interface LobbyInfo {
 	_mode : GameMode | null;
 	_llmCount : number;
 	_players : string[];
 	_spots : number;
 }
+
+export interface ScoreInfo {
+	_alive : [login : string, score : number | null][],
+	_eliminated : [login : string][]
+};

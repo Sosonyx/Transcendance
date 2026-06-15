@@ -10,10 +10,10 @@ deps:
 dev:
 	docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 
-run:deps
+run: deps
 	docker compose up -d
 
-run-logs:
+run-logs: deps
 	docker compose up
 
 stop:
@@ -28,4 +28,4 @@ clean:
 fclean:
 	docker compose down -v
 
-re:clean run
+re: clean run

@@ -25,7 +25,7 @@ function Timer({ timeEnd }: TimerProps) {
 
     return (
         <div className={`timer ${timeLeft <= 10 ? 'timer-urgent' : ''}`}>
-            {timeLeft}s
+            ⏱ {timeLeft}s
         </div>
     );
 }

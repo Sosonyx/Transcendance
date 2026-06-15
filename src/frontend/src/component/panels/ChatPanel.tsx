@@ -58,7 +58,7 @@ function ChatPanel({ socket, question, answers }: ChatPanelProps) {
 	return (
 		<div className="chat-layout">
 			<div id="chat-context">
-				<p id="chat-question" className="label">{question}</p>
+				<p id="chat-question" className="game-label">{question}</p>
 				<ul id="chat-answers">
 					{answers.map(([playerName, answer], id) => (<li key={id}>{playerName} : {answer}</li>))}
 				</ul>
@@ -75,7 +75,7 @@ function ChatPanel({ socket, question, answers }: ChatPanelProps) {
 			<div className="bottom-bar">
 				<form id="chatform" onSubmit={handleSubmit}>
 					<input id="input" type="text" placeholder="Message..." autoComplete="off" onChange={handleChange} value={message ?? ''} />
-					<button id="send-btn" type="submit">Send</button>
+					<button id="send-btn" className="game-button" type="submit">Envoyer</button>
 				</form>
 			</div>
 		</div>

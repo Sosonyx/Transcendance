@@ -1,34 +1,39 @@
-/* Vote layout */
 .vote-layout {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 2rem;
-    padding: 2rem;
+    /* height: 100%; */
+    gap: 0.75rem;
+    padding: 0;
+    overflow: hidden;
 }
 
-/* Carte du joueur actuel */
 .vote-self {
+    flex-shrink: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
 }
 
 .vote-self-name {
     font-size: 15px;
     font-weight: 700;
     color: var(--text);
+    flex: 1;
 }
 
 .vote-self-count {
     display: flex;
     align-items: center;
     gap: 8px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
     padding: 6px 14px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: var(--radius);
 }
 
 .vote-self-count span {
@@ -42,80 +47,132 @@
     color: var(--muted);
 }
 
+/* Desktop: liste */
 .vote-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  justify-content: center;
-  padding: 1rem;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 0;
+    overflow-y: auto;
 }
 
-/* Cards de vote */
-
 .player-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 1rem;
-  border-radius: var(--radius);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  cursor: pointer;
-  transition: background 0.15s, transform 0.15s, border-color 0.15s;
-  width: 120px;
-  overflow: hidden;
-  position: relative; /* nécessaire pour positionner le badge */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    gap: 0.75rem;
+    border-radius: var(--radius);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    position: relative;
 }
 
 .player-card h3 {
-  font-size: 13px;
-  font-weight: 600;
-  word-break: break-word;
+    flex: 1;
+    font-size: 13px;
+    font-weight: 600;
+    word-break: break-word;
 }
 
 .player-card:hover:not(.disabled):not(.voted) {
-  background: var(--twitch-surface);
-  border-color: var(--twitch);
-  transform: scale(1.08);
+    background: var(--twitch-surface);
+    border-color: var(--twitch);
+    transform: none; /* pas de scale en mode liste */
 }
 
 .player-card:active:not(.disabled):not(.voted) {
-  transform: scale(1);
+    transform: none;
 }
 
 .player-card.voted {
-  background: var(--twitch-surface);
-  border-color: var(--twitch);
-  cursor: default;
-  transform: scale(1.08);
+    background: var(--twitch-surface);
+    border-color: var(--twitch);
+    cursor: default;
+    transform: none;
 }
 
 .player-card.disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+    opacity: 0.4;
+    cursor: not-allowed;
 }
 
 .player-avatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  margin-bottom: 0.5rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-bottom: 0;
+    flex-shrink: 0;
 }
-
-/* Badge votes sur les cards */
 
 .vote-badge {
     position: absolute;
-    bottom: 8px;
     right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
     background: var(--twitch);
     color: #fff;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* Mobile: cards */
+@media (max-width: 600px) {
+    .vote-layout {
+        padding: 1rem;
+        height: auto;
+    }
+
+    .vote-self {
+        gap: 0.5rem;
+    }
+
+    .vote-grid {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        overflow-y: auto;
+        max-height: 50vh;
+        gap: 1rem;
+        padding: 0.5rem;
+    }
+
+    .player-card {
+        flex-direction: column;
+        align-items: center;
+        width: 100px;
+        padding: 0.75rem;
+        gap: 0;
+        height: auto;
+    }
+
+    .player-card:hover:not(.disabled):not(.voted) { transform: scale(1.08); }
+    .player-card:active:not(.disabled):not(.voted) { transform: scale(1); }
+    .player-card.voted { transform: scale(1.08); }
+
+    .player-avatar {
+        width: 52px;
+        height: 52px;
+        margin-bottom: 0.5rem;
+    }
+
+    .vote-badge {
+        position: absolute;
+        top: unset;
+        bottom: 6px;
+        right: 6px;
+        transform: none;
+    }
 }

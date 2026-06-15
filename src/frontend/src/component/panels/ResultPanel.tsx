@@ -36,8 +36,8 @@ function ResultPanel({ socket }: ResultPanelProps) {
 
 	return (
 		<div className="centered">
-			<button id="replay-btn" onClick={handleReplay} disabled={timedOut || clicked}>Replay</button>
-			<button id="new-game-btn" onClick={handleNewGame} disabled={clicked}>New game</button>
+			<button id="replay-btn" className="game-button" onClick={handleReplay} disabled={timedOut || clicked}> Rejouer </button>
+			<button id="new-game-btn" className="game-button" onClick={handleNewGame} disabled={clicked}> Nouvelle partie </button>
 		</div>
 	);
 };
