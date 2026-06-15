@@ -66,13 +66,9 @@ model Player {
   id        String @id @default(cuid())
   gameId    String
   userId    String?
-  name      String
   status    String // ('llm' | 'user')
   score     Int @default(0)
   won		Boolean @default(false)
-
-  logsFrom  Log[] @relation("LogsFrom")
-  logsTo    Log[] @relation("LogsTo")
 
   game  Game  @relation(fields: [gameId], references: [id], onDelete: Cascade)
   user  User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
@@ -81,29 +77,11 @@ model Player {
   @@index([gameId])
 } 
 
-model Log {
-  id            String @id @default(cuid())
-  gameId        String
-  event         String
-  content       String?
-  playerFromId  String?
-  playerToId    String?
-  timestamp     DateTime @default(now())
-
-  game        Game    @relation(fields: [gameId], references: [id], onDelete: Cascade)
-  playerFrom  Player?  @relation("LogsFrom", fields: [playerFromId], references: [id], onDelete: SetNull)
-  playerTo    Player?  @relation("LogsTo", fields: [playerToId], references: [id], onDelete: SetNull)
-
-  @@index([gameId, timestamp])
-}
-
 model Game {
 	id			String @id @default(cuid())
 	roomId		String
 	startTime	DateTime?
-  winner		String?
 	players		Player[]
-	logs    	Log[]
 
 	room		Room    @relation(fields: [roomId], references: [id], onDelete: Cascade)
   	@@index([roomId])

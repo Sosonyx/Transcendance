@@ -2,7 +2,6 @@ export interface Player {
     id: string;
     gameId: string;
     userId: string | null;
-    name: string;
     status: string;
     score: number;
     won: boolean;

@@ -18,6 +18,7 @@ export class Player extends EventEmitter
 	protected	_justEliminated : boolean;
 	private		_customizer : boolean;
 	private		_connected : boolean;
+	protected	_won : boolean;
 
 	public getId() : string {
 		return this._id;
@@ -83,6 +84,10 @@ export class Player extends EventEmitter
 		return (this._connected);
 	}
 
+	public getWon() : boolean {
+		return (this._won);
+	}
+
 	public incrementScore(value : number) {
 		this._score += value;
 	}
@@ -99,6 +104,7 @@ export class Player extends EventEmitter
 		this._acted = false;
 		this._voteAgainst = null;
 		this._voted = 0;
+		this._won = false;
 	}
 
 	public setName(name : string) {
@@ -139,6 +145,10 @@ export class Player extends EventEmitter
 		this._connected = status;
 	}
 
+	public setWon(status : boolean) {
+		this._won = status;
+	}
+
 	public constructor(user : SafeUser | null) {
 		super();
 		console.log("Constructor called for class Player");
@@ -156,5 +166,6 @@ export class Player extends EventEmitter
 		this._justEliminated = false;
 		this._customizer = false;
 		this._connected = false;
+		this._won = false;
 	}
 }
