@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
 import type { User } from "../../../types/types";
 import FriendChat from "./FriendChat";
+import './FriendsPanel.css';
 
 interface Friend {
   id: string;
@@ -10,48 +10,56 @@ interface Friend {
 
 interface FriendsPanelProps {
   user: User;
+  friendList: Friend[];
+  selectedFriend: Friend | null;
+  onSelectFriend: (friend: Friend | null) => void;
 }
 
-function FriendsPanel({ user }: FriendsPanelProps) {
-  const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
-  const [friendList, setFriendList] = useState<Friend[]>([]);
-
-  const getFriendsList = async () => {
-    try {
-      const res = await fetch('/api/friends', {
-        method: 'GET',
-        credentials: 'include',
-      });
-      if (!res.ok) {
-        console.error('Error 1');
-        return;
-      }
-      const data: Friend[] = await res.json();
-      setFriendList(data);
-    } catch (err) {
-      console.error('Error 2', err);
-    }
-  };
-
-  useEffect(() => {
-    getFriendsList();
-  }, []);
-
+function FriendsPanel({ user, friendList, selectedFriend, onSelectFriend }: FriendsPanelProps) {
   return (
-    <div className="friends-layout">
-      <ul className="friends-list">
-        {friendList.map((friend) => (
-          <li
-            key={friend.id}
-            className="friend"
-            onClick={() => setSelectedFriend(friend)}
-          >
-            {friend.username}
-          </li>
-        ))}
-      </ul>
+    <div className="friends-container">
+      <div className="friends-card">
+        <h2 className="friends-title">Mes amis</h2>
+
+        {friendList.length === 0 ? (
+          <p className="empty-state">
+            Vous n'avez pas encore d'amis. Recherchez un joueur pour en ajouter !
+          </p>
+        ) : (
+          <ul className="friends-list">
+            {friendList.map((friend) => (
+              <li
+                key={friend.id}
+                className={`friend-item ${selectedFriend?.id === friend.id ? "active" : ""}`}
+                onClick={() => onSelectFriend(friend)}
+              >
+                <img
+                  className="friend-avatar"
+                  src={friend.avatar && friend.avatar.trim() !== "" ? friend.avatar : "./username.png"}
+                  alt="Avatar"
+                />
+                <span className="friend-username">{friend.username}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
       {selectedFriend !== null && (
-        <FriendChat user={user} friendId={selectedFriend.id} friendUsername={selectedFriend.username} />
+        <div className="chat-card">
+          <button
+            className="chat-close-btn"
+            onClick={() => onSelectFriend(null)}
+            aria-label="Fermer la discussion"
+          >
+            ✕
+          </button>
+          <FriendChat
+            user={user}
+            friendId={selectedFriend.id}
+            friendUsername={selectedFriend.username}
+          />
+        </div>
       )}
     </div>
   );

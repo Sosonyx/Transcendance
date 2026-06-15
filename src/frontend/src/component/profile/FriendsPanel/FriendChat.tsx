@@ -20,7 +20,7 @@ function FriendChat({ user, friendId, friendUsername }: FriendChatProps) {
   const [message, setMessage] = useState<string>('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (message.trim().length > 0) {
       socket?.emit('friend:message', friendId, message.trim());
@@ -82,7 +82,7 @@ function FriendChat({ user, friendId, friendUsername }: FriendChatProps) {
   return (
     <div className="friendchat-layout">
       {friendUsername && <h3>{friendUsername}</h3>}
-      <ul id="messages">
+      <ul id="friend-messages">
         {messages.map((msg) => (
           <li key={msg.id} className={msg.senderId === user.id ? 'sent' : 'received'}>
             {msg.content}
