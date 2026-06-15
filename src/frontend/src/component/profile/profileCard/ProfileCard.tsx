@@ -75,15 +75,15 @@ export function Profile({user, onUserUpdated, readonly = false} : ProfileProps) 
         <div className="profile-stats">
             <div className="stat-item">
                 <span className="stat-value">{gamePlayed}</span>
-                <span className="stat-label">Game played</span>
+                <span className="stat-label">Parties jouées</span>
             </div>
             <div className="stat-item">
                 <span className="stat-value">{gameWon}</span>
-                <span className="stat-label">Game won</span>
+                <span className="stat-label">Parties gagnées</span>
             </div>
             <div className="stat-item">
                 <span className="stat-value">{gamePlayed - gameWon}</span>
-                <span className="stat-label">Game lost</span>
+                <span className="stat-label">Parties perdues</span>
             </div>
         </div>
 
@@ -92,15 +92,15 @@ export function Profile({user, onUserUpdated, readonly = false} : ProfileProps) 
         ) : (
             <form onSubmit={handleSubmit} className="edit-form">
                 <div className="form-group">
-                    <label htmlFor="name">New username</label>
+                    <label htmlFor="name">Nouveau nom d'utilisateur</label>
                     <input type="text" id="name" value={username} maxLength={20} onChange={(e) => setUsername(e.target.value)} required />
                 </div>
                 {avatarFile && <p style={{fontSize: '12px', color: '#8a8a9a', margin: 0}}>{avatarFile.name}</p>}
                 {editError && <p className="error-msg">{editError}</p>}
                 <div className="form-actions">
-                    <button type="submit" className="modify-button">Save</button>
+                    <button type="submit" className="modify-button">Sauvegarder</button>
                     <button type="button" className="modify-button" onClick={() => { setIsEditing(false); setAvatarFile(null); setUsername(currentUser.username); }}>
-                        Cancel
+                        Annuler
                     </button>
                 </div>
             </form>

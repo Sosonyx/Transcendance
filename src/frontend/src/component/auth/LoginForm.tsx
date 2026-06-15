@@ -23,7 +23,7 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
 			if (onSuccess)
 				await onSuccess();
 		} catch (err) {
-			setError("Erreur lors de la connexion");
+			setError("Pas de compte associé ou mot de passe invalide");
 		} finally {
 			setSubmitting(false);
 		}

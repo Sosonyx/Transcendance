@@ -16,7 +16,7 @@ export function OtherProfileSearch() {
 		setOtherProfile(null);
 
 		if (!profileUsername) {
-			setProfileError('Enter a username.');
+			setProfileError(`Entrez un nom d'utilisateur.`);
 			return;
 		}
 
@@ -25,22 +25,22 @@ export function OtherProfileSearch() {
 			setOtherProfile(profile);
 		} catch {
 			setOtherProfile(null);
-			setProfileError('User not found');
+			setProfileError(`Le nom d'utilisateur n'existe pas`);
 		}
 	};
 
 	return (
 		<div className='finder-div'>
-			<h2>Find a profile</h2>
+			<h2>Chercher un joueur</h2>
 			<div className='profile-finder'>
 			<input className='username-form'
 				value={profileUsername}
 				onChange={(event) => setProfileUsername(event.target.value)}
-				placeholder="username"
+				placeholder="Nom d'utilisateur"
 				onKeyDown={(e) => { if (e.key === 'Enter') OtherProfileLookup(); }}
 			/>
 			</div>
-			<button className='button-profile' onClick={OtherProfileLookup}>Find</button>
+			<button className='button-profile' onClick={OtherProfileLookup}>Chercher</button>
 			{profileError && <p className='error-msg'>{profileError}</p>}
 			{otherProfile && <Profile user={otherProfile} readonly />}
 		</div>

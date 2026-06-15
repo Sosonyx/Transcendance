@@ -27,7 +27,7 @@ export function Leaderboard() {
 
 	return (
 		<div className="leaderboard-container">
-			<h2 className="leaderboard-title">Global Ranking</h2>
+			<h2 className="leaderboard-title">CLASSEMENT GLOBAL</h2>
 			<div className="leaderboard-list">
 				{players.length === 0 && <p className="leaderboard-empty">Aucun joueur pour le moment</p>}
 				{players.map((player, index) => (
