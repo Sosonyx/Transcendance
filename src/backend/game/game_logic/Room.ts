@@ -166,6 +166,8 @@ export class Room extends EventEmitter
 	public sendSynchro(player : EventEmitter) : void
 	{
 		player.emit('synchronize', this._state, this._data, this._timeInfo, this._constructScoreInfo());
+		if (this._state === roomStates.LOBBY)
+			this.emit('lobby_info', this._constructLobbyInfo());
 	}
 
 	public stateSwitch(newState : roomStates) : void 
@@ -471,7 +473,9 @@ export class Room extends EventEmitter
 			this.stateSwitch(roomStates.ACTION_1);
 		}
 		else
+		{
 			this.emit('lobby_info', this._constructLobbyInfo());
+		}
 	}
 
 	private _checkVoteStatus()

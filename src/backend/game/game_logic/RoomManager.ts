@@ -11,7 +11,7 @@ export	class RoomManager implements RoomManagerInterface
 	// --- ROOM ATTRIBUTION / PLAYER CONNECTION MANAGMENT ---------------------
 
 	public connectPlayer(user : SafeUser, gameMode : GameMode, roomType : RoomType, customAction : CustomAction) : 
-	[roomId : RoomId, room : EventEmitter, player : EventEmitter, ingame : boolean]
+	[roomId : RoomId, room : EventEmitter, player : EventEmitter]
 	{
 		let player : Player | undefined;
 		let room : Room | undefined;
@@ -33,7 +33,7 @@ export	class RoomManager implements RoomManagerInterface
 
 		room.onJoin(player!, ingame);
 		console.log(room);
-		return ([room.getId(), room as EventEmitter, player as EventEmitter, ingame]);
+		return ([room.getId(), room as EventEmitter, player as EventEmitter]);
 	}
 
 	private _createRoom(gameMode : GameMode, roomType : RoomType) : Room
