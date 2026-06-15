@@ -28,7 +28,7 @@ const roundResultTime : number = 10; // 10 seconds
 const replayTime : number = 30; // 30 seconds
 const maxPlayerCount : number = 7;
 const scoreCorrectVote : number = 3;
-const scoreGetVoted : number = 1;
+const scoreGetVoted : number = 5;
 const scoreObjective : number = 10;
 const eliminationTreshold : number = 1;
 const llmNumber : number = 2;
@@ -96,7 +96,6 @@ export class Room extends EventEmitter
 					create: this._players.map((player) => ({
 						id : player.getId(),
 						userId : player.getUserId(),
-						name : player.getName(),
 						status : (player.getIsLLM() ? 'llm' : 'user')
 					}))
 				}
@@ -105,14 +104,17 @@ export class Room extends EventEmitter
 		});
 	};
 
-	private _registerResult() {
-		this._players.forEach( p => async () => {
-			await prisma.user.update({
-				data : { won : p.getWon() },
-				where : { id : p.getId() }
-			})
-		})
-	}
+	private async _registerResult()
+	{
+		Promise.all( this._players.map(p => {
+
+				prisma.player.update({
+					data :	{	won : p.getWon(),
+								score : p.getScore() },
+					where : {	id : p.getId() }
+			}
+		)
+		}))}
 
 	// SETGET
 
@@ -738,9 +740,23 @@ export class Room extends EventEmitter
 	}
 
 	private __winConditionScore() : boolean {
-		let winners : Player[] = this._players.filter(player => player.getScore() > this._config.scoreObjective);
-		if (winners.length > 0)
+		if (this._players.filter(player => player.getScore() >= this._config.scoreObjective).length > 0)
 		{
+			let winners : Player[] = [];
+			let maxScore = 0;
+
+			this._players.forEach(p => {
+				if (p.getScore() > maxScore)
+					maxScore = p.getScore();
+			});
+			this._players.forEach(p => {
+				if (p.getScore() === maxScore)
+				{
+					p.setWon(true);
+					winners.push(p);
+				}
+			})
+
 			this._winners = winners;
 			return (true);
 		}
@@ -748,17 +764,32 @@ export class Room extends EventEmitter
 	}
 
 	private __winConditionElimination() : boolean {
-		let humans : Player[] = this._players.filter(player => !player.getIsLLM() && !player.getEliminated());
+		let winners : Player[] = [];
+		let humans : Player[] = this._players.filter(
+			player => !player.getIsLLM() && !player.getEliminated());
+		
 		if (humans.length <= this._config.eliminationTreshold)
 		{
-			console.log('LLM won!');
-			this._winners = this._players.filter(p => p.getIsLLM());
+			this._players.forEach( p => {
+				if (p.getIsLLM())
+				{
+					p.setWon(true);
+					winners.push(p);
+				}
+			});
+			this._winners = winners;
 			return (true);
 		}
 		if (!this._players.find(player => player.getIsLLM() && !player.getEliminated()))
 		{
-			console.log('Humans won!');
-			this._winners = humans;
+			this._players.forEach ( p => {
+				if (!p.getIsLLM() && !p.getEliminated())
+				{
+					p.setWon(true);
+					winners.push(p);
+				}
+			})
+			this._winners = winners;
 			return (true);
 		}
 		return (false);
