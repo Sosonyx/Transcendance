@@ -117,11 +117,11 @@ function Game({ user, gameMode, roomType, customAction } : GameProps) {
             {/* Game container — caché sur mobile si tab !== chat */}
             <div className={`game-container ${mobileTab !== 'chat' ? 'mobile-hidden' : ''}`}>
                 {transition && <TransitionOverlay config={transition} />}
-                {state === roomStates.LOBBY		&& <LobbyPanel   socket={socket} isCustom={true} />}
+                {state === roomStates.LOBBY		&& <LobbyPanel   socket={socket} isCustom={roomType === RoomType.CUSTOM} />}
                 {state === roomStates.ACTION_1 	&& <Action1Panel socket={socket} />}
                 {state === roomStates.ACTION_2 	&& <Action2Panel socket={socket} prompt={prompt} />}
                 {isChatOrVote                  	&& <ChatPanel    socket={socket} question={question} answers={answers} />}
-                {state === roomStates.RESULT   	&& <ResultPanel  socket={socket} />}\
+                {state === roomStates.RESULT   	&& <ResultPanel  socket={socket} />}
             </div>
 
             {/* Side panel */}

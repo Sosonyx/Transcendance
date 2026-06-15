@@ -727,7 +727,7 @@ export class Room extends EventEmitter
 	}
 
 	private __winConditionScore() : boolean {
-		let winners : Player[] = this._players.filter(player => player.getScore() > scoreObjective);
+		let winners : Player[] = this._players.filter(player => player.getScore() > this._config.scoreObjective);
 		if (winners.length > 0)
 		{
 			this._winners = winners;
@@ -738,7 +738,7 @@ export class Room extends EventEmitter
 
 	private __winConditionElimination() : boolean {
 		let humans : Player[] = this._players.filter(player => !player.getIsLLM() && !player.getEliminated());
-		if (humans.length <= eliminationTreshold)
+		if (humans.length <= this._config.eliminationTreshold)
 		{
 			console.log('LLM won!');
 			this._winners = this._players.filter(p => p.getIsLLM());
