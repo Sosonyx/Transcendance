@@ -5,7 +5,7 @@ import { EventEmitter } from "node:events";
 import type { Message } from "../../llm/types/messages.js";
 import { GameMode , RoomType, shuffle } from "../utils/index.js";
 import { prisma } from "../../prisma/prisma.js"
-import type { VoteInfo, LobbyInfo, ScoreInfo, RoundResultInfo, GameConfig } from "../utils/index.js";
+import type { VoteInfo, LobbyInfo, ScoreInfo, RoundResultInfo, GameConfig, ResultInfo } from "../utils/index.js";
 import { names } from "./Names.js"
 
 export enum roomStates {
@@ -238,6 +238,7 @@ export class Room extends EventEmitter
 			case (roomStates.RESULT) :
 				this._registerResult();
 				this._timeInfo = Date.now() + replayTime * 1000;
+				this._data = this._constructResultInfo();
 				this._timerId = setTimeout(() => { this._onReplayTimerEnded() }, replayTime * 1000);
 				break ;
 
@@ -683,6 +684,17 @@ export class Room extends EventEmitter
 
 		const votable = this._players.filter(p => !p.getEliminated());
 		votable.forEach(p => info.push([p.getUserId(), p.getId(), p.getName(), p.getVoted()]));
+
+		return (info);
+	}
+
+	private _constructResultInfo() : ResultInfo {
+
+		let info : ResultInfo = {
+			_players : []
+		};
+
+		this._winners.forEach(p => info._players.push([p.getUsername() ?? 'IA', p.getIsLLM()]));
 
 		return (info);
 	}

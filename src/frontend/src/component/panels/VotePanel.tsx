@@ -7,14 +7,15 @@ interface VotePanelProps {
 	socket: Socket | null;
 	players: VoteInfo[];
 	userId: string;
+    eliminated: boolean;
 }
 
-function VotePanel({ socket, players, userId }: VotePanelProps) {
+function VotePanel({ socket, players, userId, eliminated }: VotePanelProps) {
 	const [votedFor, setVotedFor] = useState<string | null>(null);
 	const [votes, setVotes] = useState<VoteInfo[]>(players);
 
 	const handleVote = (player: VoteInfo) => {
-		if (votedFor) return;
+		if (votedFor || eliminated) return;
 		socket?.emit('vote', player[1]);
 		setVotedFor(player[2]);
 	};
@@ -39,7 +40,7 @@ function VotePanel({ socket, players, userId }: VotePanelProps) {
 	return (
         <div className="vote-layout">
 
-            {currentPlayer && (
+            {currentPlayer && !eliminated && (
                 <div className="vote-self">
                     <img src="/avatars/avatar.png" alt={currentPlayer[2]} className="player-avatar" />
                     <p className="vote-self-name">{currentPlayer[2]}</p>
@@ -49,6 +50,8 @@ function VotePanel({ socket, players, userId }: VotePanelProps) {
                     </div>
                 </div>
             )}
+
+            {eliminated && <p className="vote-waiting">Votes en cours</p>}
 
             <div className="vote-grid">
                 {otherPlayers.map((player) => (

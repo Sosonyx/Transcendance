@@ -72,6 +72,10 @@ export interface RoundResultInfo {
 	_players : [login : string, name : string, _llm : boolean][];
 }
 
+export interface ResultInfo {
+	_players : [login : string, _llm : boolean][];
+}
+
 // implementation found online
 // https://stackoverflow.com/questions/48083353/i-want-to-know-how-to-shuffle-an-array-in-typescript
 // with minor fix

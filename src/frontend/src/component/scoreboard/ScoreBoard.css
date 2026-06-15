@@ -17,6 +17,8 @@
     font-weight: 600;
     padding: 6px 10px;
     border-radius: var(--radius);
+    display: flex;
+    justify-content: space-between;
 }
 
 .score-list li.alive {

@@ -46,8 +46,8 @@ function LobbyPanel({ socket, isCustom }: LobbyPanelProps) {
 					<span className="lobby-llm-count">{ias} IA{ias !== 1 ? 's' : ''}</span>
 				</p>
 				<div className="lobby-players">
-					{lobbyInfo?._players.map((username, index) => (
-						<div key={index} className="lobby-card player">
+					{lobbyInfo?._players.map(([username, isReady], index) => (
+						<div key={index} className={`lobby-card player ${isReady ? 'ready' : ''}`}>
 							<img src="/avatars/avatar.png" alt={username} className="lobby-avatar" />
 							<p>{username}</p>
 						</div>
@@ -69,7 +69,7 @@ function LobbyPanel({ socket, isCustom }: LobbyPanelProps) {
 
 			<div className="lobby-footer">
 				<button id="ready-btn" type="button" onClick={handleClick} className={ready ? 'is-ready' : ''}>
-					{ready ? 'Annuler' : 'Prêt'}
+					{ready ? 'Prêt' : 'Prêt'}
 				</button>
 			</div>
 

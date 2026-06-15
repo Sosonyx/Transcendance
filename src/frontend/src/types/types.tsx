@@ -45,6 +45,7 @@ export enum roomStates {
 	ACTION_2 = "ACTION_2",
 	CHAT = "CHAT",
 	VOTE = "VOTE",
+	ROUND_RESULT = "ROUND_RESULT",
 	RESULT = "RESULT",
 	ERROR = "ERROR"
 }
@@ -77,7 +78,7 @@ export enum CustomAction {
 export interface LobbyInfo {
 	_mode : GameMode | null;
 	_llmCount : number;
-	_players : string[];
+	_players : [login : string, readyness : boolean][];
 	_spots : number;
 }
 
@@ -85,3 +86,11 @@ export interface ScoreInfo {
 	_alive : [login : string, score : number | null][],
 	_eliminated : [login : string][]
 };
+
+export interface RoundResultInfo {
+	_players : [login : string, name : string, _llm : boolean][];
+}
+
+export interface ResultInfo {
+	_players : [login : string, _llm : boolean][];
+}
