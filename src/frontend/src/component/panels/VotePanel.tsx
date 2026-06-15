@@ -32,9 +32,9 @@ function VotePanel({ socket, players, userId, eliminated }: VotePanelProps) {
 	useEffect(() => {
 		if (!socket) return;
 
-		socket?.on('vote-info', setVotes);
+		socket?.on('vote_info', setVotes);
 
-		return () => { socket?.off('vote-info', setVotes); };
+		return () => { socket?.off('vote_info', setVotes); };
 	}, [socket]);
 
 	return (

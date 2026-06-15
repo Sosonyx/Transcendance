@@ -28,10 +28,10 @@ const roundResultTime : number = 10; // 10 seconds
 const replayTime : number = 30; // 30 seconds
 const maxPlayerCount : number = 7;
 const scoreCorrectVote : number = 3;
-const scoreGetVoted : number = 5;
+const scoreGetVoted : number = 1;
 const scoreObjective : number = 10;
 const eliminationTreshold : number = 1;
-const llmNumber : number = 0;
+const llmNumber : number = 1;
 
 const minTime : number = 10;
 const maxTime : number = 120;
@@ -483,7 +483,7 @@ export class Room extends EventEmitter
 		}
 		if (!this._haveAllPlayersActed())
 		{
-			this.emit('vote-info', this._constructVoteInfo());
+			this.emit('vote_info', this._constructVoteInfo());
 			return ;
 		}
 		this._computeVote!();
