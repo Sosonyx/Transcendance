@@ -219,8 +219,14 @@ export	class RoomManager implements RoomManagerInterface
 			console.error(`\n\x1b[41mNo player with ID ${playerId} in room ${roomId}\x1b[0m\n`);
 			return ;
 		}
-		room.onDisconnect(player);
-		console.log(room);
+		if (room.onDisconnect(player))
+			this._deleteRoom(room);
+	}
+
+	private _deleteRoom(room : Room) : void 
+	{
+		this._rooms = this._rooms.filter(r => r.getId() !== room.getId());
+		room.destroy();
 	}
 
 	public onReplayEvent(playerId : string, roomId : RoomId) : void
