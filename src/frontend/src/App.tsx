@@ -40,30 +40,16 @@ export function App() {
       
       {currentView === 'home' && (
           <Home
-          user={user}
-          gameMode={gameMode}
-          setGameMode={setGameMode}
-          onViewChange={setCurrentView}
-          setShowAuthModal={setShowAuthModal}
-          roomType={roomType}
-          setRoomType={setRoomType}
-          customAction={customAction}
-          setCustomAction={setCustomAction}
-        />
-//         <div className='description'>
-//           <p>Welcome to Transcendence.</p>
-// 		  <RoomTypeSwitch roomType={roomType} setRoomType={setRoomType} />
-          
-// 			{
-// 				roomType === RoomType.CLASSIC && (
-// 					<GameModeSwitch gameMode={gameMode} setGameMode={setGameMode} /> )
-// 			}
-// 			{
-// 				roomType === RoomType.CUSTOM && (
-// 					<CustomActionSwitch customAction={customAction} setCustomAction={setCustomAction} /> )
-// 			}
-
-//         </div>
+            user={user}
+            gameMode={gameMode}
+            setGameMode={setGameMode}
+            onViewChange={setCurrentView}
+            setShowAuthModal={setShowAuthModal}
+            roomType={roomType}
+            setRoomType={setRoomType}
+            customAction={customAction}
+            setCustomAction={setCustomAction}
+          />
       )}
 
       {user && isAuthenticated && currentView === 'profile' && (

@@ -47,17 +47,17 @@ function GameConfigPanel( { socket } : GameConfigPanelProps ) {
 				gameMode={config.gameMode}
 				setGameMode={(mode: GameMode) => setConfig(prev => ({ ...prev, gameMode: mode }))}
 			/>
-			<SliderInput label="Temps de chat"		value={config.chatTime}	min={10} max={120} onChange={set('chatTime')} />
-			<SliderInput label="Temps de vote"		value={config.voteTime}	min={10} max={120} onChange={set('voteTime')} />
-			<SliderInput label="Joueur max"			value={config.maxPlayerCount} min={2} max={100} onChange={set('maxPlayerCount')} />
-			<SliderInput label="IAs dans la partie" value={config.llmNumber} min={0} max={100} onChange={set('llmNumber')} />
+			<SliderInput label="Joueur max"			value={config.maxPlayerCount} min={2} max={100} step={1} onChange={set('maxPlayerCount')} />
+			<SliderInput label="IAs dans la partie" value={config.llmNumber} min={0} max={100} step={1} onChange={set('llmNumber')} />
 
 			{config.gameMode === GameMode.SCORE && (
-				<SliderInput label="Objectif de score" value={config.scoreObjective} min={1} max={100} onChange={set('scoreObjective')} />
+				<SliderInput label="Objectif de score" value={config.scoreObjective} min={1} max={100} step={5} onChange={set('scoreObjective')} />
 			)}
 			{config.gameMode === GameMode.ELIMINATION && (
-				<SliderInput label="Seuil d'elimination" value={config.eliminationThreshold} min={1} max={config.maxPlayerCount} onChange={set('eliminationThreshold')} />
+				<SliderInput label="Seuil d'elimination" value={config.eliminationThreshold} min={1} max={config.maxPlayerCount} step={1} onChange={set('eliminationThreshold')} />
 			)}
+			<SliderInput label="Temps de chat"		value={config.chatTime}	min={10} max={120} step={5} onChange={set('chatTime')} />
+			<SliderInput label="Temps de vote"		value={config.voteTime}	min={10} max={120} step={5} onChange={set('voteTime')} />
 			<button onClick={sendConfig}>Enregistrer</button>
 		</div>
 	);

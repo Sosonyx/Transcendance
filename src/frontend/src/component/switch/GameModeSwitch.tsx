@@ -7,7 +7,7 @@ interface GameModeSwitchProps {
 }
 
 function GameModeSwitch({ gameMode, setGameMode }: GameModeSwitchProps) {
-  return (
+    return (
     <div className="switch-container">
         <label className={`mode-label ${gameMode === GameMode.ELIMINATION ? 'active' : ''}`}>
             <input
@@ -31,7 +31,7 @@ function GameModeSwitch({ gameMode, setGameMode }: GameModeSwitchProps) {
             Mode score
         </label>
     </div>
-  );
+    );
 }
 
 export default GameModeSwitch;

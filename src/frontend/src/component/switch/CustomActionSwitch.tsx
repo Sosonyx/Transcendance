@@ -8,7 +8,7 @@ interface CustomActionSwitchProps {
 }
 
 function CustomActionSwitch({ customAction, setCustomAction }: CustomActionSwitchProps) {
-  return (
+    return (
     <div className="switch-container">
         <label className={`mode-label ${customAction === CustomAction.CREATE ? 'active' : ''}`}>
             <input
@@ -32,7 +32,7 @@ function CustomActionSwitch({ customAction, setCustomAction }: CustomActionSwitc
             Join
         </label>
     </div>
-  );
+    );
 }
 
 export default CustomActionSwitch;

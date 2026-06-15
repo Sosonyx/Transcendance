@@ -18,6 +18,8 @@
     border: 1px solid var(--border);
     background: var(--surface);
     transition: color 0.15s, border-color 0.15s, background 0.15s;
+    min-width: 110px;
+    justify-content: center;
 }
 
 .mode-label input[type="radio"] {
@@ -34,4 +36,29 @@
 .mode-label:hover:not(.active) {
     border-color: var(--twitch);
     color: var(--text);
+}
+
+.mode-label--sub {
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 400;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    opacity: 0.9;
+    min-width: 120px;
+}
+
+.mode-label--sub.active {
+    color: var(--text);
+    font-weight: 600;
+    border-color: rgba(145, 71, 255, 0.5);
+    background: rgba(145, 71, 255, 0.1);
+}
+
+.mode-label--sub:hover:not(.active) {
+    border-color: rgba(145, 71, 255, 0.3);
+    color: var(--text);
+    opacity: 1;
 }
