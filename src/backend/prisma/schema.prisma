@@ -81,7 +81,6 @@ model Game {
 	id			String @id @default(cuid())
 	roomId		String
 	startTime	DateTime?
-	winner		String?
 	players		Player[]
 
 	room		Room    @relation(fields: [roomId], references: [id], onDelete: Cascade)

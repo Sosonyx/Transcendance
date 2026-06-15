@@ -31,7 +31,7 @@ const scoreCorrectVote : number = 3;
 const scoreGetVoted : number = 5;
 const scoreObjective : number = 10;
 const eliminationTreshold : number = 1;
-const llmNumber : number = 2;
+const llmNumber : number = 0;
 
 const minTime : number = 10;
 const maxTime : number = 120;
@@ -106,15 +106,17 @@ export class Room extends EventEmitter
 
 	private async _registerResult()
 	{
-		Promise.all( this._players.map(p => {
+		await Promise.all( this._players.map(p => 
 
 				prisma.player.update({
-					data :	{	won : p.getWon(),
-								score : p.getScore() },
-					where : {	id : p.getId() }
-			}
+					data :	{	
+						won : p.getWon(),
+						score : p.getScore() 
+					},
+					where : { id : p.getId() }
+			}))
 		)
-		}))}
+	}
 
 	// SETGET
 
