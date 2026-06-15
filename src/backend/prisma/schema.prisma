@@ -8,28 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id             String @id @default(cuid())
-  email          String @unique
-  username       String @unique
-  hashedPassword String?
-
-  avatar String?
-
-  twoFactorEnabled Boolean @default(false)
-  twoFactorSecret String?
-  twoFactorTempSecret String?
-
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  friends  Friendship[] @relation("UserFriends")
-  friendOf Friendship[] @relation("FriendOf")
-  OAuthAccount OAuthAccount[]
-
-  playedAs  Player[] // to find his stats
-}
-
 model OAuthAccount {
   id         Int    @id @default(autoincrement())
   provider   String
@@ -50,17 +28,7 @@ model BlacklistedToken {
   @@index([token])
 }
 
-model Friendship {
-  id        String   @id @default(cuid())
-  userId    String
-  friendId  String
-  createdAt DateTime @default(now())
 
-  user   User @relation("UserFriends", fields: [userId], references: [id], onDelete: Cascade)
-  friend User @relation("FriendOf", fields: [friendId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, friendId]) // pas deux fois la même paire
-}
 
 model Player {
   id        String @id @default(cuid())
@@ -92,20 +60,56 @@ model Room {
   games		Game[]
 }
 
-model Message 
-{
+
+
+model User {
+  id             String @id @default(cuid())
+  email          String @unique
+  username       String @unique
+  hashedPassword String?
+
+  avatar String?
+
+  twoFactorEnabled Boolean @default(false)
+  twoFactorSecret String?
+  twoFactorTempSecret String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  friends  Friendship[] @relation("UserFriends")
+  friendOf Friendship[] @relation("FriendOf")
+  OAuthAccount OAuthAccount[]
+
+  sentMessages     Message[] @relation("MessageSent")
+  receivedMessages Message[] @relation("MessagesReceived")
+
+  playedAs  Player[] // to find his stats
+}
+
+
+model Friendship {
+  id        String   @id @default(cuid())
+  userId    String
+  friendId  String
+  createdAt DateTime @default(now())
+
+  user   User @relation("UserFriends", fields: [userId], references: [id], onDelete: Cascade)
+  friend User @relation("FriendOf", fields: [friendId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, friendId]) // pas deux fois la même paire
+}
+
+
+
+model Message {
 id          String   @id @default(cuid())
-
 content     String
-
 senderId    String
 receiverId  String
-
 createdAt   DateTime @default(now())
-
 sender      User @relation("MessageSent", fields :[senderId], references: [id], onDelete: Cascade)
 receiver    User @relation("MessagesReceived", fields: [receiverId], references: [id], onDelete: Cascade)
 
 @@index([senderId, receiverId])
-
 }

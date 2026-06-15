@@ -1,111 +1,65 @@
 import type { FastifyRequest, FastifyReply } from 'fastify';
-import { prisma } from "../prisma/prisma.js";
+import { prisma } from '../prisma/prisma.js';
 
-async function getAuthenticatedUsername(request: FastifyRequest, reply: FastifyReply) {
-    try 
-    {
-        await request.jwtVerify({ onlyCookie: true });
-    } catch {
-        reply.code(401).send({ error: 'Unauthorized' });
-        return null;
-    }
+// Ajouter un ami
+export async function addFriend(req: FastifyRequest, reply: FastifyReply) {
+  const { username } = req.params as { username: string };
+  const userId = (req.user as any).userId;
 
-    const me = request.user as { username?: string } | undefined;
-    if (!me?.username) 
-    {
-        reply.code(401).send({ error: 'Unauthorized' });
-        return null;
-    }
+  const friend = await prisma.user.findUnique({ where: { username } });
+  if (!friend) {
+    return reply.status(404).send({ error: 'User not found' });
+  }
+  if (friend.id === userId) {
+    return reply.status(400).send({ error: 'Cannot add yourself' });
+  }
 
-    return me.username;
+  await prisma.friendship.create({
+    data: {
+      userId: userId,
+      friendId: friend.id,
+    },
+  });
+
+  return reply.send({ success: true });
 }
 
-export async function addFriend(request: FastifyRequest, reply: FastifyReply) {
-    const { username } = request.params as { username: string };
-    const myUsername = await getAuthenticatedUsername(request, reply);
-    if (!myUsername) 
-        return;
+// Supprimer un ami
+export async function removeFriend(req: FastifyRequest, reply: FastifyReply) {
+  const { username } = req.params as { username: string };
+  const userId = (req.user as any).userId;
 
-    if (myUsername === username) 
-        return reply.code(400).send({ error: 'Cannot add yourself as a friend' });
+  const friend = await prisma.user.findUnique({ where: { username } });
+  if (!friend) {
+    return reply.status(404).send({ error: 'User not found' });
+  }
 
-    const [currentUser, targetUser] = await Promise.all([
-        prisma.user.findUnique({ where: { username: myUsername } }),
-        prisma.user.findUnique({ where: { username } }),
-    ]);
+  await prisma.friendship.delete({
+    where: {
+      userId_friendId: {
+        userId: userId,
+        friendId: friend.id,
+      },
+    },
+  });
 
-    if (!currentUser || !targetUser) 
-        return reply.code(404).send({ error: 'User not found' });
-
-    const idA = currentUser.id;
-    const idB = targetUser.id;
-    // We order the IDs to ensure that the friendship is
-    // always stored in the same way to prevent duplicates (A-B and B-A)
-    const [uId, vId] = idA < idB ? [idA, idB] : [idB, idA];
-
-    const friendshipAlreadyExist = await prisma.friendship.findFirst({
-        where: { userId: uId, friendId: vId },
-    });
-
-    if (friendshipAlreadyExist) 
-        return reply.send({ ok: true, message: 'Already friends' });
-
-    await prisma.friendship.create({ data: { userId: uId, friendId: vId } });
-    return reply.send({ ok: true, message: 'Friend added' });
+  return reply.send({ success: true });
 }
 
-export async function removeFriend(request: FastifyRequest, reply: FastifyReply) {
-    const { username } = request.params as { username: string };
-    const myUsername = await getAuthenticatedUsername(request, reply);
-    if (!myUsername) 
-        return;
+// Lister ses amis
+export async function listFriends(req: FastifyRequest, reply: FastifyReply) {
+ const userId = (req.user as any).userId;
 
-    const [currentUser, targetUser] = await Promise.all([
-        prisma.user.findUnique({ where: { username: myUsername } }),
-        prisma.user.findUnique({ where: { username } }),
-    ]);
+  const friendships = await prisma.friendship.findMany({
+    where: { userId },
+    include: { friend: true },
+  });
 
-    if (!currentUser || !targetUser) 
-        return reply.code(404).send({ error: 'User not found' });
+  const friends = friendships.map((f) => ({
+    id: f.friend.id,
+    username: f.friend.username,
+    avatar: f.friend.avatar,
+  }));
 
-    const idA = currentUser.id;
-    const idB = targetUser.id;
-    const [uId, vId] = idA < idB ? [idA, idB] : [idB, idA];
-
-    await prisma.friendship.deleteMany({ where: { userId: uId, friendId: vId } });
-
-    return reply.send({ ok: true, message: 'Friend removed' });
+  return reply.send(friends);
 }
-
-export async function listFriends(request: FastifyRequest, reply: FastifyReply) {
-    const myUsername = await getAuthenticatedUsername(request, reply);
-    if (!myUsername) 
-        return;
-
-    const currentUser = await prisma.user.findUnique({ where: { username: myUsername } });
-
-    if (!currentUser) 
-        return reply.code(404).send({ error: 'User not found' });
-
-    const friendships = await prisma.friendship.findMany({
-        where: { OR: [{ userId: currentUser.id }, { friendId: currentUser.id }] },
-        include: { user: true, friend: true },
-    });
-
-    const friendsMap = new Map<string, { id: string; email: string; username: string; avatar: string | null }>();
-
-    for (const friendship of friendships) 
-    {
-        const friendUser = friendship.userId === currentUser.id ? friendship.friend : friendship.user;
-        friendsMap.set(friendUser.id, {
-            id: friendUser.id,
-            email: friendUser.email,
-            username: friendUser.username,
-            avatar: friendUser.avatar,
-        });
-    }
-
-    return reply.send({ ok: true, friends: [...friendsMap.values()] });
-}
-
-export default { addFriend, removeFriend, listFriends };
