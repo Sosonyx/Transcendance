@@ -67,7 +67,7 @@
 }
 
 #input:focus {
-    border-color: #9147ff;
+    border-color: var(--twitch);
 }
 
 #input::placeholder {
@@ -75,7 +75,7 @@
 }
 
 #send-btn {
-    background: #9147ff;
+    background: var(--twitch);
     color: #fff;
     border: none;
     border-radius: 4px;

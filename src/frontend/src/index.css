@@ -33,6 +33,7 @@
   --muted:    #adadb8;
   --radius:   15px;
   --navbar-height: 110px;
+  --box-shadow: 0 4px 100px rgba(255, 255, 255, 0.034);
 }
 
 /* Reset */
@@ -66,8 +67,13 @@ body {
   /* padding: 24px 16px 48px; */
 }
 
-/* Typography */
+@keyframes chrome {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
 
+/* Typography */
 h1, h2, h3 {
   font-family: 'Granit', sans-serif;
 }
@@ -78,7 +84,7 @@ h1, h2, h3 {
 .navbar-brand {
   font-family: 'Orbitron', sans-serif;
   font-weight: 900;
-  font-size: 1.5rem;
+  font-size: 0.8rem;
   letter-spacing: 0.05em;
 }
 

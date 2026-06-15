@@ -23,7 +23,7 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
 			if (onSuccess)
 				await onSuccess();
 		} catch (err) {
-			setError("Login failed");
+			setError("Pas de compte associé ou mot de passe invalide");
 		} finally {
 			setSubmitting(false);
 		}
@@ -39,33 +39,33 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
 
 	return (
 		<form className="auth-form" onSubmit={handleSubmit}>
-			<h2 className="auth-title">LOG IN</h2>
+			<h2 className="auth-title">CONNEXION</h2>
 			<input className="auth-input"
 				type="text"
-				placeholder="Username"
+				placeholder="Nom de compte"
 				value={username}
 				onChange={(e) => setUsername(e.target.value)}
 				required
 			/>
 			<input className="auth-input"
 				type="password"
-				placeholder="Password"
+				placeholder="Mot de passe"
 				value={password}
 				onChange={(e) => setPassword(e.target.value)}
 				required
 			/>
 			{error && <p className="error-msg">{error}</p>}
 			<button type="submit" className="auth-submit-btn" disabled={submitting}>
-				{submitting ? "Connexion..." : "LOG IN"}
+				{submitting ? "Connexion..." : "CONNEXION"}
 			</button>
 			<p className="auth-switch">
-				Don't have an account ?{' '}
-				<button type="button" className="auth-switch-btn" onClick={onSwitchToRegister}>Sign up</button>
+				Vous n'avez pas de compte ?{' '}
+				<button type="button" className="auth-switch-btn" onClick={onSwitchToRegister}>S'inscrire</button>
 			</p>
-			<div className="auth-divider">OR</div>
+			<div className="auth-divider">OU</div>
 			<div className="oauth-logos">
-				<img src="/42.png" alt="Connect with 42" onClick={handle42Submit} className="oauth-logo" />
-				<img src="/google.png" alt="Connect with Google" onClick={handleGoogleSubmit} className="oauth-logo" />
+				<img src="/42.png" alt="Se connecter avec 42" onClick={handle42Submit} className="oauth-logo" />
+				<img src="/google.png" alt="Se connecter avec Google" onClick={handleGoogleSubmit} className="oauth-logo" />
 			</div>
 		</form>
 	);

@@ -13,7 +13,7 @@ export async function registerController(req: FastifyRequest, reply: FastifyRepl
 
   const validUsername = await prisma.user.findUnique({where :{username:newUser.username}})
   if (validUsername)
-	  return reply.code(409).send({ error: "Cet email est déjà utilisé" })
+    return reply.code(409).send({ error: "Ce username est déjà utilisé" })
 
   const user: Partial<UserInterface>= await registerUser({
             email: newUser.email,

@@ -39,7 +39,7 @@ export async function intraHandler(req: FastifyRequest, reply: FastifyReply) {
     maxAge: 86400,
   });
   // TODO : REDIRECT TO RIGHT URL
-  return (reply.redirect("http://localhost:5173"));
+  return (reply.redirect("http://localhost:8080"));
 }
 
 export async function googleHandler(req: FastifyRequest, reply: FastifyReply) {
@@ -79,5 +79,5 @@ export async function googleHandler(req: FastifyRequest, reply: FastifyReply) {
     sameSite: "strict",
     maxAge: 86400,
   });
-  return (reply.redirect("http://localhost:5173"));
+  return (reply.redirect("http://localhost:8080"));
 }

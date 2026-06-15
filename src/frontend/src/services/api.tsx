@@ -36,16 +36,17 @@ export async function getOtherProfiles(username: string): Promise<User>{
 }
 
 export async function register(email:string, username: string, password: string): Promise<Response>{
-	const res = await fetch(`/api/register`, {
-		method: 'POST',
-		headers: {'Content-type': 'application/json'},
-		credentials: 'include',
-		body: JSON.stringify({email, username, password})
-	})
-	if (!res.ok) {
-		throw new Error("Register error")
-	}
-	return (res)
+    const res = await fetch(`/api/register`, {
+        method: 'POST',
+        headers: {'Content-type': 'application/json'},
+        credentials: 'include',
+        body: JSON.stringify({email, username, password})
+    })
+    if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error ?? "Erreur lors de l'inscription");
+    }
+    return (res)
 }
 
 export async function login(username: string, password: string): Promise<Response> {
@@ -98,8 +99,10 @@ export async function modifyUser(username: string, avatar: File | null) : Promis
 		body: formData
 	})
 
-	if (!res.ok)
-		throw new Error("Profile update error")
+	if (!res.ok) {
+		const body = await res.json().catch(() => ({}));
+		throw new Error(body.error ?? "Impossible de mettre à jour le profil");
+	}
 
 	const data: { user: User } = await res.json();
 	return data.user;

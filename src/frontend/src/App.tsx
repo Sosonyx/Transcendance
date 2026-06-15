@@ -5,6 +5,8 @@ import { ProfilePage } from './component/profile/profileCard/ProfilePage.js';
 import { useState } from 'react';
 import Game from './Game.js';
 import './App.css'
+import { Home } from './component/home/home.js';
+import { AuthModal } from './component/auth/AuthModal.js';
 import GameModeSwitch from './component/switch/GameModeSwitch.js';
 import RoomTypeSwitch from './component/switch/RoomTypeSwitch.js';
 import CustomActionSwitch from './component/switch/CustomActionSwitch.js';
@@ -14,6 +16,7 @@ export function App() {
   const { user, loading, isAuthenticated, refreshAuth } = useAuth();
   const [currentView, setCurrentView] = useState<'home' | 'profile' | 'game'>('home');
   const [gameMode, setGameMode] = useState<GameMode>(GameMode.SCORE);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const [roomType, setRoomType] = useState<RoomType>(RoomType.CLASSIC);
   const [customAction, setCustomAction] = useState<CustomAction>(CustomAction.CREATE);
@@ -33,23 +36,30 @@ export function App() {
 
   return (
     <>
-      <Navbar user={user} onLogout={handleLogout} onAuthSuccess={refreshAuth} onViewChange={setCurrentView}/>
+      <Navbar user={user} onLogout={handleLogout} setShowAuthModal={setShowAuthModal} onViewChange={setCurrentView}/>
       
       {currentView === 'home' && (
-        <div className='description'>
-          <p>Welcome to Transcendence.</p>
-		  <RoomTypeSwitch roomType={roomType} setRoomType={setRoomType} />
+          <Home
+          user={user}
+          gameMode={gameMode}
+          setGameMode={setGameMode}
+          onViewChange={setCurrentView}
+          setShowAuthModal={setShowAuthModal}
+        />
+//         <div className='description'>
+//           <p>Welcome to Transcendence.</p>
+// 		  <RoomTypeSwitch roomType={roomType} setRoomType={setRoomType} />
           
-			{
-				roomType === RoomType.CLASSIC && (
-					<GameModeSwitch gameMode={gameMode} setGameMode={setGameMode} /> )
-			}
-			{
-				roomType === RoomType.CUSTOM && (
-					<CustomActionSwitch customAction={customAction} setCustomAction={setCustomAction} /> )
-			}
+// 			{
+// 				roomType === RoomType.CLASSIC && (
+// 					<GameModeSwitch gameMode={gameMode} setGameMode={setGameMode} /> )
+// 			}
+// 			{
+// 				roomType === RoomType.CUSTOM && (
+// 					<CustomActionSwitch customAction={customAction} setCustomAction={setCustomAction} /> )
+// 			}
 
-        </div>
+//         </div>
       )}
 
       {user && isAuthenticated && currentView === 'profile' && (
@@ -59,7 +69,15 @@ export function App() {
       {currentView === 'game' && user && (
         <Game user={user} gameMode={gameMode} roomType={roomType} customAction={customAction} />
       )}
-
+      {showAuthModal && !user && (
+        <AuthModal
+          onClose={() => setShowAuthModal(false)}
+          onSuccess={() => {
+            refreshAuth();
+            setShowAuthModal(false);
+          }}
+        />
+      )}
     </>
   );
 }
