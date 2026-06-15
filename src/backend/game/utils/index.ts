@@ -33,7 +33,7 @@ export interface SafeUser {
 };
 
 export interface RoomManagerInterface {
-    connectPlayer(user : SafeUser, gamemode : GameMode, roomType : RoomType, customAction : CustomAction) : [roomId : string | null, room : EventEmitter, player : EventEmitter, ingame : boolean]; // return RoomId + room as Emitter if new room
+    connectPlayer(user : SafeUser, gamemode : GameMode, roomType : RoomType, customAction : CustomAction) : [roomId : string | null, room : EventEmitter, player : EventEmitter]; // return RoomId + room as Emitter if new room
     onReadyEvent(playerId : string, roomId : RoomId) : void;
 	onInputEvent(playerId : string, roomId : RoomId, message : string) : void;
     onChatEvent(playerId : string, roomId : RoomId, message : string) : void;

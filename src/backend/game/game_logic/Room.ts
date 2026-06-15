@@ -152,6 +152,10 @@ export class Room extends EventEmitter
 		return this._state;
 	}
 
+	public getConnectedPlayerCount() : number {
+		return (this._players.filter(p => !p.getIsLLM() && p.getConnected()).length);
+	}
+
 	public getIsAccessible() : boolean {
 		return this._isAccessible;
 	}
@@ -166,6 +170,8 @@ export class Room extends EventEmitter
 	public sendSynchro(player : EventEmitter) : void
 	{
 		player.emit('synchronize', this._state, this._data, this._timeInfo, this._constructScoreInfo());
+		if (this._state === roomStates.LOBBY)
+			this.emit('lobby_info', this._constructLobbyInfo());
 	}
 
 	public stateSwitch(newState : roomStates) : void 
@@ -390,18 +396,26 @@ export class Room extends EventEmitter
 		this.stateSwitch(newState);
 	}
 
-	public onDisconnect(player : Player) {
+	public onDisconnect(player : Player) : boolean {
 		if (this._state != roomStates.LOBBY && this._state != roomStates.RESULT)
 		{
 			player.setConnected(false);
-			return ;
+			return (this.getConnectedPlayerCount() === 0);
 		}
 		let index : number = this._players.findIndex(p => p.getId() === player.getId());
 		this._players.splice(index, 1);
+		if (this.getConnectedPlayerCount() === 0)
+			return (true);
 		if (this._state === roomStates.LOBBY)
 			this._checkLobbyStatus();
 		if (this._state === roomStates.RESULT)
 			this._checkResultStatus();
+		return (false);
+	}
+
+	public destroy() {
+		clearTimeout(this._timerId);
+		this.removeAllListeners();
 	}
 
 	// ACCESS AND UTILS
@@ -471,7 +485,9 @@ export class Room extends EventEmitter
 			this.stateSwitch(roomStates.ACTION_1);
 		}
 		else
+		{
 			this.emit('lobby_info', this._constructLobbyInfo());
+		}
 	}
 
 	private _checkVoteStatus()
@@ -659,8 +675,6 @@ export class Room extends EventEmitter
 			})
 		}
 
-		console.log('\n\n\nINFO\n\n\n');
-		console.log(info);
 		return info;
 	}
 

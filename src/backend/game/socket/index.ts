@@ -19,7 +19,7 @@ export function registerSocketHandlers(io: Server)
 		const roomType: RoomType = socket.handshake.auth.roomType;
 		const customAction: CustomAction = socket.handshake.auth.customAction;
 
-		let [roomId, roomEmitter, playerEmitter, ingame] : [RoomId, EventEmitter, EventEmitter, boolean] = roomManager.connectPlayer(user, gameMode, roomType, customAction);
+		let [roomId, roomEmitter, playerEmitter] : [RoomId, EventEmitter, EventEmitter] = roomManager.connectPlayer(user, gameMode, roomType, customAction);
 
 		// Rejoins sa room
 		if (roomId !== null)
@@ -202,7 +202,7 @@ export function registerSocketHandlers(io: Server)
 			cleanUpPlayerEvents();
 		});
 
-		if (ingame && roomId) {
+		if (roomId) {
 			roomManager.askSynchronize(roomId, user.id);
 		}
 	});
