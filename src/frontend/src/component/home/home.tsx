@@ -1,9 +1,12 @@
-import type { User } from '../../types/types.js';
-import type { GameMode } from '../../types/types.js';
+import type { GameMode, CustomAction, RoomType, User } from '../../types/types.js';
 import { Footer } from '../layout/NavBar/Footer.js';
 import GameModeSwitch from '../switch/GameModeSwitch.js';
 import './home.css';
 import '../layout/NavBar/Footer.css';
+import CustomActionSwitch from '../switch/CustomActionSwitch.js';
+import RoomTypeSwitch from '../switch/RoomTypeSwitch.js';
+import { useState } from 'react';
+
 
 interface HomeProps {
     user: User | null;
@@ -11,9 +14,17 @@ interface HomeProps {
     setGameMode: React.Dispatch<React.SetStateAction<GameMode>>;
     setShowAuthModal: (show: boolean) => void | Promise<void>
     onViewChange: (view : 'home' | 'profile' | 'game') => void | Promise<void>
+    roomType: RoomType;
+    setRoomType: React.Dispatch<React.SetStateAction<RoomType>>;
+    customAction: CustomAction;
+    setCustomAction: React.Dispatch<React.SetStateAction<CustomAction>>;
 }
 
-export function Home({ user, gameMode, setGameMode, onViewChange, setShowAuthModal }: HomeProps) {
+export function Home({ user, gameMode, setGameMode, onViewChange, setShowAuthModal, roomType, setRoomType, customAction, setCustomAction }: HomeProps) {
+    
+    const [roomType, setRoomType] = useState<RoomType>(RoomType.CLASSIC);
+    const [customAction, setCustomAction] = useState<CustomAction>(CustomAction.CREATE);
+    
     return (
     <div className="home-page">
         <div className="home-hero">
@@ -41,7 +52,16 @@ export function Home({ user, gameMode, setGameMode, onViewChange, setShowAuthMod
         </div>
 
         <div className="home-gamemode">
-            <GameModeSwitch gameMode={gameMode} setGameMode={setGameMode} />
+            <div className='description'>
+            <RoomTypeSwitch roomType={roomType} setRoomType={setRoomType} />
+			{
+				roomType === RoomType.CLASSIC && (
+					<GameModeSwitch gameMode={gameMode} setGameMode={setGameMode} /> )
+			}
+			{
+				roomType === RoomType.CUSTOM && (
+					<CustomActionSwitch customAction={customAction} setCustomAction={setCustomAction} /> )
+			}
         </div>
         {user ? (
                 <button className="home-play-btn" onClick={() => onViewChange('game')}>
@@ -56,4 +76,3 @@ export function Home({ user, gameMode, setGameMode, onViewChange, setShowAuthMod
     </div>
     );
 }
-
