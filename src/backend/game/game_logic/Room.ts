@@ -105,6 +105,15 @@ export class Room extends EventEmitter
 		});
 	};
 
+	private _registerResult() {
+		this._players.forEach( p => async () => {
+			await prisma.user.update({
+				data : { won : p.getWon() },
+				where : { id : p.getId() }
+			})
+		})
+	}
+
 	// SETGET
 
 	public getRoomType() : RoomType {
@@ -167,6 +176,7 @@ export class Room extends EventEmitter
 		switch (newState) {
 
 			case (roomStates.LOBBY) :
+				this._pickGameMode();
 				break ;
 
 			case (roomStates.ACTION_1) :
@@ -222,6 +232,7 @@ export class Room extends EventEmitter
 				break ;
 
 			case (roomStates.RESULT) :
+				this._registerResult();
 				this._timeInfo = Date.now() + replayTime * 1000;
 				this._timerId = setTimeout(() => { this._onReplayTimerEnded() }, replayTime * 1000);
 				break ;

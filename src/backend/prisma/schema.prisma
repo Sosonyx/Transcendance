@@ -101,7 +101,7 @@ model Game {
 	id			String @id @default(cuid())
 	roomId		String
 	startTime	DateTime?
-  winner		String?
+	winner		String[]?
 	players		Player[]
 	logs    	Log[]
 
