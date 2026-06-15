@@ -67,6 +67,10 @@
   overflow-wrap: break-word;
 }
 
+.game-label.waiting {
+  align-self: center;
+}
+
 .centered {
   display: flex;
   justify-content: center;

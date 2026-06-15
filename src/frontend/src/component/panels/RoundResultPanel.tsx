@@ -49,7 +49,7 @@ function RoundResultPanel ({ roundResult }: RoundResultPanelProps) {
                                     alt={login}
                                     className="result-avatar"
                                 />
-                                <p className="result-login">{isLlm ? 'IA 🤖' : login}</p>
+                                <p className="result-login">{isLlm ? 'IA' : login}</p>
                                 <p className="result-name-was">{name}</p>
                             </div>
 

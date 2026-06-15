@@ -90,3 +90,7 @@ export interface ScoreInfo {
 export interface RoundResultInfo {
 	_players : [login : string, name : string, _llm : boolean][];
 }
+
+export interface ResultInfo {
+	_players : [login : string, _llm : boolean][];
+}

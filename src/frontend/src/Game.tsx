@@ -4,7 +4,7 @@ import { LobbyPanel, Action1Panel, Action2Panel, ChatPanel, VotePanel, RoundResu
 import { TransitionOverlay } from './component/transitions';
 import { roomStates, type VoteInfo, type AnswersType } from './types/types';
 import './Game.css'
-import { GameMode, RoomType, CustomAction, type RoundResultInfo, type User } from './types/types';
+import { GameMode, RoomType, CustomAction, type ResultInfo, type RoundResultInfo, type User } from './types/types';
 import Timer from './component/timer/Timer';
 import ScoreBoard from './component/scoreboard/ScoreBoard';
 
@@ -28,6 +28,8 @@ function Game({ user, gameMode, roomType, customAction } : GameProps) {
     const [transition, setTransition] = useState<string | null>(null);
     const [mobileTab, setMobileTab] = useState<MobileTab>('chat');
     const [roundResult, setRoundResult] = useState<RoundResultInfo>({ _players: [] });
+    const [result, setResult] = useState<ResultInfo>({ _players: [] });
+    const [eliminated, setEliminated] = useState<boolean>(false);
 
     const isVotePhase = state === roomStates.VOTE;
     const isLobbyPhase = state === roomStates.LOBBY;
@@ -92,7 +94,9 @@ function Game({ user, gameMode, roomType, customAction } : GameProps) {
             setTimeEnd(timeInfo);
             setState(roomStates.ROUND_RESULT);
         });
-        s.on('startResult', (timeInfo: number | null) => {
+        s.on('startResult', (result: ResultInfo, timeInfo: number | null) => {
+            console.log('[startResult]', result);
+            setResult(result);
             setTimeEnd(timeInfo);
             setState(roomStates.RESULT)
         });
@@ -123,12 +127,12 @@ function Game({ user, gameMode, roomType, customAction } : GameProps) {
             {/* Game container — caché sur mobile si tab !== chat */}
             <div className={`game-container ${mobileTab !== 'chat' ? 'mobile-hidden' : ''}`}>
                 {transition && <TransitionOverlay config={transition} />}
-                {state === roomStates.LOBBY		&& <LobbyPanel   socket={socket} isCustom={roomType === RoomType.CUSTOM && customAction === CustomAction.CREATE} />}
-                {state === roomStates.ACTION_1 	&& <Action1Panel socket={socket} />}
-                {state === roomStates.ACTION_2 	&& <Action2Panel socket={socket} prompt={prompt} />}
-                {isChatOrVote                  	&& <ChatPanel    socket={socket} question={question} answers={answers} />}
+                {state === roomStates.LOBBY        && <LobbyPanel   socket={socket} isCustom={roomType === RoomType.CUSTOM && customAction === CustomAction.CREATE} />}
+                {state === roomStates.ACTION_1     && <Action1Panel socket={socket} eliminated={eliminated} />}
+                {state === roomStates.ACTION_2     && <Action2Panel socket={socket} prompt={prompt} eliminated={eliminated} />}
+                {isChatOrVote                      && <ChatPanel    socket={socket} question={question} answers={answers} eliminated={eliminated} />}
                 {state === roomStates.ROUND_RESULT && <RoundResultPanel roundResult={roundResult} />}
-                {state === roomStates.RESULT   	&& <ResultPanel  socket={socket} />}
+                {state === roomStates.RESULT       && <ResultPanel  socket={socket} username={user.username} result={result} />}
             </div>
 
             {/* Side panel */}
@@ -140,13 +144,13 @@ function Game({ user, gameMode, roomType, customAction } : GameProps) {
                     {/* VotePanel — visible sur desktop si vote, sur mobile si tab=vote */}
                     {isVotePhase && (
                         <div className={`side-vote-content ${mobileTab !== 'vote' ? 'mobile-hidden' : ''}`}>
-                            <VotePanel socket={socket} players={players} userId={user.id} />
+                            <VotePanel socket={socket} players={players} userId={user.id} eliminated={eliminated} />
                         </div>
                     )}
 
                     {/* ScoreBoard — caché sur desktop si vote, visible sur mobile si tab=score */}
                     <div className={`side-score-content ${isVotePhase ? 'desktop-hidden' : ''} ${mobileTab !== 'score' ? 'mobile-hidden' : ''}`}>
-                        <ScoreBoard socket={socket} />
+                        <ScoreBoard socket={socket} username={user.username} setEliminated={setEliminated} />
                     </div>
 
                 </div>

@@ -47,6 +47,29 @@
     color: var(--muted);
 }
 
+.vote-waiting {
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    padding: 0.5rem 0;
+
+    /* points animés */
+    &::after {
+        content: '';
+        display: inline-block;
+        animation: ellipsis 2s steps(4, end) infinite;
+    }
+}
+
+@keyframes ellipsis {
+    0%   { content: '';   }
+    25%  { content: '.';  }
+    50%  { content: '..'; }
+    75%  { content: '...'; }
+}
+
 /* Desktop: liste */
 .vote-grid {
     flex: 1;

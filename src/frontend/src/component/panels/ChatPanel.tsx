@@ -7,9 +7,10 @@ interface ChatPanelProps {
 	socket: Socket | null;
 	question: string | undefined;
 	answers: AnswersType;
+	eliminated: boolean;
 }
 
-function ChatPanel({ socket, question, answers }: ChatPanelProps) {
+function ChatPanel({ socket, question, answers, eliminated }: ChatPanelProps) {
 	const [message, setMessage] = useState<string | null>(null);
 	const [messages, setMessages] = useState<Message[]>([]);
 
@@ -46,15 +47,6 @@ function ChatPanel({ socket, question, answers }: ChatPanelProps) {
 		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
 	}, [messages]);
 
-	// Assign a color to each user based on their ID
-	//! to change
-	const colors = ['#ffff00','#ff0000','#0000ff','#ff8800','#00ff00','#ff0088','#ffffff','#000000'];
-	const possibleNames : string[] = ['YELLOW', 'RED', 'BLUE', 'ORANGE', 'GREEN', 'PINK', 'WHITE', 'BLACK'];
-
-	const getColor = (id: string) => {
-		return colors[possibleNames.indexOf(id)] ?? '#efeff1';
-	};
-
 	return (
 		<div className="chat-layout">
 			<div id="chat-context">
@@ -63,21 +55,23 @@ function ChatPanel({ socket, question, answers }: ChatPanelProps) {
 					{answers.map(([playerName, answer], id) => (<li key={id}>{playerName} : {answer}</li>))}
 				</ul>
 			</div>
-			<ul id="messages">
+			<ul id="messages" className={eliminated ? 'eliminated' : ''}>
 				{messages.map((msg, i) => (
 					<li key={i}>
-						<span style={{ color: getColor(msg.senderId), fontWeight: 700 }}>{msg.senderId}</span>
+						<span style={{ color: 'var(--twitch)', fontWeight: 700 }}>{msg.senderId}</span>
 						{': '}{msg.content}
 					</li>
 				))}
 				<div ref={messagesEndRef} />
 			</ul>
-			<div className="bottom-bar">
-				<form id="chatform" onSubmit={handleSubmit}>
-					<input id="input" type="text" placeholder="Message..." autoComplete="off" onChange={handleChange} value={message ?? ''} />
-					<button id="send-btn" className="game-button" type="submit">Envoyer</button>
-				</form>
-			</div>
+			{eliminated ||
+				<div className="bottom-bar">
+					<form id="chatform" onSubmit={handleSubmit}>
+						<input id="input" type="text" placeholder="Message..." autoComplete="off" onChange={handleChange} value={message ?? ''} />
+						<button id="send-btn" className="game-button" type="submit">Envoyer</button>
+					</form>
+				</div>
+			}
 		</div>
 	);
 };

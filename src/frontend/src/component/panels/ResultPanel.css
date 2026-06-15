@@ -1,20 +1,231 @@
-/* Result buttons */
+.result-layout {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    height: 100%;
+    padding: 2rem 1rem;
+    overflow: hidden;
+    transition: background 1s ease;
+}
+
+/* ── Atmosphères ────────────────────────────────── */
+
+.result-layout.user-wins {
+    background: radial-gradient(ellipse at 50% 80%, rgba(145,71,255,0.15) 0%, transparent 70%);
+}
+
+.result-layout.user-loses {
+    background: none;
+}
+
+.result-layout.ai-wins {
+    background: radial-gradient(ellipse at 50% 50%, rgba(180,0,0,0.18) 0%, transparent 80%);
+}
+
+/* ── Scanlines (AI wins) ────────────────────────── */
+
+.scanlines {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 3px,
+        rgba(0,0,0,0.25) 3px,
+        rgba(0,0,0,0.25) 4px
+    );
+    animation: flicker 4s ease-in-out infinite;
+}
+
+@keyframes flicker {
+    0%, 95%, 100% { opacity: 1; }
+    96%           { opacity: 0.6; }
+    97%           { opacity: 1; }
+    98%           { opacity: 0.4; }
+    99%           { opacity: 1; }
+}
+
+/* ── Confetti ───────────────────────────────────── */
+
+.confetti-container {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.confetti-piece {
+    position: absolute;
+    top: -20px;
+    animation: confettiFall linear forwards;
+}
+
+@keyframes confettiFall {
+    0%   { transform: translateY(0)     rotate(0deg);   opacity: 1; }
+    80%  { opacity: 1; }
+    100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
+}
+
+/* ── Titre ──────────────────────────────────────── */
+
+.result-title {
+    position: relative;
+    z-index: 2;
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    font-weight: 700;
+    text-align: center;
+    color: var(--text);
+}
+
+.ai-wins .result-title {
+    color: #f44336;
+    animation: glitch 3s infinite;
+}
+
+.user-wins .result-title {
+    color: var(--twitch);
+}
+
+@keyframes glitch {
+    0%, 88%, 100% {
+        text-shadow: none;
+        transform: none;
+    }
+    90% {
+        text-shadow: 3px 0 #f44336, -3px 0 #00e5ff;
+        transform: skewX(-2deg);
+    }
+    92% {
+        text-shadow: -3px 0 #f44336, 3px 0 #00e5ff;
+        transform: skewX(2deg);
+    }
+    94% {
+        text-shadow: 3px 0 #f44336, -3px 0 #00e5ff;
+        transform: skewX(0deg);
+    }
+}
+
+/* ── Vainqueurs ─────────────────────────────────── */
+
+.result-subtitle {
+    position: relative;
+    z-index: 2;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.result-winners {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    overflow-y: auto;
+}
+
+.winner-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 1rem 0.75rem;
+    border-radius: var(--radius);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    width: clamp(90px, 12vw, 120px);
+}
+
+.winner-card.self-winner {
+    border-color: var(--twitch);
+    background: var(--twitch-surface);
+}
+
+.winner-card.llm-winner {
+    border-color: #f44336;
+    background: rgba(244, 67, 54, 0.1);
+}
+
+.winner-avatar {
+    width: clamp(36px, 6vw, 52px);
+    height: clamp(36px, 6vw, 52px);
+    border-radius: 50%;
+}
+
+.winner-card p {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+    text-align: center;
+    word-break: break-word;
+}
+
+.llm-winner p {
+    color: #f44336;
+}
+
+.self-tag {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--twitch);
+    background: rgba(145,71,255,0.15);
+    border-radius: 99px;
+    padding: 1px 6px;
+}
+
+/* ── Actions ────────────────────────────────────── */
+
+.result-actions {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
 
 #replay-btn {
-  background: var(--twitch);
-  color: #fff;
+    background: var(--twitch);
+    color: #fff;
+    min-width: 140px;
 }
 
-#replay-btn:hover:not(:disabled) {
-	background: var(--twitch-hover);
-}
+#replay-btn:hover:not(:disabled) { background: var(--twitch-hover); }
 
 #new-game-btn {
-  background: var(--surface2);
-  color: var(--text);
-  border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    min-width: 140px;
 }
 
-#new-game-btn:hover:not(:disabled) {
-	background: #3d3d42;
+#new-game-btn:hover:not(:disabled) { background: #3d3d42; }
+
+/* ── Mobile ─────────────────────────────────────── */
+
+@media (max-width: 600px) {
+    .result-layout {
+        gap: 1.5rem;
+        padding: 1.5rem 0.75rem;
+    }
+
+    .result-actions {
+        flex-direction: column;
+        width: 100%;
+        max-width: 280px;
+    }
+
+    #replay-btn,
+    #new-game-btn {
+        width: 100%;
+    }
 }

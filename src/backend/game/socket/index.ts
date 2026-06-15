@@ -59,7 +59,7 @@ export function registerSocketHandlers(io: Server)
 					break;
 				}
 				case roomStates.RESULT: {
-					socket.emit('startResult', timeinfo);
+					socket.emit('startResult', data, timeinfo);
 					// console.log(`${roomId}: result phase`)
 					break;
 				}

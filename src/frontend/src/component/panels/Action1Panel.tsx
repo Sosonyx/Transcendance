@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
 
 interface Action1PanelProps {
 	socket: Socket | null;
+	eliminated: boolean;
 }
 
-function Action1Panel({ socket }: Action1PanelProps) {
+function Action1Panel({ socket, eliminated }: Action1PanelProps) {
 	const [prompt, setPrompt] = useState<string | null>(null);
 	const [input, setInput] = useState<boolean>(true);
 
@@ -24,6 +25,10 @@ function Action1Panel({ socket }: Action1PanelProps) {
 		}
 	};
 
+	useEffect(() => {
+		if (eliminated) setInput(false);
+	}, [eliminated])
+
 	return (
 		<div className="centered">
 			<form id="form" className="game-form" onSubmit={handleSubmit}>
@@ -34,7 +39,7 @@ function Action1Panel({ socket }: Action1PanelProps) {
 						<input id="prompt-input" type="text" placeholder="Ta question..." autoComplete="off" onChange={handleChange} value={prompt ?? ''} />
 						<button id="send-btn" className="game-button"> Envoyer </button>
 					</>) : (
-						<p id="prompt-label" className="game-label"> En attente des autres joueurs... </p>
+						<p id="prompt-label" className="game-label waiting"> En attente des autres joueurs... </p>
 					)
 				}
 			</form>
