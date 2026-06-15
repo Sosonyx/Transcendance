@@ -25,71 +25,96 @@ export function registerSocketHandlers(io: Server)
 		if (roomId !== null)
 			socket.join(roomId);
 
+
+		/* ========== ROOM EMITTED EVENTS ==========*/
+
+		
 		const stateDisplay = (state: string, data: undefined, timeinfo: number) => {
 			if (roomId === null) return;
 		    switch (state) {
-				case roomStates.LOBBY: {
-					socket.emit('startLobby');
-					// console.log(`${roomId}: lobby phase, waiting for the players to be ready`);
-					break;
-				}
-				case roomStates.ACTION_1: {
-					socket.emit('startAction1', timeinfo);
-					// console.log(`${roomId}: starting action_1 phase`);
-					break ;
-				}
-				case roomStates.ACTION_2: {
-					socket.emit('startAction2', data, timeinfo);
-					break ;
-				}
 
-				case roomStates.CHAT: {
-					socket.emit('startChat', data, timeinfo);
-					// console.log(`${roomId}: starting action phase`);
-					break;
-				}
+				case roomStates.LOBBY: {
+					socket.emit('startLobby'); break; }
+
+				case roomStates.ACTION_1: {
+					socket.emit('startAction1', timeinfo); break ; }
+
+				case roomStates.ACTION_2: { 
+					socket.emit('startAction2', data, timeinfo); break ; }
+
+				case roomStates.CHAT: { 
+					socket.emit('startChat', data, timeinfo); break; }
+
 		        case roomStates.VOTE: {
-		            socket.emit('startVote', data, timeinfo);
-		            // socket.emit('startVote', roomManager.getVotePoolFromUser(roomId, user.id), timeinfo);
-		            // console.log(`${roomId}: starting vote phase`);
-		            break;
-		        }
+		            socket.emit('startVote', data, timeinfo); break; }
+
 				case roomStates.ROUND_RESULT: {
-					socket.emit('startRoundResult', data, timeinfo);
-					break;
-				}
+					socket.emit('startRoundResult', data, timeinfo); break; }
+
 				case roomStates.RESULT: {
-					socket.emit('startResult', data, timeinfo);
-					// console.log(`${roomId}: result phase`)
-					break;
-				}
-		        default: {
-					// console.log(`Phase ${state} de room ${roomId} non reconnue`);
-		            break;
-		        }
-		    }
+					socket.emit('startResult', data, timeinfo); break; }
+
+		        default: { break; } 
+			}
 		};
 
-		// Changement d'etat de la room
-		roomEmitter.on('stateChanged', stateDisplay);
+		const onScoreInfo	= (scoreInfo : ScoreInfo) 	=> socket.emit('score_info', scoreInfo);
+		const onLobbyInfo	= (lobbyInfo : LobbyInfo) 	=> socket.emit('lobby_info', lobbyInfo);
+		const onVoteInfo	= (voteInfo : VoteInfo)		=> socket.emit('vote_info', voteInfo);
+		const onMessage		= (message : Message)		=> socket.emit('message', message);
 
-		roomEmitter.on('score_info', (scoreInfo: ScoreInfo) => {
-			socket.emit('score_info', scoreInfo);
-		});
+		const connectRoomEvents = () => {
+			roomEmitter.on('stateChanged',	stateDisplay);
+			roomEmitter.on('score_info', 	onScoreInfo);
+			roomEmitter.on('lobby_info',	onLobbyInfo);
+			roomEmitter.on('vote_info', 	onVoteInfo);
+			roomEmitter.on('message', 		onMessage);
+		}
+
+		const cleanUpRoomEvents = () => {
+			roomEmitter.off('stateChanged',	stateDisplay);
+			roomEmitter.off('lobby_info',	onLobbyInfo);
+			roomEmitter.off('score_info',	onScoreInfo);
+			roomEmitter.off('vote_info',	onVoteInfo);
+			roomEmitter.off('message',		onMessage);
+		}
+
+		connectRoomEvents();
+
+
+		/* ========== PLAYER EMITTED EVENTS ==========*/
+
+		const onTimeOut	= () => {
+			if (roomId === null) return;
+			socket.emit('timedOut');
+			socket.leave(roomId);
+			roomManager.onDisconnectEvent(user.id, roomId);
+			roomId = null;
+		};
+
+		const onSynchronize = (state : roomStates, data : any, timeout : number, scoreInfo : ScoreInfo) => {
+			stateDisplay(state, data, timeout);
+			onScoreInfo(scoreInfo);
+			console.log(scoreInfo);
+		}
+
+		const connectPlayerEvents = () => {
+			playerEmitter.on('timedOut',	onTimeOut);
+			playerEmitter.on('synchronize', onSynchronize);
+		}
+
+		const cleanUpPlayerEvents = () => {
+			playerEmitter.off('timedOut',		onTimeOut)
+			playerEmitter.off('synchronize',	onSynchronize)
+		}
+
+		connectPlayerEvents();
+
 
 		/* ==========LOBBY==========*/
 
 		// Joueur pret
-		socket.on('ready', () => {
-			// TODO : still need to check the state ?
-			// if (gamestate !== roomStates.LOBBY) return;
-			// console.log(`Ready registered for roomId ${roomId}`);
-			roomManager.onReadyEvent(user.id, roomId);
-		});
-
-		// Affichage des infos de room dans le lobby
-		roomEmitter.on('lobby_info', (lobbyInfo: LobbyInfo) => {
-			socket.emit('lobby_info', lobbyInfo);
+		socket.on('ready', () => {roomManager.onReadyEvent(user.id, roomId);
 		});
 
 		// Envoi de la config en mode custom
@@ -127,31 +152,20 @@ export function registerSocketHandlers(io: Server)
 			roomManager.onChatEvent(user.id, roomId, content);
 		});
 
-		// Relay messages emitted on the roomEmitter to socket.io clients
-		roomEmitter.on('message', (message: Message) => {
-			if (roomId === null) return;
-			socket.emit('message', message);
-		});
-
 		/* ==========VOTE==========*/
+
 		// Joueur vote
 		socket.on('vote', (playerId: string) => {
 			if (roomManager.getRoomState(roomId) !== roomStates.VOTE) return;
 			roomManager.onVoteEvent(user.id, playerId, roomId);
-			// console.log(`${user.id} a vote pour ${playerId}`);
-		});
-
-		// Envoie les infos de vote
-		roomEmitter.on('vote-info', (voteInfo: VoteInfo) => {
-			socket.emit('vote-info', voteInfo);
 		});
 
 		/* ==========RESULT==========*/
+
 		// Joueur appuie sur "replay"
 		socket.on('replay', () => {
 			if (roomManager.getRoomState(roomId) !== roomStates.RESULT) return;
 			roomManager.onReplayEvent(user.id, roomId);
-			// console.log(`${user.id} rejoue dans sa room ${roomId}`);
 		});
 
 		// Joueur appuie sur "New game"
@@ -162,41 +176,31 @@ export function registerSocketHandlers(io: Server)
 			if (roomId !== null)
 			{
 				socket.leave(roomId);
-				roomEmitter.off('stateChanged', stateDisplay);
+
+				cleanUpRoomEvents();
+				cleanUpPlayerEvents();
 			}
 			[roomId, roomEmitter, playerEmitter] = roomManager.connectPlayer(user, gameMode, roomType, CustomAction.CREATE)
 			if (roomId !== null)
 			{
 				socket.join(roomId);
-				roomEmitter.on('stateChanged', stateDisplay);
+
+				connectRoomEvents();
+				connectPlayerEvents();
 			}
 			process.stdout.write(`rejouer dans une nouvelle room ${roomId}\n`);
 			socket.emit('startLobby');
 		});
 
-		// Timer pour replay fini
-		playerEmitter.on('timedOut', () => {
-			if (roomId === null) return;
-			socket.emit('timedOut');
-			socket.leave(roomId);
-			roomManager.onDisconnectEvent(user.id, roomId);
-			roomId = null;
-		});
-
 		/* ==========Deconnexion client==========*/
+
 		// Joueur se deconnecte
+
 		socket.on('disconnect', () => {
 			roomManager.onDisconnectEvent(user.id, roomId);
-			roomEmitter.off('stateChanged', stateDisplay);
-			// console.log(`Joueur déconnecté : ${user.id}`);
+			cleanUpRoomEvents();
+			cleanUpPlayerEvents();
 		});
-
-		// Joueur demande synchronization (game side)
-		playerEmitter.on('synchronize', (state, data, timeout, scoreInfo) => {
-			stateDisplay(state, data, timeout);
-			//TODO : scoreDisplay();
-			console.log(scoreInfo);
-		})
 
 		if (ingame && roomId) {
 			roomManager.askSynchronize(roomId, user.id);
