@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
 import './LobbyPanel.css';
 import type { LobbyInfo } from "../../types/types";
+import GameConfigPanel from "./GameConfigPanel";
 
 interface LobbyPanelProps {
 	socket: Socket | null;
+	isCustom : boolean;
 }
 
-function LobbyPanel({ socket }: LobbyPanelProps) {
+function LobbyPanel({ socket, isCustom }: LobbyPanelProps) {
 	const [ready, setReady] = useState<boolean>(false);
 	const [lobbyInfo, setLobbyInfo] = useState<LobbyInfo>();
 	const players = lobbyInfo?._players.length ?? 0;
@@ -31,6 +33,8 @@ function LobbyPanel({ socket }: LobbyPanelProps) {
 
 	return (
 		<div className="lobby">
+
+			{isCustom && <GameConfigPanel socket={socket}/>}
 
 			<div className="lobby-header">
 				<h1 className="lobby-mode">{lobbyInfo?._mode}</h1>

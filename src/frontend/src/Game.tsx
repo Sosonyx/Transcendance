@@ -4,16 +4,20 @@ import { LobbyPanel, Action1Panel, Action2Panel, ChatPanel, VotePanel, ResultPan
 import { TransitionOverlay } from './component/transitions';
 import { roomStates, type VoteInfo, type AnswersType } from './types/types';
 import './Game.css'
-import type { GameMode, User } from './types/types';
+import { GameMode, RoomType, CustomAction, type User } from './types/types';
 import Timer from './component/timer/Timer';
 import ScoreBoard from './component/scoreboard/ScoreBoard';
+
+type MobileTab = 'chat' | 'vote' | 'score';
 
 interface GameProps {
     user: User;
     gameMode: GameMode;
+	roomType: RoomType;
+	customAction: CustomAction;
 }
 
-function Game({ user, gameMode } : GameProps) {
+function Game({ user, gameMode, roomType, customAction } : GameProps) {
     const [state, setState] = useState<roomStates>(roomStates.LOBBY);
     const [socket, setSocket] = useState<Socket | null>(null);
     const [timeEnd, setTimeEnd] = useState<number | null>(null);
@@ -22,6 +26,11 @@ function Game({ user, gameMode } : GameProps) {
     const [question, setQuestion] = useState<string | undefined>('');
     const [answers, setAnswers] = useState<AnswersType>([]);
     const [transition, setTransition] = useState<string | null>(null);
+    const [mobileTab, setMobileTab] = useState<MobileTab>('chat');
+
+    const isVotePhase = state === roomStates.VOTE;
+    const isLobbyPhase = state === roomStates.LOBBY;
+    const isChatOrVote = state === roomStates.CHAT || state === roomStates.VOTE;
 
     const showTransition = (message: string, callback: () => void) => {
         callback();
@@ -34,12 +43,15 @@ function Game({ user, gameMode } : GameProps) {
     useEffect(() => {
         const s = io(undefined, {
             auth: {
-                user: { 
+                user: {
                     id: user.id, 
                     username: user.username, 
                     avatar: user.avatar 
                 },
-                gameMode: gameMode
+
+                gameMode: gameMode,
+				roomType: roomType,
+				customAction: customAction
             }
         });
         setSocket(s);
@@ -82,19 +94,57 @@ function Game({ user, gameMode } : GameProps) {
         return () => { s.disconnect(); };
     }, []);
 
+    // Reset tab si on quitte la phase de vote
+    useEffect(() => {
+        if (!isVotePhase && mobileTab === 'vote') setMobileTab('chat');
+    }, [state]);
+
     return (
-        <div className='game-wrapper'>
-            <div className='game-container'>
-                <Timer timeEnd={timeEnd} />
-                {transition && <TransitionOverlay config={transition} />}
-                {state === roomStates.LOBBY    && <LobbyPanel   socket={socket} />}
-                {state === roomStates.ACTION_1 && <Action1Panel socket={socket} />}
-                {state === roomStates.ACTION_2 && <Action2Panel socket={socket} prompt={prompt} />}
-                {state === roomStates.CHAT     && <ChatPanel socket={socket} question={question} answers={answers} />}
-                {state === roomStates.VOTE     && <VotePanel    socket={socket} players={players} userId={user.id} />}
-                {state === roomStates.RESULT   && <ResultPanel  socket={socket} />}
+        <div className="game-wrapper">
+
+            {/* Tabs — cachés sur desktop */}
+            <div className="mobile-tabs">
+                <button className={`tab-btn ${mobileTab === 'chat' ? 'active' : ''}`} onClick={() => setMobileTab('chat')} type="button">💬 Chat</button>
+                {isVotePhase && <button className={`tab-btn ${mobileTab === 'vote' ? 'active' : ''}`} onClick={() => setMobileTab('vote')} type="button">🗳️ Vote</button>}
+                {!isLobbyPhase && <button className={`tab-btn ${mobileTab === 'score' ? 'active' : ''}`} onClick={() => setMobileTab('score')} type="button">🏆 Score</button>}
             </div>
-            <ScoreBoard socket={socket} />
+
+            {/* Timer mobile chat tab */}
+            <div className={`mobile-chat-timer ${mobileTab !== 'chat' ? 'mobile-hidden' : ''}`}>
+                <Timer timeEnd={timeEnd} />
+            </div>
+
+            {/* Game container — caché sur mobile si tab !== chat */}
+            <div className={`game-container ${mobileTab !== 'chat' ? 'mobile-hidden' : ''}`}>
+                {transition && <TransitionOverlay config={transition} />}
+                {state === roomStates.LOBBY		&& <LobbyPanel   socket={socket} isCustom={true} />}
+                {state === roomStates.ACTION_1 	&& <Action1Panel socket={socket} />}
+                {state === roomStates.ACTION_2 	&& <Action2Panel socket={socket} prompt={prompt} />}
+                {isChatOrVote                  	&& <ChatPanel    socket={socket} question={question} answers={answers} />}
+                {state === roomStates.RESULT   	&& <ResultPanel  socket={socket} />}\
+            </div>
+
+            {/* Side panel */}
+            {!isLobbyPhase && 
+                <div className={`side-panel ${mobileTab === 'chat' ? 'mobile-hidden' : ''}`}>
+
+                    <Timer timeEnd={timeEnd} />
+
+                    {/* VotePanel — visible sur desktop si vote, sur mobile si tab=vote */}
+                    {isVotePhase && (
+                        <div className={`side-vote-content ${mobileTab !== 'vote' ? 'mobile-hidden' : ''}`}>
+                            <VotePanel socket={socket} players={players} userId={user.id} />
+                        </div>
+                    )}
+
+                    {/* ScoreBoard — caché sur desktop si vote, visible sur mobile si tab=score */}
+                    <div className={`side-score-content ${isVotePhase ? 'desktop-hidden' : ''} ${mobileTab !== 'score' ? 'mobile-hidden' : ''}`}>
+                        <ScoreBoard socket={socket} />
+                    </div>
+
+                </div>
+            }
+
         </div>
     );
 }

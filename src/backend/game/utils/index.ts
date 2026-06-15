@@ -11,10 +11,20 @@ export type RoomId = string | null;
 
 export type VoteInfo = [userid : string | null, playerid : string, name : string, votes : number];
 
-export enum gameMode {
+export enum GameMode {
 	SCORE = "SCORE",
 	ELIMINATION = "ELIMINATION"
 };
+
+export enum RoomType {
+	CLASSIC = "CLASSIC",
+	CUSTOM = "CUSTOM"
+}
+
+export enum CustomAction {
+	CREATE = "CREATE",
+	JOIN = "JOIN"
+}
 
 export interface SafeUser {
     id: string;
@@ -23,7 +33,7 @@ export interface SafeUser {
 };
 
 export interface RoomManagerInterface {
-    connectPlayer(user : SafeUser, gamemode : gameMode) : [roomId : string | null, room : EventEmitter, player : EventEmitter, ingame : boolean]; // return RoomId + room as Emitter if new room
+    connectPlayer(user : SafeUser, gamemode : GameMode, roomType : RoomType, customAction : CustomAction) : [roomId : string | null, room : EventEmitter, player : EventEmitter, ingame : boolean]; // return RoomId + room as Emitter if new room
     onReadyEvent(playerId : string, roomId : RoomId) : void;
 	onInputEvent(playerId : string, roomId : RoomId, message : string) : void;
     onChatEvent(playerId : string, roomId : RoomId, message : string) : void;
@@ -36,24 +46,18 @@ export interface RoomManagerInterface {
 	getRoomState(roomId : RoomId) : string | null;
 };
 
-
-// export interface GameConfig {
-// 	_gamemode : gameMode | null;
-// 	_maxPlayerCount : number;
-// 	_action_1_Time : number;
-// 	_action_2_Time : number;
-// 	_chatTime : number = 60 * 1000; // 30 seconds
-// 	_voteTime : number = 30 * 1000; // 30 seconds
-// 	_replayTime : number = 30 * 1000; // 30 seconds
-// 	_maxPlayerCount : number = 7;
-// 	_scoreCorrectVote : number = 3;
-// 	_scoreGetVoted : number = 1;
-// 	_scoreObjective : number = 10;
-// 	_eliminationTreshold : number = 1;
-// }
+export interface GameConfig {
+	gameMode : GameMode;
+	chatTime : number; // 30 seconds
+	voteTime : number; // 30 seconds
+	maxPlayerCount : number;
+	scoreObjective : number;
+	eliminationTreshold : number;
+	llmNumber : number;
+}
 
 export interface LobbyInfo {
-	_mode : gameMode | null,
+	_mode : GameMode | null,
 	_llmCount : number,
 	_players : [login : string, readyness : boolean][],
 	_spots : number
