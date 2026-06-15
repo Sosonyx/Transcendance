@@ -7,9 +7,9 @@ import Game from './Game.js';
 import './App.css'
 import { Home } from './component/home/home.js';
 import { AuthModal } from './component/auth/AuthModal.js';
-import GameModeSwitch from './component/switch/GameModeSwitch.js';
-import RoomTypeSwitch from './component/switch/RoomTypeSwitch.js';
-import CustomActionSwitch from './component/switch/CustomActionSwitch.js';
+// import GameModeSwitch from './component/switch/GameModeSwitch.js';
+// import RoomTypeSwitch from './component/switch/RoomTypeSwitch.js';
+// import CustomActionSwitch from './component/switch/CustomActionSwitch.js';
 import { GameMode, RoomType, CustomAction } from './types/types.js';
 
 export function App() {
@@ -40,26 +40,16 @@ export function App() {
       
       {currentView === 'home' && (
           <Home
-          user={user}
-          gameMode={gameMode}
-          setGameMode={setGameMode}
-          onViewChange={setCurrentView}
-          setShowAuthModal={setShowAuthModal}
-        />
-//         <div className='description'>
-//           <p>Welcome to Transcendence.</p>
-// 		  <RoomTypeSwitch roomType={roomType} setRoomType={setRoomType} />
-          
-// 			{
-// 				roomType === RoomType.CLASSIC && (
-// 					<GameModeSwitch gameMode={gameMode} setGameMode={setGameMode} /> )
-// 			}
-// 			{
-// 				roomType === RoomType.CUSTOM && (
-// 					<CustomActionSwitch customAction={customAction} setCustomAction={setCustomAction} /> )
-// 			}
-
-//         </div>
+            user={user}
+            gameMode={gameMode}
+            setGameMode={setGameMode}
+            onViewChange={setCurrentView}
+            setShowAuthModal={setShowAuthModal}
+            roomType={roomType}
+            setRoomType={setRoomType}
+            customAction={customAction}
+            setCustomAction={setCustomAction}
+          />
       )}
 
       {user && isAuthenticated && currentView === 'profile' && (
