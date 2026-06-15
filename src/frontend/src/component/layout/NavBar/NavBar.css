@@ -149,3 +149,42 @@
   border-color: #8533ff;
   color: #efeff1;
 }
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .navbar {
+    padding: 0 12px;
+  }
+
+  .navbar-brand {
+    font-size: 1rem !important;
+    letter-spacing: 1px;
+  }
+
+  .navbar-logo {
+    width: 36px;
+    height: 36px;
+  }
+
+  .button-div {
+    gap: 10px;
+  }
+
+  .navbar-username {
+    display: none;  /* cache le nom, garde juste l'avatar */
+  }
+
+  .nav-button {
+    display: none;  /* cache le bouton Logout sur mobile */
+  }
+
+  .navbar-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .play-btn {
+    padding: 5px 12px;
+    font-size: 0.75rem;
+  }
+}

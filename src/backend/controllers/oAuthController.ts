@@ -33,13 +33,14 @@ export async function intraHandler(req: FastifyRequest, reply: FastifyReply) {
 
   reply.setCookie("token", appToken, {
     path: "/",
-    httpOnly: true, // TODO : TRUE EN PROD
+    httpOnly: true,
     secure: false,
     sameSite: "strict",
     maxAge: 86400,
   });
   // TODO : REDIRECT TO RIGHT URL
-  return (reply.redirect("http://localhost:8080"));
+  let url = process.env.FRONTEND_URL || "http://localhost:8080";
+  return (reply.redirect(url));
 }
 
 export async function googleHandler(req: FastifyRequest, reply: FastifyReply) {
@@ -74,10 +75,11 @@ export async function googleHandler(req: FastifyRequest, reply: FastifyReply) {
 
   reply.setCookie("token", appToken, {
     path: "/",
-    httpOnly: true, // TODO : TRUE EN PROD
+    httpOnly: true,
     secure: false,
     sameSite: "strict",
     maxAge: 86400,
   });
-  return (reply.redirect("http://localhost:8080"));
+  let url = process.env.FRONTEND_URL || "http://localhost:8080";
+  return (reply.redirect(url));
 }
