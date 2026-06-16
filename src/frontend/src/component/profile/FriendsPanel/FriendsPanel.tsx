@@ -35,7 +35,7 @@ function FriendsPanel({ user, friendList, selectedFriend, onSelectFriend }: Frie
               >
                 <img
                   className="friend-avatar"
-                  src={friend.avatar && friend.avatar.trim() !== "" ? friend.avatar : "./username.png"}
+                  src={friend.avatar && friend.avatar.trim() !== "" ? friend.avatar : "./profile-avatar.png"}
                   alt="Avatar"
                 />
                 <span className="friend-username">{friend.username}</span>

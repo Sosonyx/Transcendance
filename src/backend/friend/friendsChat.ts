@@ -11,7 +11,7 @@ export function getFriendRoomName(user1: string, user2: string): string {
 export function registerFriendChat(io: Server, prisma: PrismaClient) {
 
     io.on('connection', (socket) => {
-        const user: SafeUser = socket.handshake.auth.user;
+        const user: {id: string, username: string} = socket.handshake.auth.user;
         if (!user)
             return;
             

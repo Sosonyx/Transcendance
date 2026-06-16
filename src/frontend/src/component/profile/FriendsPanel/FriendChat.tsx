@@ -64,7 +64,6 @@ function FriendChat({ user, friendId, friendUsername }: FriendChatProps) {
         user: {
           id: user.id,
           username: user.username,
-          avatar: user.avatar
         },
       }
     });
