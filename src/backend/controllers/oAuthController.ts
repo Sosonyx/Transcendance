@@ -39,6 +39,7 @@ export async function intraHandler(req: FastifyRequest, reply: FastifyReply) {
     maxAge: 86400,
   });
   // TODO : REDIRECT TO RIGHT URL
+  req
   let url = process.env.FRONTEND_URL || "http://localhost:8080";
   return (reply.redirect(url));
 }
