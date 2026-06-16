@@ -54,11 +54,21 @@
     color: var(--text);
     font-weight: 600;
     border-color: rgba(145, 71, 255, 0.5);
-    background: rgba(145, 71, 255, 0.1);
+    background: rgba(117, 25, 255, 0.1);
 }
 
 .mode-label--sub:hover:not(.active) {
     border-color: rgba(145, 71, 255, 0.3);
     color: var(--text);
     opacity: 1;
+}
+
+.mode-description {
+    font-size: 0.78rem;
+    color: #adadb8;
+    text-align: center;
+    max-width: auto;
+    margin: 4px auto 0;
+    line-height: 1.5;
+    font-style: italic;
 }

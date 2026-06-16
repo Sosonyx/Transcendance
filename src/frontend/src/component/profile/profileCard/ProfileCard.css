@@ -254,3 +254,19 @@
   color: #ff6b6b;
   margin: 0;
 }
+
+@media (max-width: 600px) {
+  .profile-card {
+    padding: 20px 16px;
+    border-radius: 16px;
+    gap: 18px;
+  }
+
+  .profile-stats {
+    padding: 14px 8px;
+  }
+
+  .stat-value {
+    font-size: 1.25rem;
+  }
+}

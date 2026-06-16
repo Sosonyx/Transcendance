@@ -50,19 +50,19 @@ export function Profile({user, onUserUpdated, readonly = false} : ProfileProps) 
     <div className="profile-card">
         <div className="profile-avatar-section">
             {!readonly ? (
-                <label htmlFor="avatar" className="avatar-wrapper">
+                <label htmlFor="avatar" className="avatar-wrapper" style ={{cursor: isEditing ? 'pointer' : 'default'}}>
                     <img
                         className="avatar"
-                        src={currentUser.avatar && currentUser.avatar.trim() !== "" ? currentUser.avatar : "./username.png"}
+                        src={currentUser.avatar && currentUser.avatar.trim() !== "" ? currentUser.avatar : "./profile-avatar.png"}
                         alt="Avatar"
                     />
-                    <span className="avatar-overlay">✎</span>
-                    <input type="file" id="avatar" accept="image/*" onChange={handleAvatarChange} style={{display: 'none'}} />
+                    {isEditing && <span className="avatar-overlay">✎</span>}
+                    <input type="file" id="avatar" accept="image/*" onChange={handleAvatarChange} style={{display: 'none'}} disabled={!isEditing} />
                 </label>
             ) : (
                 <img
                     className="avatar"
-                    src={currentUser.avatar && currentUser.avatar.trim() !== "" ? currentUser.avatar : "./username.png"}
+                    src={currentUser.avatar && currentUser.avatar.trim() !== "" ? currentUser.avatar : "./profile-avatar.png"}
                     alt="Avatar"
                 />
             )}
@@ -88,7 +88,7 @@ export function Profile({user, onUserUpdated, readonly = false} : ProfileProps) 
         </div>
 
         {!readonly && (!isEditing ? (
-            <button className="profile-modify-btn" onClick={() => setIsEditing(true)}>Modify Profile</button>
+            <button className="profile-modify-btn" onClick={() => setIsEditing(true)}>Modifier le profil</button>
         ) : (
             <form onSubmit={handleSubmit} className="edit-form">
                 <div className="form-group">

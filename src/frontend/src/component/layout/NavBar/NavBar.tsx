@@ -25,7 +25,7 @@ export function Navbar({ user, onLogout, setShowAuthModal, onViewChange}: Props)
             <div className='navbar-user-info' onClick={() => onViewChange('profile')}>
               <img
                 className='navbar-avatar'
-                src={user.avatar && user.avatar.trim() !== '' ? user.avatar : '/username.png'}
+                src={user.avatar && user.avatar.trim() !== '' ? user.avatar : '/profile-avatar.png'}
                 alt="avatar"
               />
               <span className='navbar-username'>{user.username}</span>
