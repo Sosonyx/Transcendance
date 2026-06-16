@@ -65,3 +65,10 @@
   background: #7c2fe8;
   box-shadow: 0 0 20px rgba(145, 71, 255, 0.4);
 }
+
+@media (max-width: 600px) {
+  .finder-div {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+}

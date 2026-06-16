@@ -53,7 +53,7 @@ export function Profile({user, onUserUpdated, readonly = false} : ProfileProps) 
                 <label htmlFor="avatar" className="avatar-wrapper" style ={{cursor: isEditing ? 'pointer' : 'default'}}>
                     <img
                         className="avatar"
-                        src={currentUser.avatar && currentUser.avatar.trim() !== "" ? currentUser.avatar : "./username.png"}
+                        src={currentUser.avatar && currentUser.avatar.trim() !== "" ? currentUser.avatar : "./profile-avatar.png"}
                         alt="Avatar"
                     />
                     {isEditing && <span className="avatar-overlay">✎</span>}
@@ -62,7 +62,7 @@ export function Profile({user, onUserUpdated, readonly = false} : ProfileProps) 
             ) : (
                 <img
                     className="avatar"
-                    src={currentUser.avatar && currentUser.avatar.trim() !== "" ? currentUser.avatar : "./username.png"}
+                    src={currentUser.avatar && currentUser.avatar.trim() !== "" ? currentUser.avatar : "./profile-avatar.png"}
                     alt="Avatar"
                 />
             )}

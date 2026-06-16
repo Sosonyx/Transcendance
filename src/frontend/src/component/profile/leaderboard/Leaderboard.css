@@ -98,3 +98,15 @@
 	text-align: center;
 	padding: 20px 0;
 }
+
+@media (max-width: 600px) {
+	.leaderboard-container {
+		padding: 20px 16px;
+		border-radius: 16px;
+	}
+
+	.leaderboard-item {
+		padding: 9px 10px;
+		gap: 8px;
+	}
+}
