@@ -31,19 +31,9 @@ export function Home({ user, gameMode, setGameMode, onViewChange, setShowAuthMod
             </p>
         </div>
 
-        <div className="home-rules">
-            <div className="rule-card">
-                <span className="rule-icon"></span>
-                <h3>Discutez</h3>
-            </div>
-            <div className="rule-card">
-                <span className="rule-icon"></span>
-                <h3>Analysez</h3>
-            </div>
-            <div className="rule-card">
-                <span className="rule-icon"></span>
-                <h3>Votez</h3>
-            </div>
+
+        <div className="gamemodes-display">
+            <h2 className="home-gamemode-title">Choisissez votre mode de jeu</h2>
         </div>
         <div className="home-gamemode">
             <div className='description'>
@@ -69,6 +59,20 @@ export function Home({ user, gameMode, setGameMode, onViewChange, setShowAuthMod
                 Jouer
                 </button>
             )}
+            <div className="home-rules">
+                <div className="rule-card">
+                <span className="rule-icon"></span>
+                <h3>Discutez</h3>
+            </div>
+            <div className="rule-card">
+                <span className="rule-icon"></span>
+                <h3>Analysez</h3>
+            </div>
+            <div className="rule-card">
+                <span className="rule-icon"></span>
+                <h3>Votez</h3>
+            </div>
+        </div>
         <Footer />
     </div>
     );

@@ -1,4 +1,7 @@
 .finder-div {
+  min-width: 280px;
+  grid-column: 2;
+  grid-row: 2;
   display: flex;
   flex-direction: column;
   gap: 16px;

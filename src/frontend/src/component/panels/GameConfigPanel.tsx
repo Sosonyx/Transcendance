@@ -51,7 +51,7 @@ function GameConfigPanel( { socket } : GameConfigPanelProps ) {
 			<SliderInput label="IAs dans la partie" value={config.llmNumber} min={0} max={100} step={1} onChange={set('llmNumber')} />
 
 			{config.gameMode === GameMode.SCORE && (
-				<SliderInput label="Objectif de score" value={config.scoreObjective} min={1} max={100} step={5} onChange={set('scoreObjective')} />
+				<SliderInput label="Objectif de score" value={config.scoreObjective} min={1} max={50} step={1} onChange={set('scoreObjective')} />
 			)}
 			{config.gameMode === GameMode.ELIMINATION && (
 				<SliderInput label="Seuil d'elimination" value={config.eliminationThreshold} min={1} max={config.maxPlayerCount} step={1} onChange={set('eliminationThreshold')} />

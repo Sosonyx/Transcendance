@@ -63,7 +63,7 @@ function FriendChat({ user, friendId, friendUsername }: FriendChatProps) {
       auth: {
         user: {
           id: user.id,
-          username: user.username,
+          username: user.username
         },
       }
     });

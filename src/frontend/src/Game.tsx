@@ -48,8 +48,7 @@ function Game({ user, gameMode, roomType, customAction } : GameProps) {
             auth: {
                 user: {
                     id: user.id, 
-                    username: user.username, 
-                    avatar: user.avatar 
+                    username: user.username
                 },
 
                 gameMode: gameMode,

@@ -1,6 +1,6 @@
 import { Server } from 'socket.io';
-import type { SafeUser } from '../game/utils/index.ts';
 import type { PrismaClient } from '@prisma/client';
+import type { SafeUser } from '../game/utils/index.js';
 
 export function getFriendRoomName(user1: string, user2: string): string {
     const user_array = [user1, user2].sort();
@@ -11,7 +11,7 @@ export function getFriendRoomName(user1: string, user2: string): string {
 export function registerFriendChat(io: Server, prisma: PrismaClient) {
 
     io.on('connection', (socket) => {
-        const user: {id: string, username: string} = socket.handshake.auth.user;
+        const user: SafeUser = socket.handshake.auth.user;
         if (!user)
             return;
             

@@ -10,10 +10,10 @@
 .description{
 	color: white;
 	background-color: transparent;
-	padding: 30px;
+	/* padding: 30px; */
 	margin: auto;
-	margin-top: 30px;
-	width: 40%;
+	/* margin-top: 30px; */
+	width: 100%;
 	text-align: center;
 }
 

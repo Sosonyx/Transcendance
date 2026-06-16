@@ -102,6 +102,9 @@
     width: clamp(40px, 6vw, 72px);
     height: clamp(40px, 6vw, 72px);
     border-radius: 50%;
+    border: 2px solid var(--border);
+    box-shadow: 0 0 10px var(--border);
+    object-fit: cover;
 }
 
 .lobby-avatar-placeholder {
