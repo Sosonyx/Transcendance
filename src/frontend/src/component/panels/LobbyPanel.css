@@ -74,13 +74,14 @@
 }
 
 .lobby-card.player {
-    background: var(--twitch-surface);
-    border-color: var(--twitch);
+    background: var(--surface);
 }
 
 .lobby-card.player.ready {
     box-shadow: 0 0 1rem var(--twitch-shadow);
     transform: scale(1.05);
+    background: var(--twitch-surface);
+    border: 2px solid var(--twitch);
 }
 
 .lobby-card.llm {
@@ -122,10 +123,11 @@
     width: 220px;
     height: clamp(44px, 7vh, 60px);
     min-height: 44px;
-    background: var(--surface2);
-    color: var(--muted);
-    border: 1px solid var(--border);
+    background: var(--twitch);
+    color: #fff;
+    border: 1px solid var(--twitch);
     border-radius: var(--radius);
+    box-shadow: 0 0 16px #9147ff66;
     font-family: 'Orbitron', sans-serif;
     font-size: clamp(1rem, 2vh, 1.2rem);
     font-weight: 700;
@@ -135,20 +137,19 @@
 }
 
 #ready-btn:hover {
+    background: var(--twitch-hover);
+    box-shadow: 0 0 20px rgba(145, 71, 255, 0.6);
+}
+
+#ready-btn.is-ready {
+    background: var(--surface2);
+    color: var(--muted);
+    border-color: var(--border);
+}
+
+#ready-btn.is-ready:hover {
     background: var(--surface);
     border-color: var(--twitch);
     color: var(--text);
     box-shadow: 0 0 12px #9147ff33;
-}
-
-#ready-btn.is-ready {
-    background: var(--twitch);
-    color: #fff;
-    border-color: var(--twitch);
-    box-shadow: 0 0 16px #9147ff66;
-}
-
-#ready-btn.is-ready:hover {
-    background: var(--twitch-hover);
-    box-shadow: 0 0 20px rgba(145, 71, 255, 0.6);
 }
