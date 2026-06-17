@@ -786,7 +786,7 @@ export class Room extends EventEmitter
 			const voted = this._players.filter(p => p.getScore() === highScore);
 
 			voted.forEach(player => player.setEliminated(true));
-			this._players.forEach(p => )
+			this._players.forEach(p => p.setScore(0));
 		}
 	}
 
