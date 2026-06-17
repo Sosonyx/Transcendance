@@ -786,6 +786,7 @@ export class Room extends EventEmitter
 			const voted = this._players.filter(p => p.getScore() === highScore);
 
 			voted.forEach(player => player.setEliminated(true));
+			this._players.forEach(p => )
 		}
 	}
 
@@ -843,7 +844,7 @@ export class Room extends EventEmitter
 			return (true);
 		}
 		if (!this._players.find(player => player.getEliminated()))
-			return (true);
+			return (true)
 		return (false);
 	}
 
