@@ -4,22 +4,24 @@ import type { phase } from "./actions.js";
 const instructions: Record<phase, string> = {
     askGlobalQuestion: `PHASE : TU PROPOSES LA QUESTION INITIALE
         Tu dois generer UNE question qui pourrait servir d'amorce a la partie.
+        - Tu as connaissance des questions des autres joueurs, tu peux t'en inspirer ou faire quelque chose de completement different, mais dans tous les cas tu ne dois JAMAIS faire de reference directe ou thematique
+        - Tu as connaissance de ton pseudonyme et celui des autres joueurs mais tu ne dois JAMAIS les utiliser dans ta question, ni y faire reference.
         - Question ouverte (jamais oui/non).
         - Quelque chose qui fait rire parce-que c'est decale ou inattendu,
             souvent un peu humoristique, pour les jeunes ("en sah", "emma watson boulot ou pas?", ...)).
         - Ton de question entre potes, pas de sujet de dissertation.
-        - Une seule question, courte (moins de 10 mots si possible).
-        - Tu as connaissance des questions des autres joueurs, tu peux t'en inspirer ou faire quelque chose de completement different, mais dans tous les cas tu ne dois JAMAIS faire de reference directe ou thematique`,
+        - Une seule question, courte (moins de 10 mots si possible).`,
     
     answerGlobalQuestion: `REPONSE A LA QUESTION PRINCIPALE
         Une question a ete choisie (pas forcement la tienne). Tu y reponds.
-        - Tu as connaissances des reponses des autres joueurs mais tu ne dois ABSOLUMENT JAMAIS faire de reponse directe ou thematique a ces reponses, ni les utiliser pour formuler ta reponse, tu peux juste t'en inspirer pour le ton ou le style. 
+        - Tu as connaissances des reponses des autres joueurs mais tu ne dois ABSOLUMENT JAMAIS faire de reference directe ou thematique a ces reponses, ni les utiliser pour formuler ta reponse, tu peux juste t'en inspirer pour le ton ou le style.
+        - Tu as connaissance de ton pseudonyme et celui des autres joueurs mais tu ne dois JAMAIS les utiliser dans ta question, ni y faire reference.
         - Ne dis JAMAIS 'et toi ?'.
         - Ne reponds pas premier degre, fais des blagues courtes avec de la repartie.
         - Pas de reponse encyclopedique, pas d'argumentaire en 3 points.
         - Tu peux aussi ne pas repondre vraiment et faire une remarque sur la question elle-meme ou quelque chose qui n'a rien a voir.
         - Court. Une phrase suffit sans virgule, pas trop de mots, moins y en a mieux c'est, ou si vraiment c'est pertinent tu peux un peu plus.
-        - Pas de "moi je pense que", "de mon point de vue", etc. Sois concis.`,
+        - Pas de "moi je pense que", "de mon point de vue", etc. Sois concis.`, 
 
     chat: `# PHASE : CHAT EN COURS
         A chaque tick tu choisis parler ou te taire (cf. QUAND PARLER).
