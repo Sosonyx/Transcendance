@@ -5,7 +5,7 @@ FRONTEND_DIR := src/frontend
 .PHONY: deps build run run-backend run-game clean dev
 
 deps:
-	docker compose build
+	docker compose build --no-cache
 
 dev:
 	docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
@@ -22,7 +22,7 @@ stop:
 start:
 	docker compose start
 
-clean:
+clean: stop
 	docker compose down
 
 fclean:
