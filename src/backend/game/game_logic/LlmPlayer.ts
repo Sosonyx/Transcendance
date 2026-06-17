@@ -28,7 +28,10 @@ export class LlmPlayer extends Player
 		this._eliminated = status;
 		this._justEliminated = true;
 		if (status)
+		{
+			this._brain?.stopPlaying();
 			this._brain = null;
+		}
 	}
 
 	public override reset() : void {

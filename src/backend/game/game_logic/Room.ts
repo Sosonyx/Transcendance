@@ -844,7 +844,11 @@ export class Room extends EventEmitter
 			return (true);
 		}
 		if (!this._players.find(player => player.getEliminated()))
+<<<<<<< HEAD
 			return (true)
+=======
+			return (true);
+>>>>>>> 773b8b80017702ffb1ae99278fcbeac9bd5cff59
 		return (false);
 	}
 
