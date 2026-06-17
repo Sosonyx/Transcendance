@@ -1,41 +1,15 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { MessageParam } from "@anthropic-ai/sdk/resources";
 
-import dotenv from "dotenv";
-import { existsSync } from "fs";
-import { dirname, resolve } from "path";
-import { fileURLToPath } from "url";
-
 import { tools } from "./actions.js";
 import type { phase } from "./actions.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-function loadEnv(): void {
-    const candidatePaths = [
-        resolve(__dirname, ".env"),
-        resolve(__dirname, "../../../src/backend/llm/.env"),
-        resolve(process.cwd(), "src/backend/llm/.env"),
-        resolve(process.cwd(), ".env"),
-    ];
-
-    const envPath = candidatePaths.find((path) => existsSync(path));
-
-    if (envPath)
-        dotenv.config({ path: envPath });
-    else
-        dotenv.config();
-}
-
-loadEnv();
-
 const apiKey = process.env.ANTHROPIC_API_KEY;
+// if (!apiKey)
+//     throw new Error("ANTHROPIC_API_KEY is not set");
 
-if (!apiKey)
-    throw new Error("ANTHROPIC_API_KEY is not set");
-
-const myClientAPI = new Anthropic({ apiKey });
+const myClientAPI = apiKey  ? new Anthropic({ apiKey, maxRetries: 2, timeout: 10000 }) 
+                            : null;
 
 function getSystemPrompt(promptContext : string) : Anthropic.Messages.TextBlockParam
 {
@@ -78,22 +52,33 @@ function extractAction(res: Anthropic.Message): GameAction {
     }
 }
 
+// Just a basic fallback action in case of an error.
+function fallbackAction(_phase: phase): GameAction {
+    return { type: "silent", reason: "Check if you have set the ANTHROPIC_API_KEY environment variable or if the API key is valid." };
+}
+
 export async function askClaude(promptContext: string, conversationHistory: MessageParam[], phase: phase): Promise<GameAction> {
-    const llmResponse = await myClientAPI.messages.create({
-        // model: "claude-haiku-4-5-20251001",
-        model: "claude-opus-4-8",
-        max_tokens: 150,
-        temperature: 1.0,
-        system: [getSystemPrompt(promptContext)], 
+    if (!myClientAPI) {
+        console.error("ANTHROPIC_API_KEY is not set. Returning fallback action.");
+        return fallbackAction(phase);
+    }
+    try {
+        const llmResponse = await myClientAPI.messages.create({
+            // model: "claude-haiku-4-5-20251001",
+            model: "claude-opus-4-8",
+            max_tokens: 150,
+            temperature: 1.0,
+            system: [getSystemPrompt(promptContext)],
         messages: conversationHistory,
         tool_choice: {type: "any" },
-        tools: tools[phase]
+        tools: tools[phase]});
 
-    });
-    return extractAction(llmResponse);
+        return extractAction(llmResponse);
+    }
+    catch (error) {
+        return fallbackAction(phase);
+    }
 }
-        // model: "claude-opus-4-8",
-        // model: "claude-opus-4-7"
-        // model: "claude-haiku-4-5-20251001",
-
-
+// model: "claude-opus-4-8",
+// model: "claude-opus-4-7"
+// model: "claude-haiku-4-5-20251001",
