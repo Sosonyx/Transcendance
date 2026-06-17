@@ -45,6 +45,6 @@ export const oauthPlugin = fp(async function (fastify: FastifyInstance) {
       auth: googleAuth,
     },
     startRedirectPath: "/api/auth/google",
-    callbackUri: `https://localhost/api/auth/google/callback`,
+    callbackUri: `https://localhost:8080/api/auth/google/callback`,
   });
 });
