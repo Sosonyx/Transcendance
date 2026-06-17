@@ -40,7 +40,7 @@ export async function intraHandler(req: FastifyRequest, reply: FastifyReply) {
   });
   // TODO : REDIRECT TO RIGHT URL
   req
-  let url = process.env.FRONTEND_URL || "http://localhost:8080";
+  let url = process.env.FRONTEND_URL || "https://localhost:8080";
   return (reply.redirect(url));
 }
 
@@ -81,6 +81,6 @@ export async function googleHandler(req: FastifyRequest, reply: FastifyReply) {
     sameSite: "strict",
     maxAge: 86400,
   });
-  let url = process.env.FRONTEND_URL || "http://localhost:8080";
+  let url = process.env.FRONTEND_URL || "https://localhost:8080";
   return (reply.redirect(url));
 }
