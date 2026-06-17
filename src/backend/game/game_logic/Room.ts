@@ -185,7 +185,6 @@ export class Room extends EventEmitter
 		switch (newState) {
 
 			case (roomStates.LOBBY) :
-				this._pickGameMode();
 				break ;
 
 			case (roomStates.ACTION_1) :
@@ -195,13 +194,13 @@ export class Room extends EventEmitter
 				this._players = shuffle(this._players);
 				this._allPlayersShouldAct();
 				this._timeInfo = Date.now() + action_1_Time * 1000;
-				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.ACTION_2) }, action_1_Time * 1000);
+				this._timerId = setTimeout(() => { this._checkActionStatus() }, action_1_Time * 1000);
 				break ;
 
 			case (roomStates.ACTION_2) :
 				this._allPlayersShouldAct();
 				this._timeInfo = Date.now() + action_2_Time * 1000;
-				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.CHAT) }, action_2_Time * 1000);
+				this._timerId = setTimeout(() => { this._checkActionStatus() }, action_2_Time * 1000);
 				this._input = this._pickAnInput();
 				if (this._input === null)
 				{
@@ -283,6 +282,7 @@ export class Room extends EventEmitter
 
 		console.log('\n\n\n CONFIG VALIDEEE \n\n\n ');
 		this._config = config;
+		this._pickGameMode();
 		this._checkLobbyStatus();
 		return (true);
 	}
@@ -330,7 +330,8 @@ export class Room extends EventEmitter
 			console.log(`Player ${player.getName()} (room ${this._number}) : ${input}`);
 			player.setActed(true);
 		}
-		this._checkActionStatus();
+		if (this._haveAllPlayersActed())
+			this._checkActionStatus();
 	}
 
 	public onChat(player : Player, message : string) {
@@ -529,11 +530,6 @@ export class Room extends EventEmitter
 
 	private async _checkActionStatus()
 	{
-		if (!this._haveAllPlayersActed())
-		{
-			console.log('Not all players have acted');
-			return ;
-		}
 		clearTimeout(this._timerId);
 		switch (this._state) {
 			case roomStates.ACTION_1 :
@@ -688,6 +684,7 @@ export class Room extends EventEmitter
 					info._eliminated.push([p.getUsername() ?? 'IA']);
 				else 
 					info._alive.push([p.getUsername() ?? 'IA', null]);
+				p.setScore(0);
 			})
 		}
 
@@ -756,38 +753,34 @@ export class Room extends EventEmitter
 
 	private __computeVoteScore() : void
 	{
-		if (this._config.gameMode === GameMode.SCORE)
-		{
-			this._players.forEach(player => {
-				if (!player.getIsLLM() && player.getVoteAgainst() !== null)
-				{
-					let target : Player = player.getVoteAgainst()!;
-					if (target.getIsLLM())
-						player.incrementScore(scoreCorrectVote);
-					else 
-						target.incrementScore(scoreGetVoted);
-				}
-			});
-		}
+		this._players.forEach(player => {
+			if (!player.getIsLLM() && player.getVoteAgainst() !== null)
+			{
+				let target : Player = player.getVoteAgainst()!;
+				if (target.getIsLLM())
+					player.incrementScore(scoreCorrectVote);
+				else 
+					target.incrementScore(scoreGetVoted);
+			}
+		});
+		
 	}
 
 	private __computeVoteElimination() : void
 	{
-		if (this._config.gameMode === GameMode.ELIMINATION)
-		{
-			this._players.forEach(player => {
-				if (!player.getEliminated() && player.getVoteAgainst() != null)
-				{
-					let target : Player = player.getVoteAgainst()!;
-					target.incrementScore(1);
-				}}
-			)
-			const highScore = Math.max(...this._players.map(p => p.getScore()));
-			const voted = this._players.filter(p => p.getScore() === highScore);
-
-			voted.forEach(player => player.setEliminated(true));
-			this._players.forEach(p => p.setScore(0));
-		}
+		this._players.forEach(p => p.setScore(0));
+		this._players.forEach(player => {
+			if (!player.getEliminated() && player.getVoteAgainst() != null)
+			{
+				let target : Player = player.getVoteAgainst()!;
+				target.incrementScore(1);
+			}}
+		)
+		const highScore = Math.max(...this._players.map(p => p.getScore()));
+		if (highScore === 0)
+			return;
+		const voted = this._players.filter(p => p.getScore() === highScore);
+		voted.forEach(player => player.setEliminated(true));
 	}
 
 	private __winConditionScore() : boolean {
@@ -844,11 +837,7 @@ export class Room extends EventEmitter
 			return (true);
 		}
 		if (!this._players.find(player => player.getEliminated()))
-<<<<<<< HEAD
-			return (true)
-=======
 			return (true);
->>>>>>> 773b8b80017702ffb1ae99278fcbeac9bd5cff59
 		return (false);
 	}
 
