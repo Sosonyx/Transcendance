@@ -5,11 +5,12 @@ import { tools } from "./actions.js";
 import type { phase } from "./actions.js";
 
 const apiKey = process.env.ANTHROPIC_API_KEY;
-// if (!apiKey)
-//     throw new Error("ANTHROPIC_API_KEY is not set");
+if (!apiKey)
+    throw new Error("ANTHROPIC_API_KEY is not set");
 
-const myClientAPI = apiKey  ? new Anthropic({ apiKey, maxRetries: 2, timeout: 10000 }) 
-                            : null;
+// const myClientAPI = apiKey !== null ? new Anthropic({ apiKey, timeout: 10000 }) : null;
+
+const myClientAPI = new Anthropic({ apiKey })      
 
 function getSystemPrompt(promptContext : string) : Anthropic.Messages.TextBlockParam
 {
@@ -58,16 +59,16 @@ function fallbackAction(_phase: phase): GameAction {
 }
 
 export async function askClaude(promptContext: string, conversationHistory: MessageParam[], phase: phase): Promise<GameAction> {
-    if (!myClientAPI) {
+    if (myClientAPI === null) {
         console.error("ANTHROPIC_API_KEY is not set. Returning fallback action.");
         return fallbackAction(phase);
     }
     try {
         const llmResponse = await myClientAPI.messages.create({
-            model: "claude-haiku-4-5-20251001",
-            // model: "claude-opus-4-8",
+            // model: "claude-haiku-4-5-20251001",
+            model: "claude-opus-4-8",
             max_tokens: 150,
-            temperature: 1.0,
+            // temperature: 0.8,
             system: [getSystemPrompt(promptContext)],
             messages: conversationHistory,
             tool_choice: {type: "any" },
@@ -79,6 +80,7 @@ export async function askClaude(promptContext: string, conversationHistory: Mess
         return fallbackAction(phase);
     }
 }
+// }
 // model: "claude-opus-4-8",
 // model: "claude-opus-4-7"
-// model: "claude-haiku-4-5-20251001",
+// model: "claude-haiku-4-5-20251001"
