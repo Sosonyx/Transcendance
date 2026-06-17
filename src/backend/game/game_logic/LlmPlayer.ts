@@ -19,6 +19,11 @@ export class LlmPlayer extends Player
 		this._brain?.setName(name);
 	}
 
+	public override setColor(color : string) {
+		this._color = color;
+		this._brain?.setColor(color)
+	}
+
 	public override setEliminated(status: boolean): void {
 		this._eliminated = status;
 		if (status)
