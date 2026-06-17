@@ -64,14 +64,14 @@ export async function askClaude(promptContext: string, conversationHistory: Mess
     }
     try {
         const llmResponse = await myClientAPI.messages.create({
-            // model: "claude-haiku-4-5-20251001",
-            model: "claude-opus-4-8",
+            model: "claude-haiku-4-5-20251001",
+            // model: "claude-opus-4-8",
             max_tokens: 150,
             temperature: 1.0,
             system: [getSystemPrompt(promptContext)],
-        messages: conversationHistory,
-        tool_choice: {type: "any" },
-        tools: tools[phase]});
+            messages: conversationHistory,
+            tool_choice: {type: "any" },
+            tools: tools[phase]});
 
         return extractAction(llmResponse);
     }
