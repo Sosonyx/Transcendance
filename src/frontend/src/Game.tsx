@@ -67,7 +67,7 @@ function Game({ user, gameMode, roomType, customAction } : GameProps) {
 
 		s.on('startAction1', (timeInfo: number | null) => {
             setTimeEnd(timeInfo);
-            showTransition('Round 1', () => {
+            showTransition('Début du round !', () => {
                 setState(roomStates.ACTION_1);
             });
         });

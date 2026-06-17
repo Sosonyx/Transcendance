@@ -7,6 +7,7 @@ import { GameMode , RoomType, shuffle } from "../utils/index.js";
 import { prisma } from "../../prisma/prisma.js"
 import type { VoteInfo, LobbyInfo, ScoreInfo, RoundResultInfo, GameConfig, ResultInfo } from "../utils/index.js";
 import { names } from "./Names.js"
+import { colors } from "./Colors.js"
 
 export enum roomStates {
 	INIT = "INIT",
@@ -26,7 +27,7 @@ const chatTime : number = 60; // 60 seconds
 const voteTime : number = 30; // 30 seconds
 const roundResultTime : number = 10; // 10 seconds
 const replayTime : number = 30; // 30 seconds
-const maxPlayerCount : number = 7;
+const maxPlayerCount : number = 8;
 const scoreCorrectVote : number = 3;
 const scoreGetVoted : number = 1;
 const scoreObjective : number = 10;
@@ -44,9 +45,7 @@ const maxScore : number = 100;
 const minElim : number = 1;
 const maxElim : number = 99;
 
-// const possibleGameModes : gameMode[] = [gameMode.SCORE, gameMode.ELIMINATION];
-
-type playerInput =  { name : string, input : string};
+type playerInput =  { name : string, input : string, color? : string | undefined};
 type winCondition = () => boolean;
 type computeVote = () => void;
 
@@ -192,6 +191,7 @@ export class Room extends EventEmitter
 			case (roomStates.ACTION_1) :
 				console.log(this);
 				this._givePlayersName();
+				this._givePlayersColor();
 				this._players = shuffle(this._players);
 				this._allPlayersShouldAct();
 				this._timeInfo = Date.now() + action_1_Time * 1000;
@@ -213,7 +213,7 @@ export class Room extends EventEmitter
 			case (roomStates.CHAT) :
 				this._data = {
 					question: this._input?.input,
-					answers : this._inputs.map(p => [p.name, p.input])
+					answers : this._inputs.map(p => [p.name, p.input, p.color])
 				}
 				this._players.forEach((player) => {
 					if (player.getIsLLM())
@@ -231,14 +231,14 @@ export class Room extends EventEmitter
 				this._data = this._constructVoteInfo();
 				this._allPlayersShouldAct();
 				this._timeInfo = Date.now() + this._config.voteTime * 1000;
-				this._timerId = setTimeout(() => { this.stateSwitch(roomStates.ROUND_RESULT) }, this._config.voteTime * 1000);
+				this._timerId = setTimeout(() => { this._computeVotesAndNewState() }, this._config.voteTime * 1000);
 				break ;
 
 			case (roomStates.ROUND_RESULT) :
-				this._timeInfo = Date.now() + roundResultTime;
+				this._timeInfo = Date.now() + roundResultTime * 1000;
 				this.emit('score_info', this._constructScoreInfo());
 				this._data = this._constructRoundResultInfo();
-				this._timerId = setTimeout(() => { this._checkRoundResultStatus() }, roundResultTime);
+				this._timerId = setTimeout(() => { this._checkRoundResultStatus() }, roundResultTime * 1000);
 				break ;
 
 			case (roomStates.RESULT) :
@@ -325,7 +325,8 @@ export class Room extends EventEmitter
 		if (this._state == roomStates.ACTION_2)
 		{
 			let name : string = player.getName();
-			this._inputs.push({name, input});
+			let color : string = player.getColor();
+			this._inputs.push({name, input, color});
 			console.log(`Player ${player.getName()} (room ${this._number}) : ${input}`);
 			player.setActed(true);
 		}
@@ -333,13 +334,13 @@ export class Room extends EventEmitter
 	}
 
 	public onChat(player : Player, message : string) {
-		if (this._state != roomStates.CHAT)
+		if (this._state != roomStates.CHAT && this._state != roomStates.VOTE)
 		{
 			this.stateSwitch(roomStates.ERROR);
 			return ;
 		}
 		const msg: Message = { senderId: player.getName(), content: message, timestamp: Date.now() };
-		this.emit("message", msg);
+		this.emit("message", msg, player.getColor());
 		this._players.forEach((player) => {
 			if (player.getIsLLM())
 				(player as LlmPlayer).getBrain()?.receiveUserMessage(msg);
@@ -403,7 +404,8 @@ export class Room extends EventEmitter
 			return (this.getConnectedPlayerCount() === 0);
 		}
 		let index : number = this._players.findIndex(p => p.getId() === player.getId());
-		this._players.splice(index, 1);
+		if (index != -1)
+			this._players.splice(index, 1);
 		if (this.getConnectedPlayerCount() === 0)
 			return (true);
 		if (this._state === roomStates.LOBBY)
@@ -416,6 +418,9 @@ export class Room extends EventEmitter
 	public destroy() {
 		clearTimeout(this._timerId);
 		this.removeAllListeners();
+		
+		const llms = this._players.filter(p => p.getIsLLM());
+		(llms as LlmPlayer[]).forEach(p => p.getBrain()?.stopPlaying());
 	}
 
 	// ACCESS AND UTILS
@@ -423,7 +428,6 @@ export class Room extends EventEmitter
 	private	_checkRestart() {
 		if (this._doAllPlayersWannaReplay())
 		{
-			// TODO 
 			this._restartRoom();
 		}
 	}
@@ -592,6 +596,12 @@ export class Room extends EventEmitter
 		this._players.forEach( player => {player.setName(namePool.pop() as string)} );
 	}
 
+	private _givePlayersColor() {
+		let colorPool = [...colors];
+		shuffle(colorPool);
+		this._players.forEach( player => {player.setColor(colorPool.pop() as string)});
+	}
+
 	public accessPlayerByName(name : string) : Player | undefined {
 		return this._players.find(player => player.getName() == name);
 	}
@@ -664,6 +674,12 @@ export class Room extends EventEmitter
 			let pool = this._players.filter(p => !p.getIsLLM());
 			pool.forEach(p => {
 				info._alive.push([p.getUsername()!, p.getScore()])});
+
+			info._alive.sort((a: [string, score : number | null], b: [string, score : number | null]) => {
+				if (a[1] === null || b[1] === null)
+					return (0);
+				return (b[1] - a[1]);
+			});
 		}
 		else if (this._config.gameMode === GameMode.ELIMINATION)
 		{
@@ -697,7 +713,7 @@ export class Room extends EventEmitter
 		let info : VoteInfo[] = [];
 
 		const votable = this._players.filter(p => !p.getEliminated());
-		votable.forEach(p => info.push([p.getUserId(), p.getId(), p.getName(), p.getVoted()]));
+		votable.forEach(p => info.push([p.getUserId(), p.getId(), p.getName(), p.getVoted(), p.getColor()]));
 
 		return (info);
 	}
@@ -730,6 +746,12 @@ export class Room extends EventEmitter
 			default :
 				console.log(`If you see this it's a bug`);
 		}
+	}
+
+	private _computeVotesAndNewState() : void
+	{
+		this._computeVote!();
+		this.stateSwitch(roomStates.ROUND_RESULT);
 	}
 
 	private __computeVoteScore() : void

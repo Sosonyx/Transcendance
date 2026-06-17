@@ -8,7 +8,7 @@ import { LlmScheduler } from "./services/llmScheduler.js";
 import type { Message } from "./types/messages.js";
 
 // Duplicate type definition, should be moved to a common file
-export type playerInput =  { name : string, input : string};
+export type playerInput =  { name : string, input : string, color? : string | undefined};
 
 export class Llm {
 	private				_lastMessages: Message[] = [];
@@ -57,10 +57,11 @@ export class Llm {
     responsesFromUsers.push({ senderId: "Message from the server", content: `Global question you have to answer to: ${globalQuestion}`, timestamp: Date.now() });
 
     const action = await pipeline(this._llmHistory, this._contextBuilder.buildContext(responsesFromUsers), this._llmPersonnality, "answerGlobalQuestion", `Global question answered: ${globalQuestion}`);
-    if (action.type === "answer_global_question")
-        return {name: this._llmPersonnality.getName() ?? "", input: action.response};
+    const color = this._llmPersonnality.getColor();
+	if (action.type === "answer_global_question")
+        return {name: this._llmPersonnality.getName() ?? "", input: action.response, color: color};
     else
-        return {name: this._llmPersonnality.getName() ?? "", input: ""};
+        return {name: this._llmPersonnality.getName() ?? "", input: "", color: color};
 }
 
 	public async vote(): Promise<void> {
@@ -107,5 +108,9 @@ export class Llm {
 
 	public setName(name: string): void {
 		this._llmPersonnality.setName(name);
+	}
+
+	public setColor(color: string): void {
+		this._llmPersonnality.setColor(color);
 	}
 }

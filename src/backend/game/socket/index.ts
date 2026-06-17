@@ -58,10 +58,10 @@ export function registerSocketHandlers(io: Server)
 				}
 			};
 
-			const onScoreInfo	= (scoreInfo : ScoreInfo) 	=> socket.emit('score_info', scoreInfo);
-			const onLobbyInfo	= (lobbyInfo : LobbyInfo) 	=> socket.emit('lobby_info', lobbyInfo);
-			const onVoteInfo	= (voteInfo : VoteInfo)		=> socket.emit('vote_info', voteInfo);
-			const onMessage		= (message : Message)		=> socket.emit('message', message);
+			const onScoreInfo	= (scoreInfo : ScoreInfo) 				=> socket.emit('score_info', scoreInfo);
+			const onLobbyInfo	= (lobbyInfo : LobbyInfo) 				=> socket.emit('lobby_info', lobbyInfo);
+			const onVoteInfo	= (voteInfo : VoteInfo)					=> socket.emit('vote_info', voteInfo);
+			const onMessage		= (message : Message, color : string)	=> socket.emit('message', message, color);
 
 			const connectRoomEvents = () => {
 				roomEmitter.on('stateChanged',	stateDisplay);
@@ -144,7 +144,8 @@ export function registerSocketHandlers(io: Server)
 			// Joueur envoie un message
 			socket.on('message', (content: string) => {
 				if (roomId === null) return;
-				if (roomManager.getRoomState(roomId) !== roomStates.CHAT) return;
+				if (roomManager.getRoomState(roomId) !== roomStates.CHAT 
+					&& roomManager.getRoomState(roomId) != roomStates.VOTE) return;
 				if (typeof content !== 'string') return;
 				if (content.trim() === '') return;
 				if (content.length > 500) return;

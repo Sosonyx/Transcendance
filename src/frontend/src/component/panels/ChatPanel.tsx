@@ -12,7 +12,7 @@ interface ChatPanelProps {
 
 function ChatPanel({ socket, question, answers, eliminated }: ChatPanelProps) {
 	const [message, setMessage] = useState<string | null>(null);
-	const [messages, setMessages] = useState<Message[]>([]);
+	const [messages, setMessages] = useState<[Message, string][]>([]);
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const value: string = event.target.value;
@@ -28,8 +28,8 @@ function ChatPanel({ socket, question, answers, eliminated }: ChatPanelProps) {
 		}
 	};
 
-	const handleMessage = (msg: Message) => {
-		setMessages((msgs) => ([...msgs, msg]));
+	const handleMessage = (msg: Message, color : string) => {
+		setMessages((msgs) => ([...msgs, [msg, color]]));
 	};
 
 	useEffect(() => {
@@ -52,13 +52,13 @@ function ChatPanel({ socket, question, answers, eliminated }: ChatPanelProps) {
 			<div id="chat-context">
 				<p id="chat-question" className="game-label">{question}</p>
 				<ul id="chat-answers">
-					{answers.map(([playerName, answer], id) => (<li key={id}>{playerName} : {answer}</li>))}
+					{answers.map(([playerName, answer, color], id) => (<li key={id} style={{ color: `${color}`, fontWeight: 700, borderColor: `${color}` }} >{playerName} : {answer}</li>))}
 				</ul>
 			</div>
 			<ul id="messages" className={eliminated ? 'eliminated' : ''}>
-				{messages.map((msg, i) => (
+				{messages.map(([msg, color], i) => (
 					<li key={i}>
-						<span style={{ color: 'var(--twitch)', fontWeight: 700 }}>{msg.senderId}</span>
+						<span style={{ color: `${color}`, fontWeight: 700 }}>{msg.senderId}</span>
 						{': '}{msg.content}
 					</li>
 				))}

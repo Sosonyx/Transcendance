@@ -29,7 +29,7 @@ export class LlmResponseEmitter {
 				timestamp: Date.now()
 			};
 
-			this._roomEmitter.emit("message", msg);
+			this._roomEmitter.emit("message", msg, this._llmPersonnality.getColor());
 		}, delay);
 	}
 }
