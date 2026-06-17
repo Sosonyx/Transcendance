@@ -26,8 +26,12 @@ export class LlmPlayer extends Player
 
 	public override setEliminated(status: boolean): void {
 		this._eliminated = status;
+		this._justEliminated = true;
 		if (status)
+		{
+			this._brain?.stopPlaying();
 			this._brain = null;
+		}
 	}
 
 	public override reset() : void {
@@ -35,6 +39,7 @@ export class LlmPlayer extends Player
 		this._voteAgainst = null;
 		this._voted = 0;
 		this._brain?.resetHistory();
+		this._justEliminated = false;
 	}
 
 	public _init(roomEmitter : EventEmitter, playerNames : string[])

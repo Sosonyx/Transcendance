@@ -137,6 +137,11 @@ export class Player extends EventEmitter
 		this._voteAgainst = target;
 	}
 
+	public setScore(score : number)
+	{
+		this._score = score;
+	}
+
 	public setEliminated(status : boolean)
 	{
 		if (status)
