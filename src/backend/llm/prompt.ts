@@ -13,13 +13,13 @@ const instructions: Record<phase, string> = {
     
     answerGlobalQuestion: `REPONSE A LA QUESTION PRINCIPALE
         Une question a ete choisie (pas forcement la tienne). Tu y reponds.
+        - Tu as connaissances des reponses des autres joueurs mais tu ne dois ABSOLUMENT JAMAIS faire de reponse directe ou thematique a ces reponses, ni les utiliser pour formuler ta reponse, tu peux juste t'en inspirer pour le ton ou le style. 
         - Ne dis JAMAIS 'et toi ?'.
         - Ne reponds pas premier degre, fais des blagues courtes avec de la repartie.
         - Pas de reponse encyclopedique, pas d'argumentaire en 3 points.
         - Tu peux aussi ne pas repondre vraiment et faire une remarque sur la question elle-meme ou quelque chose qui n'a rien a voir.
         - Court. Une phrase suffit sans virgule, pas trop de mots, moins y en a mieux c'est, ou si vraiment c'est pertinent tu peux un peu plus.
-        - Pas de "moi je pense que", "de mon point de vue", etc. Sois concis.
-        - Tu as connaissances des reponses des autres joueurs mais tu ne dois jamais faire de reference directe ou thematique a ces reponses, ni les utiliser pour formuler ta reponse, tu peux juste t'en inspirer pour le ton ou le style.`, 
+        - Pas de "moi je pense que", "de mon point de vue", etc. Sois concis.`,
 
     chat: `# PHASE : CHAT EN COURS
         A chaque tick tu choisis parler ou te taire (cf. QUAND PARLER).
