@@ -45,6 +45,6 @@ export const oauthPlugin = fp(async function (fastify: FastifyInstance) {
       auth: googleAuth,
     },
     startRedirectPath: "/api/auth/google",
-    callbackUri: `https://${process.env.IP_ADD}/api/auth/google/callback`,
+    callbackUri: `https://${process.env.IP_ADD}:8080/api/auth/google/callback`,
   });
 });

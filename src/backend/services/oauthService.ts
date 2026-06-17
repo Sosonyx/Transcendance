@@ -32,7 +32,6 @@ export async function handleOAuthLogin(fastify: FastifyInstance, provider: strin
 		})
 	}
 	const token = fastify.jwt.sign({ userId: oAuthAccount.user.id, username: oAuthAccount.user.username },{ expiresIn: "24h" })
-	console.log(oAuthAccount)
 	return { token, user: oAuthAccount.user };
 }
 

@@ -9,6 +9,7 @@ export class Player extends EventEmitter
 	// private		_avatar : string | null;
 	private		_username : string | null;
 	protected	_name : string;
+	protected	_color : string;
 	protected	_acted : boolean;
 	private 	_wantReplay : boolean;
 	protected	_voteAgainst : Player | null;
@@ -25,7 +26,7 @@ export class Player extends EventEmitter
 	}
 
 	public getUserId() : string | null {
-		return this._userId;
+		return (this._userId);
 	}
 
 	// public getAvatar() : string | null {
@@ -33,11 +34,15 @@ export class Player extends EventEmitter
 	// }
 
 	public getUsername() : string | null {
-		return this._username;
+		return (this._username);
 	}
 
 	public getName() : string {
-		return this._name;
+		return (this._name);
+	}
+
+	public getColor() : string {
+		return (this._color);
 	}
 
 	public getIsLLM() : boolean {
@@ -111,6 +116,10 @@ export class Player extends EventEmitter
 		this._name = name;
 	}
 
+	public setColor(color : string) {
+		this._color = color;
+	}
+
 	public setActed(status : boolean) {
 		this._acted = status;
 	}
@@ -157,6 +166,7 @@ export class Player extends EventEmitter
 		this._username = user ? user.username : null;
 		// this._avatar = user ? user.avatar : null;
 		this._name = 'no-name';
+		this._color = 'no-color';
 		this._acted = false;
 		this._wantReplay = false;
 		this._voteAgainst = null;

@@ -22,11 +22,10 @@ export const fastify = Fastify({logger : true});
 
 await fastify.register(multipart, {
     limits: {
-        fileSize: 20 * 1024 * 1024, // 20MB
+        fileSize: 5 * 1024 * 1024, // 5MB
     }
 });
 
-await fastify.register
 
 const io = new Server(fastify.server, {
     connectionStateRecovery: {}
