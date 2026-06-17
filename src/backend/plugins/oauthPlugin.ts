@@ -31,7 +31,7 @@ export const oauthPlugin = fp(async function (fastify: FastifyInstance) {
       auth: intraAuth,
     },
     startRedirectPath: "/api/auth/42",
-    callbackUri: `https://localhost:8080/api/auth/42/callback`,
+    callbackUri: `https://${process.env.IP_ADD}:8080/api/auth/42/callback`,
   });
 
   await fastify.register(fastifyOauth2, {
@@ -45,6 +45,6 @@ export const oauthPlugin = fp(async function (fastify: FastifyInstance) {
       auth: googleAuth,
     },
     startRedirectPath: "/api/auth/google",
-    callbackUri: `https://localhost/api/auth/google/callback`,
+    callbackUri: `https://${process.env.IP_ADD}/api/auth/google/callback`,
   });
 });
