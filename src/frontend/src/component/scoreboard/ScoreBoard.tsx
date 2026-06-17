@@ -1,24 +1,14 @@
-import { useEffect, useState } from "react";
-import type { Socket } from "socket.io-client";
+import { useEffect } from "react";
 import type { ScoreInfo } from "../../types/types";
 import "./ScoreBoard.css";
 
 interface ScoreBoardProps {
-	socket: Socket | null;
 	username: string;
+	scoreInfo: ScoreInfo | null;
 	setEliminated: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-function ScoreBoard({ socket, username, setEliminated }: ScoreBoardProps) {
-	const [scoreInfo, setScoreInfo] = useState<ScoreInfo | null>(null);
-
-	useEffect(()=>{
-		if (!socket) return;
-		
-		socket.on('score_info', setScoreInfo);
-
-		return (() => { socket.off('score_info', setScoreInfo); });
-	},[socket])
+function ScoreBoard({ username, scoreInfo, setEliminated }: ScoreBoardProps) {
 
 	useEffect(() => {
 		if (!scoreInfo) return;

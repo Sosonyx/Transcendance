@@ -4,7 +4,7 @@ import { LobbyPanel, Action1Panel, Action2Panel, ChatPanel, VotePanel, RoundResu
 import { TransitionOverlay } from './component/transitions';
 import { roomStates, type VoteInfo, type AnswersType } from './types/types';
 import './Game.css'
-import { GameMode, RoomType, CustomAction, type ResultInfo, type RoundResultInfo, type User } from './types/types';
+import { GameMode, RoomType, CustomAction, type ResultInfo, type RoundResultInfo, type User, type ScoreInfo } from './types/types';
 import Timer from './component/timer/Timer';
 import ScoreBoard from './component/scoreboard/ScoreBoard';
 
@@ -23,6 +23,7 @@ function Game({ user, gameMode, roomType, customAction } : GameProps) {
     const [timeEnd, setTimeEnd] = useState<number | null>(null);
     const [prompt, setPrompt] = useState<string | null>(null);
     const [players, setPlayers] = useState<VoteInfo[]>([]);
+	const [scoreInfo, setScoreInfo] = useState<ScoreInfo | null>(null);
     const [question, setQuestion] = useState<string | undefined>('');
     const [answers, setAnswers] = useState<AnswersType>([]);
     const [transition, setTransition] = useState<string | null>(null);
@@ -62,6 +63,8 @@ function Game({ user, gameMode, roomType, customAction } : GameProps) {
             setTimeEnd(null);
             setState(roomStates.LOBBY);
         });
+		s.on('score_info', setScoreInfo);
+
 		s.on('startAction1', (timeInfo: number | null) => {
             setTimeEnd(timeInfo);
             showTransition('Round 1', () => {
@@ -149,7 +152,7 @@ function Game({ user, gameMode, roomType, customAction } : GameProps) {
 
                     {/* ScoreBoard — caché sur desktop si vote, visible sur mobile si tab=score */}
                     <div className={`side-score-content ${isVotePhase ? 'desktop-hidden' : ''} ${mobileTab !== 'score' ? 'mobile-hidden' : ''}`}>
-                        <ScoreBoard socket={socket} username={user.username} setEliminated={setEliminated} />
+                        <ScoreBoard username={user.username} scoreInfo={scoreInfo} setEliminated={setEliminated} />
                     </div>
 
                 </div>
