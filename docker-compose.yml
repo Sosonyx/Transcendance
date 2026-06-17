@@ -17,7 +17,7 @@ services:
     ports :
       - 5555:5555
     environment:
-      - FRONT_URL=http://localhost:8080
+      - FRONTEND_URL=http://localhost:8080
     depends_on :
     - postgres
 

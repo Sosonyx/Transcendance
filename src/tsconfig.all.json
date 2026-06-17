@@ -8,6 +8,8 @@
     { "path": "./" },
     { "path": "./backend" },
     { "path": "./game" },
-    { "path": "./llm" }
+    { "path": "./llm" },
+    { "path": "./friend" }
+
   ]
 }

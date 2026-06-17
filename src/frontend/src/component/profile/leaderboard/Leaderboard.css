@@ -1,4 +1,6 @@
 .leaderboard-container {
+	grid-column: 3;
+	grid-row: 1;
 	background: linear-gradient(160deg, rgba(145, 71, 255, 0.07) 0%, rgba(15, 15, 25, 0.6) 100%);
 	border: 1px solid rgba(145, 71, 255, 0.2);
 	border-radius: 20px;

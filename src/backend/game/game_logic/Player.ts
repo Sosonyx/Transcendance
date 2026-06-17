@@ -6,7 +6,7 @@ export class Player extends EventEmitter
 {
 	private		_id : string;
 	private 	_userId : string | null;
-	private		_avatar : string | null;
+	// private		_avatar : string | null;
 	private		_username : string | null;
 	protected	_name : string;
 	protected	_acted : boolean;
@@ -28,9 +28,9 @@ export class Player extends EventEmitter
 		return this._userId;
 	}
 
-	public getAvatar() : string | null {
-		return this._avatar;
-	}
+	// public getAvatar() : string | null {
+	// 	return this._avatar;
+	// }
 
 	public getUsername() : string | null {
 		return this._username;
@@ -155,7 +155,7 @@ export class Player extends EventEmitter
 		this._id = uuid();
 		this._userId = user ? user.id : null;
 		this._username = user ? user.username : null;
-		this._avatar = user ? user.avatar : null;
+		// this._avatar = user ? user.avatar : null;
 		this._name = 'no-name';
 		this._acted = false;
 		this._wantReplay = false;

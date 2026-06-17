@@ -4,7 +4,7 @@ import { getProfileController, getOtherProfileController, getLeaderbordControlle
 import { modifyUserProfile } from "../controllers/usersController.js";
 import { requireAuth } from "../services/authService.js";
 import { intraHandler, googleHandler } from '../controllers/oAuthController.js'
-import { setup2fa, verify2fa, validate2fa, disable2fa } from "../services/authService.js";
+import { setup2fa, verify2fa, validate2fa, disable2fa } from "../services/authService.js"; 
 
 export async function publicRoutes(fastify: FastifyInstance) {
 	fastify.post('/api/register', registerController);

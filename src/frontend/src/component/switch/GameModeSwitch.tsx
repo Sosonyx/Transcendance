@@ -34,8 +34,8 @@ function GameModeSwitch({ gameMode, setGameMode }: GameModeSwitchProps) {
         </div>
         <p className="mode-description">
             {gameMode === GameMode.ELIMINATION
-                ? "Chaque round, le joueur le plus voté est éliminé. Survivez jusqu'à la fin ou éliminez tous les humains !"
-                : "Marquez des points en votant correctement contre l'IA. Le premier à atteindre l'objectif de score gagne."
+                ? "Chaque round, le joueur le plus voté est éliminé. Survivez jusqu'à la fin ou éliminez toutes les IA !"
+                : "Marquez des points en votant correctement contre l'IA ou en vous faisant passer pour elle. Le premier à atteindre l'objectif de score gagne."
             }
         </p>
     </div>
