@@ -842,6 +842,8 @@ export class Room extends EventEmitter
 			this._winners = winners;
 			return (true);
 		}
+		if (!this._players.find(player => player.getEliminated()))
+			return (true);
 		return (false);
 	}
 
