@@ -124,7 +124,8 @@
   padding: 10px 14px;
   font-size: 13px;
   font-weight: 500;
-  border-left: 3px solid var(--twitch);
+  border: 0 solid var(--twitch);
+  border-width: 3px 4px;
   color: var(--text);
   overflow-wrap: break-word;
 }

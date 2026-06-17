@@ -13,6 +13,7 @@ const IA_STRATEGIE_OPTIONS = [
 
 export class llmPersonnality {
     private _name?: string;
+	private _color? : string;
     private _players?: string[];
     private _wayOfSpeaking: string;
     private _iaStrategie: string;
@@ -27,9 +28,17 @@ export class llmPersonnality {
         this._name = name;
     }
 
+	public setColor(color: string): void {
+		this._color = color;
+	}
+
     public getName(): string | undefined {
         return (this._name);
     }
+
+	public getColor(): string | undefined {
+		return (this._color);
+	}
 
     public getPlayers(): string[] | undefined {
         return (this._players);

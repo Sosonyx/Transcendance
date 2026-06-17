@@ -56,9 +56,9 @@ export interface Message {
     timestamp: number
 }
 
-export type VoteInfo = [userid: string | null, playerid: string, name: string, votes: number]
+export type VoteInfo = [userid: string | null, playerid: string, name: string, votes: number, color: string]
 
-export type AnswersType = [playerName: string, answer: string][]
+export type AnswersType = [playerName: string, answer: string, color: string][]
 
 export enum GameMode {
 	SCORE = "SCORE",
