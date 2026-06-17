@@ -1,41 +1,15 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { MessageParam } from "@anthropic-ai/sdk/resources";
 
-import dotenv from "dotenv";
-import { existsSync } from "fs";
-import { dirname, resolve } from "path";
-import { fileURLToPath } from "url";
-
 import { tools } from "./actions.js";
 import type { phase } from "./actions.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-function loadEnv(): void {
-    const candidatePaths = [
-        resolve(__dirname, ".env"),
-        resolve(__dirname, "../../../src/backend/llm/.env"),
-        resolve(process.cwd(), "src/backend/llm/.env"),
-        resolve(process.cwd(), ".env"),
-    ];
-
-    const envPath = candidatePaths.find((path) => existsSync(path));
-
-    if (envPath)
-        dotenv.config({ path: envPath });
-    else
-        dotenv.config();
-}
-
-loadEnv();
-
 const apiKey = process.env.ANTHROPIC_API_KEY;
+// if (!apiKey)
+//     throw new Error("ANTHROPIC_API_KEY is not set");
 
-if (!apiKey)
-    throw new Error("ANTHROPIC_API_KEY is not set");
-
-const myClientAPI = new Anthropic({ apiKey, maxRetries: 2, timeout: 10000 });
+const myClientAPI = apiKey  ? new Anthropic({ apiKey, maxRetries: 2, timeout: 10000 }) 
+                            : null;
 
 function getSystemPrompt(promptContext : string) : Anthropic.Messages.TextBlockParam
 {
@@ -78,22 +52,16 @@ function extractAction(res: Anthropic.Message): GameAction {
     }
 }
 
-function fallbackAction(phase: phase): GameAction {
-    switch (phase) {
-        case "askGlobalQuestion":
-            return { type: "ask_global_question", question: "" };
-        case "answerGlobalQuestion":
-            return { type: "answer_global_question", response: "" };
-        case "chat":
-            return { type: "message", text: "" };
-        case "vote":
-            return { type: "vote", target: "" };
-        default:
-            return { type: "silent", reason: "" };
-    }    
+// Just a basic fallback action in case of an error.
+function fallbackAction(_phase: phase): GameAction {
+    return { type: "silent", reason: "Check if you have set the ANTHROPIC_API_KEY environment variable or if the API key is valid." };
 }
 
 export async function askClaude(promptContext: string, conversationHistory: MessageParam[], phase: phase): Promise<GameAction> {
+    if (!myClientAPI) {
+        console.error("ANTHROPIC_API_KEY is not set. Returning fallback action.");
+        return fallbackAction(phase);
+    }
     try {
         const llmResponse = await myClientAPI.messages.create({
             // model: "claude-haiku-4-5-20251001",
@@ -108,12 +76,9 @@ export async function askClaude(promptContext: string, conversationHistory: Mess
         return extractAction(llmResponse);
     }
     catch (error) {
-        console.error("Erreur lors de l'appel à l'API Claude:", error);
         return fallbackAction(phase);
     }
 }
-        // model: "claude-opus-4-8",
-        // model: "claude-opus-4-7"
-        // model: "claude-haiku-4-5-20251001",
-
-
+// model: "claude-opus-4-8",
+// model: "claude-opus-4-7"
+// model: "claude-haiku-4-5-20251001",
