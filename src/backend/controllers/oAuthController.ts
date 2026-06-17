@@ -34,7 +34,7 @@ export async function intraHandler(req: FastifyRequest, reply: FastifyReply) {
   reply.setCookie("token", appToken, {
     path: "/",
     httpOnly: true,
-    secure: false,
+    secure: true,
     sameSite: "strict",
     maxAge: 86400,
   });
@@ -77,7 +77,7 @@ export async function googleHandler(req: FastifyRequest, reply: FastifyReply) {
   reply.setCookie("token", appToken, {
     path: "/",
     httpOnly: true,
-    secure: false,
+    secure: true,
     sameSite: "strict",
     maxAge: 86400,
   });
