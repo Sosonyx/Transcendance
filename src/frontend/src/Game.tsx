@@ -100,6 +100,8 @@ function Game({ user, gameMode, roomType, customAction } : GameProps) {
             setState(roomStates.RESULT)
         });
 
+        s.emit('startGame');
+
         return () => { s.disconnect(); };
     }, []);
 
