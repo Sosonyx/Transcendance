@@ -18,7 +18,7 @@ import { registerSocketHandlers } from './game/socket/index.js';
 import { initRoutes } from './routes/initRoutes.js'
 
 
-export const fastify = Fastify({logger : true});
+export const fastify = Fastify({logger : true, trustProxy: true});
 
 await fastify.register(multipart, {
     limits: {

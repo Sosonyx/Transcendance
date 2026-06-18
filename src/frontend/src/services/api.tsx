@@ -8,12 +8,17 @@ export async function logout(): Promise<Response> {
 }
 
 export async function getProfile(): Promise<User> {
-	const res = await fetch(`/api/profile`, {method: 'GET', credentials: 'include'})
-	if (!res.ok) 
-		throw new Error("Profile error")
-	return res.json()
+    const res = await fetch(`/api/profile`, { method: 'GET', credentials: 'include' });
+    
+    if (res.status === 401) {
+        throw new Error("Utilisateur non connecté");
+    }
+    if (!res.ok) {
+        throw new Error("Profile error");
+    }
+    
+    return res.json();
 }
-
 export async function getLeaderbord(): Promise<LeaderboardUser[]> {
 	const res = await fetch(`/api/leaderboard`, {
 		method: 'GET',

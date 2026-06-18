@@ -17,8 +17,8 @@ export interface UserInterface {
 }
 
 export interface UserSafeInterface {
-    id: string;
-    email: string;
+    id?: string;
+    email?: string;
     username: string;
     avatar: string | null;
     playedAs?: Player[];

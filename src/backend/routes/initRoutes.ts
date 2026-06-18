@@ -12,8 +12,8 @@ import { messagesRoutes } from './friendsChatRoutes.js';
 
 export async function initRoutes(fastify: FastifyInstance)
 {
-	await fastify.register(oauthPlugin);
 	await fastify.register(fastifyJwt, {secret: process.env.JWT_SECRET!, cookie: { cookieName: 'token', signed: false }});
+	await fastify.register(oauthPlugin);
 		
 	await fastify.register(publicRoutes);
 	await fastify.register(healthRoutes);
