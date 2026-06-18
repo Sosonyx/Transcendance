@@ -9,11 +9,11 @@ export async function registerController(req: FastifyRequest, reply: FastifyRepl
   
   const validEmail = await prisma.user.findUnique({where :{email:newUser.email}})
   if (validEmail)
-		return reply.code(409).send({ error: "Email already used" });
+		return reply.code(409).send({ error: "Cet e-mail est déjà utilisé." });
 
   const validUsername = await prisma.user.findUnique({where :{username:newUser.username}})
   if (validUsername)
-    return reply.code(409).send({ error: "Username already used" })
+    return reply.code(409).send({ error: "Cet username est déjà utilisé." })
 
   const user: Partial<UserInterface>= await registerUser({
             email: newUser.email,
@@ -30,7 +30,7 @@ export async function registerController(req: FastifyRequest, reply: FastifyRepl
           { expiresIn: '1h' });
   reply.setCookie('token', token, { 
     httpOnly: true,
-    secure: true /* true en prod (HTTPS seulement)*/,
+    secure: true,
     sameSite: 'strict',
     maxAge: 86400,
     path: '/'});
@@ -51,21 +51,21 @@ export async function loginController(req : FastifyRequest, reply : FastifyReply
   
     reply.setCookie('token', token, { 
         httpOnly: true,
-        secure: true /* true en prod (HTTPS seulement)*/,
+        secure: true,
         sameSite: 'strict',
         maxAge: 86400,
         path: '/'
     });
     return (reply.send({token, user}));
   }catch (error) {
-    return (reply.code(401).send({ message: "Invalid credentials" }));
+    return (reply.code(401).send({ message: "Identifiants de connexion invalides." }));
   }
 }
 
 export async function logoutController(req : FastifyRequest, reply: FastifyReply){
   const token : string | undefined = req.cookies.token;
   if (token === undefined)
-      return (reply.code(400).send({ message: "No user connected" }))
+      return (reply.code(400).send({ message: "Pas d'utilisateur connecté." }))
   try {
     const decoded = req.server.jwt.decode<JwtPayload>(token);
     await prisma.blacklistedToken.create({
@@ -80,8 +80,8 @@ export async function logoutController(req : FastifyRequest, reply: FastifyReply
       sameSite: 'strict',
       path: '/'
     });
-    return (reply.send({ message: 'Disconnected' }));
+    return (reply.send({ message: 'Déconnecté.' }));
   }catch (error){
-    return (reply.code(400).send({message: "Json web token invalid"}))
+    return (reply.code(400).send({message: "Json web token invalide."}))
   }
 }
