@@ -37,6 +37,6 @@ clean: stop
 	docker compose down
 
 fclean:
-	docker compose down -v
+	docker compose down -v --rmi all
 
 re: clean run

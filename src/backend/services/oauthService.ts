@@ -14,18 +14,18 @@ export async function handleOAuthLogin(fastify: FastifyInstance, provider: strin
 	})
 	if (!oAuthAccount){
 		let user = await prisma.user.findUnique({where: {email: profile.email }})
-		if (!user){
-			user = await prisma.user.create({
-				data: {
-					email: profile.email,
-					username: await generateUsername(profile.username)
-				}
-			})
-		}
+		if (user)
+			return {error: "Email deja existant"}
+		user = await prisma.user.create({
+			data: {
+				email: profile.email,
+				username: await generateUsername(profile.username)
+			}
+		})
 		oAuthAccount = await prisma.oAuthAccount.create({
 			data:{
 				provider: provider,
-				providerId: profile.providerId.toString(),
+				providerId: profile.providerId,
 				userId: user.id
 			},
 			include: { user: true }

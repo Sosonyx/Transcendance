@@ -4,13 +4,13 @@ import type { Profile42, ProfileGoogle } from "../types/interfaces.js";
 
 export async function intraHandler(req: FastifyRequest, reply: FastifyReply) {
 
-	const fastify = req.server;
-	const { token } = await fastify.intra42.getAccessTokenFromAuthorizationCodeFlow(req);
+  const fastify = req.server;
+  const { token } = await fastify.intra42.getAccessTokenFromAuthorizationCodeFlow(req);
 
   const response = await fetch("https://api.intra.42.fr/v2/me", {
     headers: { Authorization: `Bearer ${token.access_token}` }
   });
-  let profile : Profile42;
+  let profile: Profile42;
   profile = await response.json() as Profile42;
   if (!response.ok)
     return reply.code(401).send({ error: "Failed to fetch profile from 42 Intra" });
@@ -20,57 +20,67 @@ export async function intraHandler(req: FastifyRequest, reply: FastifyReply) {
     email: profile.email,
     username: profile.login,
   });
-
-  const appToken = fastify.jwt.sign({
-    userId: result.user.id,
-    username: result.user.username,
-  }, { expiresIn: '1h' });
-
-  reply.setCookie("token", appToken, {
-    path: "/",
-    httpOnly: true,
-    secure: true,
-    sameSite: "strict",
-    maxAge: 86400,
-  });
-  req
-  let url = process.env.FRONTEND_URL!;
-  return (reply.redirect(url));
-}
-
-export async function googleHandler(req: FastifyRequest, reply: FastifyReply) {
-
-	const fastify = req.server;
-	const { token } = await fastify.google.getAccessTokenFromAuthorizationCodeFlow(req);
-
-  const response : Response = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
-    headers: { Authorization: `Bearer ${token.access_token}` }
-  });
   
-  let profile : ProfileGoogle;
-  profile = await response.json() as ProfileGoogle;
+  if ("error" in result || !result.user) {
+    const frontendUrl = process.env.FRONTEND_URL!;
+  return reply.redirect(`${frontendUrl}/login?error=email_already_exists`);
+  }
 
-  if (!response.ok)
-    return reply.code(401).send({ error: "Failed to fetch profile from 42 Intra" });
+    const appToken = fastify.jwt.sign({
+      userId: result.user.id,
+      username: result.user.username,
+    }, { expiresIn: '24h' });
 
-  const result = await handleOAuthLogin(fastify, "google", {
-    providerId: profile.id.toString(),
-    email: profile.email,
-    username: profile.name,
-  });
+    reply.setCookie("token", appToken, {
+      path: "/",
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 86400,
+    });
+    req
+    let url = process.env.FRONTEND_URL!;
+    return (reply.redirect(url));
+  }
 
-  const appToken = fastify.jwt.sign({
-    userId: result.user.id,
-    username: result.user.username,
-  }, { expiresIn: '1h' });
+  export async function googleHandler(req: FastifyRequest, reply: FastifyReply) {
 
-  reply.setCookie("token", appToken, {
-    path: "/",
-    httpOnly: true,
-    secure: true,
-    sameSite: "strict",
-    maxAge: 86400,
-  });
-  let url = process.env.FRONTEND_URL!;
-  return (reply.redirect(url));
-}
+    const fastify = req.server;
+    const { token } = await fastify.google.getAccessTokenFromAuthorizationCodeFlow(req);
+
+    const response: Response = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
+      headers: { Authorization: `Bearer ${token.access_token}` }
+    });
+
+    let profile: ProfileGoogle;
+    profile = await response.json() as ProfileGoogle;
+
+    if (!response.ok)
+      return reply.code(401).send({ error: "Failed to fetch profile from 42 Intra" });
+
+    const result = await handleOAuthLogin(fastify, "google", {
+      providerId: profile.id.toString(),
+      email: profile.email,
+      username: profile.name,
+    });
+
+    if ("error" in result || !result.user) {
+      const frontendUrl = process.env.FRONTEND_URL!;
+      return reply.redirect(`${frontendUrl}/login?error=email_already_exists`);
+    }
+
+    const appToken = fastify.jwt.sign({
+      userId: result.user.id,
+      username: result.user.username,
+    }, { expiresIn: '24h' });
+
+    reply.setCookie("token", appToken, {
+      path: "/",
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 86400,
+    });
+    let url = process.env.FRONTEND_URL!;
+    return (reply.redirect(url));
+  }
