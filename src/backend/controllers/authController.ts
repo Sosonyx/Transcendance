@@ -15,7 +15,7 @@ export function isValidUsername(username: string): boolean {
 }
 
 function  isValidPassword(password: string): boolean {
-  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{5,}$/;;
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{5,}$/;
   return passwordRegex.test(password);
 }
 

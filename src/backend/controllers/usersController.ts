@@ -57,7 +57,7 @@ export async function modifyUserProfile(request: FastifyRequest, reply: FastifyR
                 }
             } else if (part.type === 'field' && part.fieldname === 'username') {
                 if (part.value !== undefined) {
-                    if (!isValidUsername(part.value)) {
+                    if (!isValidUsername(part.value as string)) {
                         return reply.code(400).send({ error: "Nom d'utilisateur invalide." });
                     }
                     data.username = part.value as string;
