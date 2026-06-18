@@ -62,7 +62,7 @@ cp .env.example .env
 ```
 
 Then edit `.env`:
-
+```
 PORT="8080"
 
 JWT_SECRET="change_me_a_real_long_random_string"
@@ -248,20 +248,20 @@ The schema is defined in `src/backend/prisma/schema.prisma`.
 | Web								| Websockets					| major	| Socket.io				|
 | Web								| User interaction				| major	| User profile panel	|
 | Web								| Custom design system			| minor	| Component based CSS	|
-|-----------------------------------|-------------------------------|-------|-----------------------|
+
 | Accessibility and internalization	| Additional browsers support	| minor | Chrome, Firefox, Edge |
-|-----------------------------------|-------------------------------|-------|-----------------------|
+
 | User management					| User management and auth...	| major | login, hash pass...	|
 | User management					| OAuth 2.0						| minor | Google, 42 APIs		|
-|-----------------------------------|-------------------------------|-------|-----------------------|
+
 | Artificial intelligence			| AI Opponent					| major | AI decision making	|
 | Artificial intelligence			| LLM systeme interface			| major | Llm outputs			|
 | Artificial intelligence			| Sentiment analysis			| minor | Contextual adaptation	|
-|-----------------------------------|-------------------------------|-------|-----------------------|
+
 | Gaming and user experience		| Web based game				| major | Hosted game panel		|
 | Gaming and user experience		| Remote players				| major | Nginx + ip porting	|
 | Gaming and user experience		| Multiplayer					| major | Authoritarian server	|
-|-----------------------------------|-------------------------------|-------|-----------------------|
+
 | Modules of choice					| Multiple game mode and		| major | See below...			|
 |									| game customization			|		|						|
 
