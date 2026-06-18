@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,               
+    "rootDir": "./",               
+    "outDir": "../../../app/build/backend/llm"   
+  },
+  "include": ["**/*"],
+}

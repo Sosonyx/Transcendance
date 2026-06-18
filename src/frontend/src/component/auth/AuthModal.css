@@ -1,0 +1,258 @@
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.auth-modal {
+  background-color: #25253a;
+  padding: 40px 36px 32px;
+  border-radius: 12px;
+  position: relative;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+  width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: color 0.2s;
+  width: auto;
+  padding: 4px 8px;
+}
+
+.modal-close-btn:hover {
+  color: #fff;
+}
+
+/* Reusable auth form styles */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  /* gap: 8px; */
+}
+
+.auth-title {
+  text-align: center;
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 7px;
+  margin-top: -12px;
+}
+
+.auth-input {
+  width: 100%;
+  background: #2a2a38;
+  border: 1px solid #3a3a4a;
+  border-radius: 20px;
+  color: #fff;
+  margin-bottom: -5px;
+  font-size: 14px;
+  padding: 12px 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.auth-input:focus {
+  border-color: var(--twitch);
+}
+
+.auth-input::placeholder {
+  color: #6a6a7a;
+}
+
+.auth-submit-btn {
+  width: 100%;
+  background: var(--twitch);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 14px;
+  margin-top: 16px;
+  margin-bottom: 4px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.auth-submit-btn:hover:not(:disabled) {
+  background: #a970ff;
+}
+
+.auth-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+.auth-switch {
+  text-align: center;
+  color: #bbb;
+  font-size: 13px;
+}
+
+.auth-switch-tos-policy {
+  text-align: center;
+  color: #bbb;
+  font-size: 11px;
+}
+
+.auth-tos-link {
+  background: none;
+  border: none;
+  color: #9147ff;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: inherit;
+  padding: 0;
+  width: auto;
+  transition: color 0.2s;
+}
+
+.auth-tos-link:hover {
+  color: #b47aff;
+}
+
+.legal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.legal-modal {
+  background: #12111a;
+  border: 1px solid rgba(145, 71, 255, 0.25);
+  border-radius: 14px;
+  padding: 40px;
+  max-width: 680px;
+  width: 100%;
+  max-height: 78vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.legal-close {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  background: none;
+  border: none;
+  color: #6b6b8a;
+  font-size: 1.1rem;
+  cursor: pointer;
+  width: auto;
+  transition: color 0.2s;
+}
+
+.legal-close:hover {
+  color: #efeff1;
+}
+
+.legal-content {
+  color: #c0c0d8;
+  font-size: 0.88rem;
+  line-height: 1.7;
+}
+
+.legal-content h1 {
+  color: #efeff1;
+  font-size: 1.3rem;
+  margin-bottom: 4px;
+}
+
+.legal-content h2 {
+  color: #9147ff;
+  font-size: 1rem;
+  margin-top: 24px;
+  margin-bottom: 8px;
+}
+
+.legal-content p, .legal-content li {
+  color: #adadb8;
+}
+
+.legal-content ul {
+  padding-left: 20px;
+}
+
+.auth-switch-btn {
+  background: none;
+  border: none;
+  color: var(--twitch);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+  width: auto;
+  font-weight: 600;
+}
+
+.auth-switch-btn:hover {
+  color: #a970ff;
+  text-decoration: underline;
+}
+
+/* Divider lines */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  margin-top: 12px;
+  gap: 10px;
+  color: #aaa;
+  font-size: 12px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #515164;
+}
+
+/* OAuth logos */
+.oauth-logos {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.oauth-logo {
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  opacity: 0.75;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.oauth-logo:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.error-msg {
+  text-align: center;
+  color: #e03c3c;
+  font-size: 13px;
+}

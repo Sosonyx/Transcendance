@@ -1,0 +1,22 @@
+#root {
+	/* max-width: 560px; */
+	width: 100%;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	/* gap: 14px; */
+}
+
+.description{
+	color: white;
+	background-color: transparent;
+	/* padding: 30px; */
+	margin: auto;
+	/* margin-top: 30px; */
+	width: 100%;
+	text-align: center;
+}
+
+.button{
+	background-color: transparent;
+}

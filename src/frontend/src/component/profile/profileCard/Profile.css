@@ -1,0 +1,26 @@
+.profile-page {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr;
+  gap: 28px;
+  padding: 40px 40px 24px;
+  align-items: start;
+  align-content: start;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .profile-page {
+    grid-template-columns: 1fr;
+    max-width: 600px;
+    margin: 0 auto;
+    gap: 20px;
+    padding: 28px 24px;
+  }
+}
+
+@media (max-width: 600px) {
+  .profile-page {
+    gap: 14px;
+    padding: 16px 12px 24px;
+  }
+}

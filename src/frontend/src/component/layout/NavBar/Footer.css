@@ -1,0 +1,9 @@
+.foot-div{
+    color: #ffffff99;
+    font-size: 12px;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: auto;
+}

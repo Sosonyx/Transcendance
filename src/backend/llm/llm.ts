@@ -1,0 +1,116 @@
+import type { EventEmitter } from "node:events";
+import { pipeline } from "./pipeline.js";
+import { LlmContextBuilder } from "./services/llmContextBuilder.js";
+import { llmHistory as llmHistory } from "./services/llmHistory.js";
+import { llmPersonnality } from "./personnality.js";
+import { LlmResponseEmitter } from "./services/llmResponseEmitter.js";
+import { LlmScheduler } from "./services/llmScheduler.js";
+import type { Message } from "./types/messages.js";
+
+// Duplicate type definition, should be moved to a common file
+export type playerInput =  { name : string, input : string, color? : string | undefined};
+
+export class Llm {
+	private				_lastMessages: Message[] = [];
+	private 			_llmHistory: llmHistory;
+
+	private				_llmPersonnality: llmPersonnality;
+	private readonly	_scheduler: LlmScheduler;
+	private readonly	_contextBuilder: LlmContextBuilder;
+	private readonly	_responseEmitter: LlmResponseEmitter;
+
+	public constructor(roomEmitter: EventEmitter,
+	playerNames: string[] = []) 
+	{
+		this._llmHistory = new llmHistory();
+		this._llmPersonnality = new llmPersonnality(playerNames);
+		this._scheduler = new LlmScheduler();
+		this._contextBuilder = new LlmContextBuilder();
+		this._responseEmitter = new LlmResponseEmitter(roomEmitter, this._llmPersonnality);
+	}
+	// To set when the room is in a state where the LLM should answer
+	public startPlaying(): void {
+		this._scheduler.start(() => { void this.llmChat(); });
+	}
+
+	public stopPlaying(): void {
+		this._scheduler.stop();
+	}
+
+	public resetHistory(): void {
+		this._llmHistory.reset();
+		this._lastMessages = [];
+	}
+
+	public async askGlobalQuestion(questionsFromUsers: Message[]): Promise<playerInput> {
+		const action = await pipeline(this._llmHistory, this._contextBuilder.buildContext(questionsFromUsers), this._llmPersonnality, "askGlobalQuestion");
+		if (action.type === "ask_global_question")
+		{
+			console.log("LLM proposed global question:", action.question);
+			return {name : this._llmPersonnality.getName() ?? "", input : action.question};
+		}
+		else
+			return {name : this._llmPersonnality.getName() ?? "", input : ""};			
+	}
+
+	public async answerGlobalQuestion(globalQuestion: string, responsesFromUsers: Message[]): Promise<playerInput> {
+    responsesFromUsers.push({ senderId: "Message from the server", content: `Global question you have to answer to: ${globalQuestion}`, timestamp: Date.now() });
+
+    const action = await pipeline(this._llmHistory, this._contextBuilder.buildContext(responsesFromUsers), this._llmPersonnality, "answerGlobalQuestion", `Global question answered: ${globalQuestion}`);
+    const color = this._llmPersonnality.getColor();
+	if (action.type === "answer_global_question")
+        return {name: this._llmPersonnality.getName() ?? "", input: action.response, color: color};
+    else
+        return {name: this._llmPersonnality.getName() ?? "", input: "", color: color};
+}
+
+	public async vote(): Promise<void> {
+		const action = await pipeline(this._llmHistory, this._contextBuilder.buildContext(this._lastMessages), this._llmPersonnality, "vote");
+		if (action.type === "vote")
+			this._responseEmitter.emit(action.target, () => this._scheduler.canEmit());
+	}
+
+	public	receiveUserMessage(message: Message): void {
+		this._lastMessages.push(message);
+
+		this._scheduler.scheduleNextTick(() => { void this.llmChat(); });
+	}
+
+	private async llmChat(): Promise<void> {
+		if (!this._scheduler.tryBeginAnswering()) 
+		{
+			this._scheduler.scheduleNextTick(() => { void this.llmChat(); });
+			return;
+		}
+
+		try {
+			const cutoff = this._contextBuilder.getCutoffTime();
+			const messages = this._contextBuilder.collectMessagesToAnswer(this._lastMessages, cutoff);
+
+			const action = await pipeline(this._llmHistory, this._contextBuilder.buildContext(messages), this._llmPersonnality, "chat");
+
+			console.log("LLM action:", action);
+			if (action.type === "message")
+			{
+				this._responseEmitter.emit(action.text, () => this._scheduler.canEmit());
+				this._lastMessages = this._contextBuilder.clearProcessedMessages(this._lastMessages, cutoff);
+			}
+		} 
+		catch (error) {
+			console.error("Error in LLM pipeline:", error);
+		} 
+		finally {
+			this._scheduler.finishAnswering(() => {
+			this._scheduler.scheduleNextTick(() => { void this.llmChat(); });
+			});
+		}
+	}
+
+	public setName(name: string): void {
+		this._llmPersonnality.setName(name);
+	}
+
+	public setColor(color: string): void {
+		this._llmPersonnality.setColor(color);
+	}
+}

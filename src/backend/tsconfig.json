@@ -1,0 +1,16 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+	"composite":true,
+    "rootDir": "./",
+    "outDir": "../build/backend"
+  },
+  "exclude" : [
+    "frontend",
+    "node_modules"
+  ],
+  "include": ["**/*", "../server.ts"],
+  "references": [
+	{"path": "./prisma"}
+  ]
+}

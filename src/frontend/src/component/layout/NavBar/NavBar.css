@@ -1,0 +1,190 @@
+.navbar {
+  height: var(--navbar-height);
+  display: flex;
+  justify-content: space-between;
+  padding: 0 28px;
+  height: var(--navbar-height);
+  align-items: center;
+  background-color: var(--twitch-surface);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(145, 71, 255, 0.25);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar-brand {
+  background-color: transparent;
+  font-weight: 900;
+  font-size: 2rem !important;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #efeff1;
+  cursor: pointer;
+  text-shadow: 0 0 12px rgba(145, 71, 255, 0.6);
+  transition: text-shadow 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.navbar-left:hover {
+  cursor: pointer;
+}
+
+.navbar-brand:hover {
+  text-shadow: 0 0 12px rgba(145, 71, 255, 1);
+}
+
+.button-div {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.nav-button {
+  border: none;
+  background-color: transparent;
+  color: #adadb8;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  width: auto;
+  padding: 6px 0;
+  transition: color 0.2s;
+  position: relative;
+}
+
+.nav-button::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: #9147ff;
+  transition: width 0.2s;
+}
+
+.nav-button:hover {
+  color: #efeff1;
+}
+
+.nav-button:hover::after {
+  width: 100%;
+}
+
+.navbar-user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 0.2s;
+}
+
+.navbar-user-info:hover {
+  opacity: 1;
+}
+
+.navbar-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #9147ff;
+  box-shadow: 0 0 8px rgba(145, 71, 255, 0.5);
+}
+
+.navbar-account-icon {
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.navbar-account-icon:hover {
+  opacity: 1;
+}
+
+.navbar-username {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #efeff1;
+  letter-spacing: 0.5px;
+}
+
+.navbar-logo {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.play-btn {
+  border: 2px solid #9147ff;
+  border-radius: 4px;
+  background: var(--twitch);
+  color: #fff;
+  padding: 6px 20px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  width: auto;
+  transition: background 0.2s, color 0.2s;
+}
+
+.play-btn:hover {
+  background: #8533ff;
+  border-color: #8533ff;
+  color: #efeff1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .navbar {
+    padding: 0 12px;
+  }
+
+  .navbar-brand {
+    font-size: 1rem !important;
+    letter-spacing: 1px;
+  }
+
+  .navbar-logo {
+    width: 36px;
+    height: 36px;
+  }
+
+  .button-div {
+    gap: 10px;
+  }
+
+  .navbar-username {
+    display: none;  /* cache le nom, garde juste l'avatar */
+  }
+
+  .nav-button {
+    display: none;  /* cache le bouton Logout sur mobile */
+  }
+
+  .navbar-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .play-btn {
+    padding: 5px 12px;
+    font-size: 0.75rem;
+  }
+}

@@ -1,0 +1,180 @@
+@import '../node_modules/mini.css/dist/mini-dark.min.css';
+
+.centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+/*! AI replica of Twitch */
+/* Chat */
+#messages {
+    list-style-type: none;
+    margin: 0;
+    padding: 8px 0;
+    padding-bottom: 4rem;
+    overflow-y: auto;
+    background: #18181b;
+}
+
+#messages li {
+    padding: 4px 14px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #efeff1;
+    word-break: break-word;
+    animation: slideIn 0.2s ease;
+}
+
+#messages li:hover {
+    background: #222226;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Bottom bar */
+.bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #18181b;
+    border-top: 1px solid #2d2d2d;
+    padding: 10px 12px;
+    box-sizing: border-box;
+}
+
+#chatform {
+    display: flex;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+}
+
+#input {
+    flex: 1;
+    background: #3d3d42;
+    border: 1px solid #4a4a55;
+    border-radius: 4px;
+    color: #efeff1;
+    font-size: 13px;
+    padding: 8px 10px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+#input:focus {
+    border-color: var(--twitch);
+}
+
+#input::placeholder {
+    color: #adadb8;
+}
+
+#send-btn {
+    background: var(--twitch);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+#send-btn:hover {
+    background: #a970ff;
+}
+
+/* .bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+	height: 5.725rem;
+}
+
+#messages {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+	padding-bottom: 5.725rem;
+	overflow-y: auto;
+}
+
+#messages > li {
+	padding: 0.5rem 1rem;
+}
+
+#messages > li:nth-child(odd) {
+	background: #efefef;
+}
+
+#chatform {
+    display: flex;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    margin: 0;
+}
+
+#input {
+    flex: 1;
+} */
+
+.vote-grid {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	justify-content: center;
+	padding: 1rem;
+}
+
+.player-card {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 1rem;
+	border-radius: 8px;
+	background: #333;
+	cursor: pointer;
+	transition: background 0.2s;
+	width: 120px;
+    overflow: hidden;
+}
+
+.player-card h3 {
+    word-break: break-word;
+}
+
+.player-card:hover:not(.disabled):not(.voted) {
+	background: #c0392b;
+    transform: scale(1.08);
+}
+
+.player-card:active:not(.disabled):not(.voted) {
+	background: #c0392b;
+    transform: scale(1);
+}
+
+.player-card.voted {
+	background: #c0392b;
+	cursor: default;
+    transform: scale(1.08);
+}
+
+.player-card.disabled {
+	background: #999;
+	cursor: not-allowed;
+	opacity: 0.6;
+}
+
+.player-avatar {
+	width: 64px;
+	height: 64px;
+	border-radius: 50%;
+	margin-bottom: 0.5rem;
+}

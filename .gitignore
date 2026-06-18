@@ -1,0 +1,11 @@
+node_modules/
+.env
+*.log
+.DS_Store
+/generated/prisma
+npc_lab/
+test
+todo.txt
+build
+build/*
+src/backend/llm/src/debug_llm.ts

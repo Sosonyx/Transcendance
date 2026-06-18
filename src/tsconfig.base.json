@@ -1,0 +1,40 @@
+{
+  // Visit https://aka.ms/tsconfig to read more about this file
+  
+  "compilerOptions": {
+    // File Layout
+    "rootDir": "./",
+    
+    // Environment Settings
+    // See also https://aka.ms/tsconfig/module
+    "module": "nodenext",
+    "target": "esnext",
+    "types": ["node"],
+    "lib": ["esnext"],
+
+    // Other Outputs
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+
+    // Stricter Typechecking Options
+    "noUncheckedIndexedAccess": true, // arr[x] est de type T | undefined
+    "exactOptionalPropertyTypes": true, // différencie { age?: number } (propriété absente) de { age: number | undefined } (propriété présente mais undefined)
+
+    // Good-practices
+    "strict": true, // types explicites obligatoires, pas de null/undefined implicites, etc.
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+
+    // Recommended Options
+    // "jsx": "react-jsx", // Pour React
+    "verbatimModuleSyntax": true, // oblige a ecrire "import type" pour les types
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force", // evite ambiguites CommonJS/ES
+    "skipLibCheck": true, // ne verifie pas le typage dans les librairies externes (accelere compilation)
+    "esModuleInterop": true, // tu peux ecrire "import x from" au lieu de "import * as x from"
+  }
+}

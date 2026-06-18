@@ -1,0 +1,153 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+
+/* Custom fonts */
+@font-face {
+  font-family: 'Font';
+  src: url('/fonts/font.otf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Font';
+  src: url('/fonts/Granit.otf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Font';
+  src: url('/fonts/font2.ttf') format('truetype');
+}
+
+/* Variables */
+:root {
+  --twitch:       #9147ff;
+  --twitch-dark:  #6316c1;
+  --twitch-hover: #a970ff;
+  --twitch-surface: #9147ff26;
+  --twitch-shadow: #9147ff4d;
+
+  --bg:       #190521b3;
+  --surface:  #1f1f23;
+  --surface2: #2d2d35;
+  --border:   #ffffff1a;
+  --text:     #efeff1;
+  --muted:    #adadb8;
+  --radius:   15px;
+  --navbar-height: 110px;
+  --box-shadow: 0 4px 100px rgba(255, 255, 255, 0.034);
+}
+
+/* Reset */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Granit', sans-serif;
+
+  background: linear-gradient(
+    135deg,
+    #05020f 0%,
+    #0f0520 10%,
+    #1a0a35 20%,
+    #0f0520 30%,
+    #05020f 40%,
+    #390a20 50%,
+    #0f0520 60%,
+    #05020f 70%,
+    #1a0a35 80%,
+    #0f0520 90%,
+    #05020f 100%
+  );
+
+  background-size: 400% 400%;
+  animation: chrome 18s ease infinite;
+
+  background-blend-mode: overlay, normal;
+
+  color: var(--text);
+  min-height: 100vh;
+}
+
+@keyframes chrome {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.play-btn {
+  font-family: 'Granit', sans-serif;
+}
+.navbar-brand {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+}
+
+/* Layout */
+form {
+  max-width: 560px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Text inputs */
+input:where([type="text"], [type="password"], [type="email"]) {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  padding: 10px 14px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+}
+
+input:where([type="text"], [type="password"], [type="email"])::placeholder { color: var(--muted); }
+
+input:where([type="text"], [type="password"], [type="email"]):focus {
+  border-color: var(--twitch);
+  box-shadow: 0 0 0 2px var(--twitch-shadow);
+}
+
+/* Buttons - base */
+/* button {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  /* width: 100%; */
+/* } */
+
+button:active:not(:disabled) { transform: scale(0.98); }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--surface);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--twitch);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--twitch-hover);
+}
+
+/* Responsive */
+
+@media (max-width: 420px) {
+  button { font-size: 13px; padding: 10px 16px; }
+}

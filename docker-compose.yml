@@ -1,0 +1,34 @@
+services:
+  postgres:
+    image: docker.io/postgres:16-alpine
+    container_name: postgres
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  
+  backend:
+    container_name: backend
+    build :
+      context : src/
+      dockerfile: ../docker_files/Dockerfile.backend
+    env_file : 
+      - .env
+    ports :
+      - 5555:5555 
+    depends_on :
+    - postgres
+
+  frontend :
+    container_name: frontend
+    build:
+      context: src/frontend
+      dockerfile: ../../docker_files/Dockerfile.frontend
+    ports :
+      - 8080:443
+    depends_on :
+    - backend
+    stop_signal: SIGKILL
+
+volumes:
+  postgres_data:

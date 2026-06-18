@@ -1,0 +1,74 @@
+.switch-container{
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.mode-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+    min-width: 110px;
+    justify-content: center;
+}
+
+.mode-label input[type="radio"] {
+    display: none;
+}
+
+.mode-label.active {
+    color: var(--text);
+    font-weight: 700;
+    border-color: var(--twitch);
+    background: var(--twitch-surface);
+}
+
+.mode-label:hover:not(.active) {
+    border-color: var(--twitch);
+    color: var(--text);
+}
+
+.mode-label--sub {
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 400;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    opacity: 0.9;
+    min-width: 120px;
+}
+
+.mode-label--sub.active {
+    color: var(--text);
+    font-weight: 600;
+    border-color: rgba(145, 71, 255, 0.5);
+    background: rgba(117, 25, 255, 0.1);
+}
+
+.mode-label--sub:hover:not(.active) {
+    border-color: rgba(145, 71, 255, 0.3);
+    color: var(--text);
+    opacity: 1;
+}
+
+.mode-description {
+    font-size: 0.78rem;
+    color: #adadb8;
+    text-align: center;
+    max-width: 400px;
+    margin: 4px auto 0;
+    line-height: 1.5;
+    font-style: italic;
+}
