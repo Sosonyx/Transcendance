@@ -34,7 +34,7 @@ export function registerSocketHandlers(io: Server)
 				switch (state) {
 
 					case roomStates.LOBBY: {
-						socket.emit('startLobby'); break; }
+						socket.emit('startLobby', data); break; }
 
 					case roomStates.ACTION_1: {
 						socket.emit('startAction1', timeinfo); break ; }

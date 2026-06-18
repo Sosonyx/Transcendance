@@ -6,12 +6,13 @@ import GameConfigPanel from "./GameConfigPanel";
 
 interface LobbyPanelProps {
 	socket: Socket | null;
+	lobbyInit: LobbyInfo | undefined;
 	isCustom : boolean;
 }
 
-function LobbyPanel({ socket, isCustom }: LobbyPanelProps) {
+function LobbyPanel({ socket, lobbyInit, isCustom }: LobbyPanelProps) {
 	const [ready, setReady] = useState<boolean>(false);
-	const [lobbyInfo, setLobbyInfo] = useState<LobbyInfo>();
+	const [lobbyInfo, setLobbyInfo] = useState<LobbyInfo | undefined>(lobbyInit);
 	const players = lobbyInfo?._players.length ?? 0;
 	const ias    = lobbyInfo?._llmCount ?? 0;
 	const spots   = lobbyInfo?._spots ?? 0;

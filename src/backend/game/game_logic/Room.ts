@@ -195,6 +195,7 @@ export class Room extends EventEmitter
 		switch (newState) {
 
 			case (roomStates.LOBBY) :
+				this._data = this._constructLobbyInfo();
 				break ;
 
 			case (roomStates.ACTION_1) :
@@ -462,8 +463,8 @@ export class Room extends EventEmitter
 		{
 			this._winners = [];
 			this.stateSwitch(roomStates.LOBBY);
-			this.sendSynchro();
 			this._checkLobbyStatus();
+			this.sendSynchro();
 		}
 	}
 
