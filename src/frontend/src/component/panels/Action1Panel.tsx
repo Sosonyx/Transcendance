@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
+import SendButton from "./SendButton";
 
 interface Action1PanelProps {
 	socket: Socket | null;
@@ -37,7 +38,7 @@ function Action1Panel({ socket, eliminated }: Action1PanelProps) {
 					(<>
 						<p id="prompt-label" className="game-label"> Pose une question ! </p>
 						<input id="prompt-input" type="text" placeholder="Ta question..." autoComplete="off" onChange={handleChange} value={prompt ?? ''} />
-						<button id="send-btn" className="game-button"> Envoyer </button>
+						<SendButton type="submit"> Envoyer </SendButton>
 					</>) : (
 						<p id="prompt-label" className="game-label waiting"> En attente des autres joueurs... </p>
 					)

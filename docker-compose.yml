@@ -30,7 +30,7 @@ services:
       - 8080:443
     depends_on :
     - backend
-    stop_signal: SIGQUIT
+    stop_signal: SIGKILL
 
 volumes:
   postgres_data:

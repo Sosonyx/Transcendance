@@ -39,6 +39,7 @@
     height: 100%;
     transform-style: preserve-3d;
     transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
 }
 
 .result-card.revealed .result-card-inner {
@@ -66,6 +67,7 @@
 /* Front */
 .result-card-front {
     background: var(--surface);
+    transform: translateZ(0);
 }
 
 .result-hint {
@@ -78,7 +80,7 @@
 .result-card-back {
     background: var(--surface2);
     border-color: var(--twitch);
-    transform: rotateY(180deg);
+    transform: rotateY(180deg) translateZ(0);
 }
 
 .result-card-back.is-llm {
