@@ -97,7 +97,6 @@ function Game({ user, gameMode, roomType, customAction } : GameProps) {
             setState(roomStates.ROUND_RESULT);
         });
         s.on('startResult', (result: ResultInfo, timeInfo: number | null) => {
-            console.log('[startResult]', result);
             setResult(result);
             setTimeEnd(timeInfo);
             setState(roomStates.RESULT)

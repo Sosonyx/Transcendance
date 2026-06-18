@@ -33,9 +33,7 @@ function GameConfigPanel( { socket } : GameConfigPanelProps ) {
 
 	const sendConfig = async () => { 
 		try {
-			const ack = await socket?.timeout(5000).emitWithAck('config', config);
-			console.log('\n\n\n ACK : ');
-			console.log(ack); 
+			await socket?.timeout(5000).emitWithAck('config', config);
 		}
 		catch {}
 	};
