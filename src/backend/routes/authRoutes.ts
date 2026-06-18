@@ -4,6 +4,7 @@ import { getProfileController, getOtherProfileController, getLeaderbordControlle
 import { modifyUserProfile } from "../controllers/usersController.js";
 import { requireAuth } from "../services/authService.js";
 import { intraHandler, googleHandler } from '../controllers/oAuthController.js'
+import { heartbeat } from "../controllers/onlineStatusCheck.js";
 
 export async function publicRoutes(fastify: FastifyInstance) {
 	fastify.post('/api/register', registerController);
@@ -19,4 +20,5 @@ export async function privateRoutes(fastify: FastifyInstance) {
 	fastify.addHook('preHandler', requireAuth);
 	fastify.patch('/api/profile', modifyUserProfile);
 	fastify.get('/api/profile', getProfileController);
+	fastify.post('/api/heartbeat', heartbeat);
 }

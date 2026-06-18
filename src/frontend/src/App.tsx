@@ -45,6 +45,15 @@ export function App() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!user) return;
+    const ping = () =>
+      fetch('/api/heartbeat', { method: 'POST', credentials: 'include' }).catch(() => {});
+    ping();
+    const id = setInterval(ping, 20_000); // toutes les 20s
+    return () => clearInterval(id);
+  }, [user]);
+
   if (loading) {
     return (
       <div>

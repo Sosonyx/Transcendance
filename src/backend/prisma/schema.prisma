@@ -81,6 +81,8 @@ model User {
   receivedMessages Message[] @relation("MessagesReceived")
 
   playedAs  Player[] // to find his stats
+
+  lastSeenAt DateTime?
 }
 
 
