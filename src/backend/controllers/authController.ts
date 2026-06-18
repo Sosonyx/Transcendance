@@ -9,18 +9,17 @@ export async function registerController(req: FastifyRequest, reply: FastifyRepl
   
   const validEmail = await prisma.user.findUnique({where :{email:newUser.email}})
   if (validEmail)
-		return reply.code(409).send({ error: "Cet email est déjà utilisé" });
+		return reply.code(409).send({ error: "Email already used" });
 
   const validUsername = await prisma.user.findUnique({where :{username:newUser.username}})
   if (validUsername)
-    return reply.code(409).send({ error: "Ce username est déjà utilisé" })
+    return reply.code(409).send({ error: "Username already used" })
 
   const user: Partial<UserInterface>= await registerUser({
             email: newUser.email,
             username: newUser.username,
             password: newUser.password!,
             avatar: newUser.avatar,
-            twoFactorEnabled: false,
             id: newUser.id
           });
 
@@ -81,7 +80,7 @@ export async function logoutController(req : FastifyRequest, reply: FastifyReply
       sameSite: 'strict',
       path: '/'
     });
-    return (reply.send({ message: 'Deconnecte' }));
+    return (reply.send({ message: 'Disconnected' }));
   }catch (error){
     return (reply.code(400).send({message: "Json web token invalid"}))
   }

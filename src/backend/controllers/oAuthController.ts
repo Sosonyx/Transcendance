@@ -1,7 +1,6 @@
 import { handleOAuthLogin } from "../services/oauthService.js";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import type { Profile42, ProfileGoogle } from "../types/interfaces.js";
-import {prisma} from "../prisma/prisma.js"
 
 export async function intraHandler(req: FastifyRequest, reply: FastifyReply) {
 
@@ -21,14 +20,10 @@ export async function intraHandler(req: FastifyRequest, reply: FastifyReply) {
     email: profile.email,
     username: profile.login,
   });
-  const userInDb = await prisma.user.findUnique({ where: { id: result.user.id } });
-
-  const is2faRequired = userInDb?.twoFactorEnabled ?? false;
 
   const appToken = fastify.jwt.sign({
     userId: result.user.id,
     username: result.user.username,
-    twoFactorVerified: !is2faRequired
   }, { expiresIn: '1h' });
 
   reply.setCookie("token", appToken, {
@@ -38,7 +33,6 @@ export async function intraHandler(req: FastifyRequest, reply: FastifyReply) {
     sameSite: "strict",
     maxAge: 86400,
   });
-  // TODO : REDIRECT TO RIGHT URL
   req
   let url = process.env.FRONTEND_URL!;
   return (reply.redirect(url));
@@ -64,14 +58,10 @@ export async function googleHandler(req: FastifyRequest, reply: FastifyReply) {
     email: profile.email,
     username: profile.name,
   });
-  const userInDb = await prisma.user.findUnique({ where: { id: result.user.id } });
 
-  const is2faRequired = userInDb?.twoFactorEnabled ?? false;
-  
   const appToken = fastify.jwt.sign({
     userId: result.user.id,
     username: result.user.username,
-    twoFactorVerified: !is2faRequired
   }, { expiresIn: '1h' });
 
   reply.setCookie("token", appToken, {

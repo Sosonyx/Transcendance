@@ -1,5 +1,5 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
-import type { DBUserResponse, Player, UserMap, UserSafeInterface, UserInterface } from "../types/interfaces.js";
+import type { DBUserResponse, Player, UserMap, UserSafeInterface } from "../types/interfaces.js";
 import { prisma } from "../prisma/prisma.js";
 
 export async function getProfileController(req: FastifyRequest, reply: FastifyReply){
@@ -8,8 +8,7 @@ export async function getProfileController(req: FastifyRequest, reply: FastifyRe
 		const currUser = req.user as {userId: string};
 		const dbUser  = await prisma.user.findUnique({ where : {id : currUser.userId}, include:{playedAs: true}})						
 		if (!dbUser) {
-       		 console.error("Inexistant user!");
-        	return reply.code(404).send({ error: "Inexistant user" });
+        	return (reply.code(404).send({ error: "Inexistant user" }));
     	}
 		const user : UserSafeInterface = {
 			id: dbUser.id,
@@ -39,18 +38,15 @@ export async function getOtherProfileController(req: FastifyRequest, reply: Fast
         return (reply.code(404).send({ error: "Inexistant user" }));
     }
 
-    const user: UserInterface = {
+    const user: UserSafeInterface = {
         id: dbUser.id,
         email: dbUser.email,
         username: dbUser.username,
         avatar: dbUser.avatar,
-        password: null,
 		playedAs: dbUser.playedAs,
-		twoFactorEnabled: dbUser.twoFactorEnabled
     };
 
-    const safeProfile: UserSafeInterface = user;
-    return (reply.send(safeProfile));
+    return (reply.send(user));
 }
 
 function getUserMap(user : DBUserResponse): UserMap{

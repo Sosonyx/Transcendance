@@ -38,8 +38,7 @@ export async function modifyUserProfile(request: FastifyRequest, reply: FastifyR
     } 
     catch (jwtError)
     {
-        console.error("ÉCHEC JWT SUR LE PATCH :", jwtError);
-        return reply.code(401).send({ error: "Unauthorized" });
+        return (reply.code(401).send({ error: "Unauthorized" }));
     }
 
     const me = await getUser(request, reply);
@@ -82,7 +81,7 @@ export async function modifyUserProfile(request: FastifyRequest, reply: FastifyR
     }
     catch (error: any) {
         if (error?.code === 'P2002')
-            return reply.code(409).send({ error: "Ce username est déjà utilisé" });
+            return reply.code(409).send({ error: "Username already used" });
         return reply.code(500).send({ error: "Database update error" });
     }
 }

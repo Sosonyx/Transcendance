@@ -13,7 +13,6 @@ export interface UserInterface {
 	password?: string | null;
     username: string;
     avatar: string | null;
-    twoFactorEnabled?: boolean;
     playedAs?: Player[];
 }
 
@@ -46,12 +45,6 @@ export interface DBUserResponse {
     username: string;
     avatar: string | null;
     playedAs: Player[];
-}
-
-export interface TwoFactorSecret {
-  secret: string;            
-  otpauthUrl: string;
-  qrCode: string;
 }
 
 export interface JwtPayload {
