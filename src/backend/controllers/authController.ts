@@ -3,9 +3,41 @@ import { registerUser, loginUser } from "../services/authService.js";
 import { prisma } from "../prisma/prisma.js"
 import type { JwtPayload, UserInterface } from "../types/interfaces.js"
 
+
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+function isValidUsername(username: string): boolean {
+  const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+  return usernameRegex.test(username);
+}
+
+function  isValidPassword(password: string): boolean {
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$/;
+  return passwordRegex.test(password);
+}
+
+function validateFormData(data: Partial<UserInterface>): boolean {
+  const { email, username, password } = data;
+  
+  if (!email || !isValidEmail(email))
+    return false;
+  if (!username || !isValidUsername(username))
+    return false;
+  if (!password || !isValidPassword(password))
+    return false;
+  
+  return true;
+}
+
 export async function registerController(req: FastifyRequest, reply: FastifyReply)
 {
   let newUser: UserInterface = req.body as UserInterface;
+
+  if (!validateFormData(newUser))
+    return reply.code(400).send({ error: "Données de formulaire invalides." });
   
   const validEmail = await prisma.user.findUnique({where :{email:newUser.email}})
   if (validEmail)
@@ -37,44 +69,10 @@ export async function registerController(req: FastifyRequest, reply: FastifyRepl
   return (reply.code(201).send({token, user}));
 }
 
-function isValidEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
-
-function isValidUsername(username: string): boolean {
-  const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
-  return usernameRegex.test(username);
-}
-
-function  isValidPassword(password: string): boolean {
-  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-  password.length >= 8;
-  return passwordRegex.test(password);
-}
-
-function validateFormData(data: Partial<UserInterface>): boolean {
-  const { email, username, password } = data;
-  if (!email || !isValidEmail(email)) {
-    return false;
-  }
-  if (!username || !isValidUsername(username)) {
-    return false;
-  }
-  if (!password || !isValidPassword(password)) {
-    return false;
-  }
-  return true;
-}
-
 export async function loginController(req : FastifyRequest, reply : FastifyReply)
 {
   try {
     const body = req.body as Partial <UserInterface>;
-
-    if (!validateFormData(body)) {
-      return reply.code(400).send({ message: "Données de connexion invalides." });
-    }
 
     const user = await loginUser(body);
     var token: string = req.server.jwt.sign({

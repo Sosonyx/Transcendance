@@ -61,18 +61,6 @@ export async function login(username: string, password: string): Promise<Respons
 	return (res)
 }
 
-export async function loginGoogle(): Promise<Response> {
-	const res = await fetch(`/api/auth/google/callback`, {
-		method: 'GET',
-		headers: {'Content-type': 'application/json'},
-		credentials: 'include',
-	})
-	if (!res.ok) {
-		throw new Error("Login error")
-	}
-	return (res)
-}
-
 export async function login42(): Promise<Response> {
 	const res = await fetch(`/api/auth/42/callback`, {
 		method: 'GET',
