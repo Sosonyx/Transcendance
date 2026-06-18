@@ -16,6 +16,13 @@
 	box-sizing: border-box;
 }
 
+@media (max-width: 1024px) {
+	.leaderboard-container {
+		grid-column: 1;
+		grid-row: 2;
+	}
+}
+
 .leaderboard-title {
 	font-size: 0.85rem;
 	font-weight: 700;
