@@ -7,9 +7,6 @@ export function useAuth() {
   const [loading, setLoading] = useState(false); //Loading/Submitting dans toutes les fct font qui font des calls API (Pas rerender avec des etats intermediaire)
 
   const refreshAuth = async () => {
-    const token = document.cookie.split(";").find(row => row.startsWith("token"));
-    if (!token)
-        return ;
     setLoading(true);
 
     try {

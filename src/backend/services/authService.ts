@@ -17,7 +17,8 @@ export async function loginUser(currUser: Partial<UserInterface>) {
   if (!validPassword) {
     throw new Error("Invalid credentials");
   }
-  return (user);
+  const { hashedPassword, ...safeUser } = user;
+  return (safeUser);
 }
 
 
@@ -33,15 +34,9 @@ export async function registerUser(newUser: UserInterface): Promise<UserSafeInte
       hashedPassword: hash,
       avatar: newUser.avatar || null,
     },
-    select: {
-        id: true,
-        email: true,
-        username: true,
-        avatar: true
-    }
   });
-
-  return (user);
+  const { hashedPassword, ...safeUser } = user;
+  return (safeUser);
 }
 
 

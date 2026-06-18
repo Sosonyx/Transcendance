@@ -1,7 +1,7 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import { registerUser, loginUser } from "../services/authService.js";
 import { prisma } from "../prisma/prisma.js"
-import type { JwtPayload, UserInterface } from "../types/interfaces.js"
+import type { JwtPayload, UserInterface, UserSafeInterface } from "../types/interfaces.js"
 
 
 function isValidEmail(email: string): boolean {
@@ -74,7 +74,7 @@ export async function loginController(req : FastifyRequest, reply : FastifyReply
   try {
     const body = req.body as Partial <UserInterface>;
 
-    const user = await loginUser(body);
+    const user: UserSafeInterface = await loginUser(body);
     var token: string = req.server.jwt.sign({
         userId: user.id,
         username: user.username
