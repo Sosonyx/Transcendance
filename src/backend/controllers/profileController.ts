@@ -39,8 +39,6 @@ export async function getOtherProfileController(req: FastifyRequest, reply: Fast
     }
 
     const user: UserSafeInterface = {
-        id: dbUser.id,
-        email: dbUser.email,
         username: dbUser.username,
         avatar: dbUser.avatar,
 		playedAs: dbUser.playedAs,
