@@ -20,10 +20,10 @@ export async function intraHandler(req: FastifyRequest, reply: FastifyReply) {
     email: profile.email,
     username: profile.login,
   });
-  
+
   if ("error" in result || !result.user) {
     const frontendUrl = process.env.FRONTEND_URL!;
-  return reply.redirect(`${frontendUrl}/login?error=email_already_exists`);
+    return reply.redirect(`${frontendUrl}/login?error=email_already_exists`);
   }
 
     const appToken = fastify.jwt.sign({
