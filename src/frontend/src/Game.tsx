@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { LobbyPanel, Action1Panel, Action2Panel, ChatPanel, VotePanel, RoundResultPanel, ResultPanel } from './component/panels'
 import { TransitionOverlay } from './component/transitions';
-import { roomStates, type VoteInfo, type AnswersType } from './types/types';
+import { roomStates, type VoteInfo, type AnswersType, type LobbyInfo } from './types/types';
 import './Game.css'
 import { GameMode, RoomType, CustomAction, type ResultInfo, type RoundResultInfo, type User, type ScoreInfo } from './types/types';
 import Timer from './component/timer/Timer';
@@ -24,6 +24,7 @@ function Game({ user, gameMode, roomType, customAction } : GameProps) {
     const [prompt, setPrompt] = useState<string | null>(null);
     const [players, setPlayers] = useState<VoteInfo[]>([]);
 	const [scoreInfo, setScoreInfo] = useState<ScoreInfo | null>(null);
+    const [lobbyInfo, setLobbyInfo] = useState<LobbyInfo>();
     const [question, setQuestion] = useState<string | undefined>('');
     const [answers, setAnswers] = useState<AnswersType>([]);
     const [transition, setTransition] = useState<string | null>(null);
@@ -59,8 +60,9 @@ function Game({ user, gameMode, roomType, customAction } : GameProps) {
         });
         setSocket(s);
 
-        s.on('startLobby', () => {
+        s.on('startLobby', (lobbyInfo) => {
             setTimeEnd(null);
+            setLobbyInfo(lobbyInfo);
             setState(roomStates.LOBBY);
         });
 		s.on('score_info', setScoreInfo);
@@ -97,7 +99,6 @@ function Game({ user, gameMode, roomType, customAction } : GameProps) {
             setState(roomStates.ROUND_RESULT);
         });
         s.on('startResult', (result: ResultInfo, timeInfo: number | null) => {
-            console.log('[startResult]', result);
             setResult(result);
             setTimeEnd(timeInfo);
             setState(roomStates.RESULT)
@@ -131,7 +132,7 @@ function Game({ user, gameMode, roomType, customAction } : GameProps) {
             {/* Game container — caché sur mobile si tab !== chat */}
             <div className={`game-container ${mobileTab !== 'chat' ? 'mobile-hidden' : ''}`}>
                 {transition && <TransitionOverlay config={transition} />}
-                {state === roomStates.LOBBY        && <LobbyPanel   socket={socket} isCustom={roomType === RoomType.CUSTOM && customAction === CustomAction.CREATE} />}
+                {state === roomStates.LOBBY        && <LobbyPanel   socket={socket} lobbyInit={lobbyInfo} isCustom={roomType === RoomType.CUSTOM && customAction === CustomAction.CREATE} />}
                 {state === roomStates.ACTION_1     && <Action1Panel socket={socket} eliminated={eliminated} />}
                 {state === roomStates.ACTION_2     && <Action2Panel socket={socket} prompt={prompt} eliminated={eliminated} />}
                 {isChatOrVote                      && <ChatPanel    socket={socket} question={question} answers={answers} eliminated={eliminated} />}

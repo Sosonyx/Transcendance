@@ -166,9 +166,19 @@ export class Room extends EventEmitter
 
 	// STATE LOGIC
 
-	public sendSynchro(player : EventEmitter) : void
+	public sendSynchro(player? : EventEmitter) : void
 	{
-		player.emit('synchronize', this._state, this._data, this._timeInfo, this._constructScoreInfo());
+		if (player !== undefined)
+		{
+			player.emit('synchronize', this._state, this._data, this._timeInfo, this._constructScoreInfo());
+			
+		}
+		else 
+		{
+			this._players.forEach(player => {
+				player.emit('synchronize', this._state, this._data, this._timeInfo, this._constructScoreInfo());
+			});
+		}
 		if (this._state === roomStates.LOBBY)
 			this.emit('lobby_info', this._constructLobbyInfo());
 	}
@@ -185,6 +195,7 @@ export class Room extends EventEmitter
 		switch (newState) {
 
 			case (roomStates.LOBBY) :
+				this._data = this._constructLobbyInfo();
 				break ;
 
 			case (roomStates.ACTION_1) :
@@ -453,6 +464,7 @@ export class Room extends EventEmitter
 			this._winners = [];
 			this.stateSwitch(roomStates.LOBBY);
 			this._checkLobbyStatus();
+			this.sendSynchro();
 		}
 	}
 
