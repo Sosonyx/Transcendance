@@ -11,7 +11,7 @@ export class LlmScheduler {
 	private			_state: LlmSchedulerState = LlmSchedulerState.Stopped;
 	private			_timer: NodeJS.Timeout | null = null;
 
-	public constructor(intervalMs = 2000, jitterMs = 1000) {
+	public constructor(intervalMs = 4000, jitterMs = 1000) {
 		this._intervalMs = intervalMs;
 		this._jitterMs = jitterMs;
 	}

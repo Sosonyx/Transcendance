@@ -223,10 +223,6 @@ export class Room extends EventEmitter
 				break ;
 
 			case (roomStates.VOTE) :
-				this._players.forEach((player) => {
-					if (player.getIsLLM())
-						(player as LlmPlayer).getBrain()?.stopPlaying();
-				});
 				this._data = this._constructVoteInfo();
 				this._allPlayersShouldAct();
 				this._timeInfo = Date.now() + this._config.voteTime * 1000;
@@ -234,6 +230,10 @@ export class Room extends EventEmitter
 				break ;
 
 			case (roomStates.ROUND_RESULT) :
+				this._players.forEach((player) => {
+					if (player.getIsLLM())
+						(player as LlmPlayer).getBrain()?.stopPlaying();
+				});
 				this._timeInfo = Date.now() + roundResultTime * 1000;
 				this.emit('score_info', this._constructScoreInfo());
 				this._data = this._constructRoundResultInfo();

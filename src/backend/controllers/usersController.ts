@@ -2,6 +2,7 @@ import type { FastifyRequest, FastifyReply } from 'fastify';
 import '@fastify/multipart';
 import { prisma } from '../prisma/prisma.js';
 import type { JwtPayload } from '../types/interfaces.js';
+import { isValidUsername } from './authController.js';
 
 const userProfileSelect = {
     id: true,
@@ -12,19 +13,19 @@ const userProfileSelect = {
 } as const;
 
 export async function getUser(req: FastifyRequest, reply: FastifyReply){
-   const jwtoken = req.cookies?.token;
+    const jwtoken = req.cookies?.token;
 
-  if (!jwtoken) {
+    if (!jwtoken) {
     return (reply.code(401).send({ error: "Utilisateur non connecté." }));
-  }
+    }
 
-  const decoded = req.server.jwt.decode<JwtPayload>(jwtoken);
-  if (!decoded) {
+    const decoded = req.server.jwt.decode<JwtPayload>(jwtoken);
+    if (!decoded) {
     return (reply.code(401).send({ error: "Token invalide." }));
-  }
+    }
 
-  const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
-  return (user)
+    const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
+    return (user)
 }
 
 export type UpdateProfileBody = { username?: string; avatar?: string };
@@ -56,6 +57,9 @@ export async function modifyUserProfile(request: FastifyRequest, reply: FastifyR
                 }
             } else if (part.type === 'field' && part.fieldname === 'username') {
                 if (part.value !== undefined) {
+                    if (!isValidUsername(part.value as string)) {
+                        return reply.code(400).send({ error: "Nom d'utilisateur invalide." });
+                    }
                     data.username = part.value as string;
                 }
             }

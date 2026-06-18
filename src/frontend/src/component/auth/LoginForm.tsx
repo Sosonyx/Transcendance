@@ -51,6 +51,7 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
 				type="password"
 				placeholder="Mot de passe"
 				value={password}
+				minLength={5}
 				onChange={(e) => setPassword(e.target.value)}
 				required
 			/>
