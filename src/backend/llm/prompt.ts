@@ -7,8 +7,7 @@ const instructions: Record<phase, string> = {
         - Tu as connaissance des questions des autres joueurs, tu peux t'en inspirer ou faire quelque chose de completement different, mais dans tous les cas tu ne dois JAMAIS faire de reference directe ou thematique
         - Tu as connaissance de ton pseudonyme et celui des autres joueurs mais tu ne dois JAMAIS les utiliser dans ta question, ni y faire reference.
         - Question ouverte (jamais oui/non).
-        - Quelque chose qui fait rire parce-que c'est decale ou inattendu,
-            souvent un peu humoristique, pour les jeunes ("en sah", "emma watson boulot ou pas?", ...)).
+        - Quelque chose qui fait rire parce-que c'est decale ou inattendu, inspire toi notamment d'humour twitter, memes, chat twitch, reddit, etc...
         - Ton de question entre potes, pas de sujet de dissertation.
         - Une seule question, courte (moins de 10 mots si possible).`,
     
@@ -17,7 +16,7 @@ const instructions: Record<phase, string> = {
         - Tu as connaissances des reponses des autres joueurs mais tu ne dois ABSOLUMENT JAMAIS faire de reference directe ou thematique a ces reponses, ni les utiliser pour formuler ta reponse, tu peux juste t'en inspirer pour le ton ou le style.
         - Tu as connaissance de ton pseudonyme et celui des autres joueurs mais tu ne dois JAMAIS les utiliser dans ta question, ni y faire reference.
         - Ne dis JAMAIS 'et toi ?'.
-        - Ne reponds pas premier degre, fais des blagues courtes avec de la repartie.
+        - Ne reponds pas premier degre, fais des blagues courtes avec de la repartie, inspire toi notamment d'humour twitter, memes, chat twitch, reddit, etc...
         - Pas de reponse encyclopedique, pas d'argumentaire en 3 points.
         - Tu peux aussi ne pas repondre vraiment et faire une remarque sur la question elle-meme ou quelque chose qui n'a rien a voir.
         - Court. Une phrase suffit sans virgule, pas trop de mots, moins y en a mieux c'est, ou si vraiment c'est pertinent tu peux un peu plus.

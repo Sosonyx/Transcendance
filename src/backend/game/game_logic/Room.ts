@@ -69,6 +69,7 @@ export class Room extends EventEmitter
 	private _timerId : NodeJS.Timeout | undefined;
 	private _data : any;
 	private _timeInfo : number | null;
+	private _resolvingAction : boolean;
 	private _winners : Player[];
 	
 	// DATABASE
@@ -199,7 +200,7 @@ export class Room extends EventEmitter
 				break ;
 
 			case (roomStates.ACTION_1) :
-				console.log(this);
+				this._resolvingAction = false;
 				this._givePlayersName();
 				this._givePlayersColor();
 				this._players = shuffle(this._players);
@@ -209,6 +210,7 @@ export class Room extends EventEmitter
 				break ;
 
 			case (roomStates.ACTION_2) :
+				this._resolvingAction = false;
 				this._allPlayersShouldAct();
 				this._timeInfo = Date.now() + action_2_Time * 1000;
 				this._timerId = setTimeout(() => { this._checkActionStatus() }, action_2_Time * 1000);
@@ -220,6 +222,7 @@ export class Room extends EventEmitter
 				}
 				this._data = this._input.input;
 				break;
+				
 			case (roomStates.CHAT) :
 				this._data = {
 					question: this._input?.input,
@@ -542,6 +545,9 @@ export class Room extends EventEmitter
 
 	private async _checkActionStatus()
 	{
+		if (this._resolvingAction)
+			return ;
+		this._resolvingAction = true;
 		clearTimeout(this._timerId);
 		switch (this._state) {
 			case roomStates.ACTION_1 :
@@ -568,7 +574,7 @@ export class Room extends EventEmitter
 
 				await Promise.all(
 					(llms as LlmPlayer[]).map(async (llm) => {
-						const llmInput = await llm.getBrain()?.answerGlobalQuestion(this._input?.input ?? "", inputs);
+						const llmInput = await llm.getBrain()?.answerGlobalQuestion(this._input?.input ?? "", inputs);	
 						if (llmInput)
 							this._inputs.push(llmInput);
 					})	
@@ -886,6 +892,7 @@ export class Room extends EventEmitter
 		this._timeInfo = null;
 		this._data = null;
 		this._winners = [];
+		this._resolvingAction = false;
 
 		this._pickGameMode();
 		this._createRoomInDB();

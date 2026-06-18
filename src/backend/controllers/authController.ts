@@ -66,7 +66,7 @@ export async function registerController(req: FastifyRequest, reply: FastifyRepl
     sameSite: 'strict',
     maxAge: 86400,
     path: '/'});
-  return (reply.code(201).send({token, user}));
+  return (reply.code(201).send({ user }));
 }
 
 export async function loginController(req : FastifyRequest, reply : FastifyReply)
@@ -89,7 +89,7 @@ export async function loginController(req : FastifyRequest, reply : FastifyReply
         maxAge: 86400,
         path: '/'
     });
-    return (reply.send({token, user}));
+    return (reply.send({ user }));
   }catch (error) {
     return (reply.code(401).send({ error: "Identifiants de connexion invalides." }));
   }
