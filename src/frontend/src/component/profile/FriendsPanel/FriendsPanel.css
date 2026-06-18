@@ -246,5 +246,6 @@
   border-radius:50%; 
   display:inline-block; 
 }
+
 .status-dot.online  { background:#63de8a; }
 .status-dot.offline { background:#e74545; }
