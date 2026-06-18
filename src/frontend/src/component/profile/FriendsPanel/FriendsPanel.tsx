@@ -40,6 +40,7 @@ function FriendsPanel({ user, friendList, selectedFriend, onSelectFriend }: Frie
                   alt="Avatar"
                 />
                 <span className="friend-username">{friend.username}</span>
+                <img className="message-icon" src="./message-icon.png" alt="Message Icon" />
                 <span className={`status-dot ${friend.online ? 'online' : 'offline'}`} />
               </li>
             ))}
