@@ -40,7 +40,7 @@ function FriendsPanel({ user, friendList, selectedFriend, onSelectFriend }: Frie
                   alt="Avatar"
                 />
                 <span className="friend-username">{friend.username}</span>
-                {friend.online && <span className="friend-status">En ligne</span>}
+                <span className={`status-dot ${friend.online ? 'online' : 'offline'}`} />
               </li>
             ))}
           </ul>

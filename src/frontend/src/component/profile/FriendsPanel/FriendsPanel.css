@@ -239,6 +239,12 @@
   color: #ffffff;
 }
 
-.status-dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
-.status-dot.online  { background:#3ba55d; }
+.status-dot {
+  margin-left: 8px;
+  width:10px; 
+  height:10px; 
+  border-radius:50%; 
+  display:inline-block; 
+}
+.status-dot.online  { background:#63de8a; }
 .status-dot.offline { background:#e74545; }
