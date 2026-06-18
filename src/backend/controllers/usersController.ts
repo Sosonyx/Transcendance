@@ -15,12 +15,12 @@ export async function getUser(req: FastifyRequest, reply: FastifyReply){
    const jwtoken = req.cookies?.token;
 
   if (!jwtoken) {
-    return (reply.code(401).send({ error: "User not connected" }));
+    return (reply.code(401).send({ error: "Utilisateur non connecté." }));
   }
 
   const decoded = req.server.jwt.decode<JwtPayload>(jwtoken);
   if (!decoded) {
-    return (reply.code(401).send({ error: "Invalid token" }));
+    return (reply.code(401).send({ error: "Token invalide." }));
   }
 
   const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
@@ -38,12 +38,12 @@ export async function modifyUserProfile(request: FastifyRequest, reply: FastifyR
     } 
     catch (jwtError)
     {
-        return (reply.code(401).send({ error: "Unauthorized" }));
+        return (reply.code(401).send({ error: "Non autorisé." }));
     }
 
     const me = await getUser(request, reply);
     if (!me) 
-        return reply.code(401).send({ error: "Unauthorized" });
+        return reply.code(401).send({ error: "Non autorisé." });
     const parts = request.parts()
     const data: { username?: string; avatar?: string } = {};
     try {
@@ -61,7 +61,7 @@ export async function modifyUserProfile(request: FastifyRequest, reply: FastifyR
             }
         }
     } catch (err) {
-        return reply.code(400).send({ error: "Erreur lors du traitement des données ou du fichier" });
+        return reply.code(400).send({ error: "Erreur lors du traitement des données ou du fichier." });
     }
 
     try{
@@ -81,7 +81,7 @@ export async function modifyUserProfile(request: FastifyRequest, reply: FastifyR
     }
     catch (error: any) {
         if (error?.code === 'P2002')
-            return reply.code(409).send({ error: "Username already used" });
-        return reply.code(500).send({ error: "Database update error" });
+            return reply.code(409).send({ error: "Cet username est déjà utilisé." });
+        return reply.code(500).send({ error: "Erreur lors de l'update de la database." });
     }
 }
