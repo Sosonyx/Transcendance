@@ -9,13 +9,13 @@ function isValidEmail(email: string): boolean {
   return emailRegex.test(email);
 }
 
-function isValidUsername(username: string): boolean {
+export function isValidUsername(username: string): boolean {
   const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
   return usernameRegex.test(username);
 }
 
 function  isValidPassword(password: string): boolean {
-  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$/;
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{5,}$/;;
   return passwordRegex.test(password);
 }
 
