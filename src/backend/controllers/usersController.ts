@@ -79,7 +79,7 @@ export async function modifyUserProfile(request: FastifyRequest, reply: FastifyR
         path: '/',
         secure: true, 
         httpOnly: true,
-        sameSite: 'lax'
+        sameSite: 'strict'
     });
     return reply.send({ user: updatedUser });
     }
