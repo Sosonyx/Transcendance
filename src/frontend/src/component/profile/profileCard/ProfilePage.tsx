@@ -1,25 +1,3 @@
-// import { type User } from "../../../types/types.js";
-// import { Leaderboard } from "../leaderboard/Leaderboard.js";
-// import { OtherProfileSearch } from "./FindProfile.js";
-// import { Profile } from "./ProfileCard.js";
-// import FriendsPanel from "../FriendsPanel/FriendsPanel.js";
-
-// interface ProfileProps {
-// 	user: User;
-// 	onUserUpdated?: () => Promise<void> | void;
-// }
-
-// export function ProfilePage({ user, onUserUpdated }: ProfileProps) {
-// 	return (<>
-// 		<div className="profile-page">
-// 			<Profile user={user} {...(onUserUpdated ? { onUserUpdated } : {})} />
-// 			<Leaderboard />
-// 			<OtherProfileSearch />
-// 			<FriendsPanel user={user} />
-// 		</div>
-// 	</>)
-// }
-
 import { useEffect, useState } from "react";
 import { type User } from "../../../types/types.js";
 import { Leaderboard } from "../leaderboard/Leaderboard.js";
@@ -32,6 +10,7 @@ interface Friend {
   id: string;
   username: string;
   avatar?: string | null;
+  online?: boolean;
 }
 
 // Les props (paramètres) qu'on attend pour ce composant
@@ -75,6 +54,11 @@ export function ProfilePage(props: ProfileProps) {
   // juste après que le composant apparaisse à l'écran
   useEffect(() => {
     refreshFriends();
+  }, []);
+
+  useEffect(() => {
+    const id = setInterval(refreshFriends, 30_000);
+    return () => clearInterval(id);
   }, []);
 
   // Au lieu du spread conditionnel "{...(onUserUpdated ? {...} : {})}",

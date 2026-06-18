@@ -6,6 +6,7 @@ interface Friend {
   id: string;
   username: string;
   avatar?: string | null;
+  online?: boolean;
 }
 
 interface FriendsPanelProps {
@@ -39,6 +40,7 @@ function FriendsPanel({ user, friendList, selectedFriend, onSelectFriend }: Frie
                   alt="Avatar"
                 />
                 <span className="friend-username">{friend.username}</span>
+                <span className={`status-dot ${friend.online ? 'online' : 'offline'}`} />
               </li>
             ))}
           </ul>

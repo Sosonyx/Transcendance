@@ -48,7 +48,8 @@ export async function removeFriend(req: FastifyRequest, reply: FastifyReply) {
 
 // Lister ses amis
 export async function listFriends(req: FastifyRequest, reply: FastifyReply) {
- const userId = (req.user as any).userId;
+  const userId = (req.user as any).userId;
+  const onlineCheckStatusMs = 60_000;
 
   const friendships = await prisma.friendship.findMany({
     where: { userId },
@@ -59,6 +60,9 @@ export async function listFriends(req: FastifyRequest, reply: FastifyReply) {
     id: f.friend.id,
     username: f.friend.username,
     avatar: f.friend.avatar,
+    online:
+      !!f.friend.lastSeenAt &&
+      Date.now() - new Date(f.friend.lastSeenAt).getTime() < onlineCheckStatusMs,
   }));
 
   return reply.send(friends);

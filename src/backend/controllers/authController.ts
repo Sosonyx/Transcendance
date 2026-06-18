@@ -107,6 +107,7 @@ export async function logoutController(req : FastifyRequest, reply: FastifyReply
         token : token as string,
         expiresAt: new Date(decoded!.exp * 1000)
       }})
+    await prisma.user.update({ where: { id: decoded!.userId }, data: { lastSeenAt: null } }).catch(() => {});
     reply.clearCookie('token', {
       httpOnly: true,
       secure: true,
