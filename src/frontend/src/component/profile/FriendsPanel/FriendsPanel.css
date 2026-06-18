@@ -240,7 +240,8 @@
 }
 
 .status-dot {
-  margin-left: 8px;
+  margin-left: auto;
+  border: 1px solid #000000;
   width:10px; 
   height:10px; 
   border-radius:50%; 
@@ -248,4 +249,14 @@
 }
 
 .status-dot.online  { background:#63de8a; }
-.status-dot.offline { background:#e74545; }
+.status-dot.offline { background:#ff0000; }
+
+.message-icon {
+  width: 32px;
+  height: 32px;
+  margin-left: auto;
+}
+
+.message-icon:hover {
+  filter: brightness(1.4);
+}
