@@ -105,7 +105,7 @@ Open **https://${IP_ADD}:8080** in the browser of your choice. (We recommend Goo
 Connect to your intra > profile settings > API panel > register a new APP > fill the informations > add the redirect URI 'https://${IP_ADD}:8080/api/auth/42/callback'
 
 Google : (Supported in localhost only)
-Go on https://console.cloud.google.com/apis/library> open the left panel > API and services > credentials > create a new project > create credentials > OAuth client > follow the instructions
+Go on https://console.cloud.google.com/apis/library > open the left panel > API and services > credentials > create a new project > create credentials > OAuth client > follow the instructions
 
 ### Useful Makefile targets
 ```bash
