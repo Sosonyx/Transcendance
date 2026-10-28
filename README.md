@@ -58,7 +58,7 @@ You also need a few **credentials/secrets** (see `.env` setup below):
 Copy the provided example file and fill in your own values:
 ```bash
 
-cp .env.example .env
+cp .env-example .env
 ```
 
 Then edit `.env`:
